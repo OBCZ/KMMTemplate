@@ -1,4 +1,4 @@
 include(":app", ":shared")
-rootProject.name = "KaMPKit"
+rootProject.name = "KMM Template"
 
 enableFeaturePreview("VERSION_CATALOGS")

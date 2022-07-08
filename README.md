@@ -1,25 +1,11 @@
 [![KaMPKit Android](https://img.shields.io/github/workflow/status/touchlab/KaMPKit/KaMPKit-Android/main?logo=Android&style=plastic)](https://github.com/touchlab/KaMPKit/actions/workflows/KaMPKit-Android.yml)
 [![KaMPKit iOS](https://img.shields.io/github/workflow/status/touchlab/KaMPKit/KaMPKit-iOS?logo=iOS&style=plastic)](https://github.com/touchlab/KaMPKit/actions/workflows/KaMPKit-iOS.yml)
 
-# KaMP Kit
-
-![KaMP Kit Image](kampkit.png)
-
-***Welcome to the KaMP Kit!*** 
+# KMM Template
 
 ## 2022 Update
 
-KaMP Kit started a little over 2 years ago with the goal of helping developers interesting in KMP and KMM get started 
-quickly with a great set of libraries and patterns. At the time, there were not many sample apps and getting started
-was not trivial. The KMM situation has improved considerably since then, and various barriers to entry have been removed.
-
-Over the next few weeks we are giving KaMP Kit a complete refresh. It will be less "getting started" and more "best practice model".
-The first change was moving to the new memory model. We'll be updating much more over the next few weeks. Watch this 
-repo and follow [@TouchlabHQ](https://twitter.com/TouchlabHQ) for updates!
-
-> ## Touchlab's Hiring!
->
-> We're looking for a Mobile Developer, with Android/Kotlin experience, who is eager to dive into Kotlin Multiplatform Mobile (KMM) development. Come join the fully distributed team putting KMM in production. [More info here](https://go.touchlab.co/careers-gh).
+NOTE: I renamed the repo to 'KMM Template' to differentiate it from the forked repo (KaMP Kit), since changes might come in the future.
 
 ## Getting Help
 
@@ -147,19 +133,7 @@ If you are attempting to integrate your KMP project with a production iOS applic
 ## Troubleshooting
 
 [TROUBLESHOOTING](docs/TROUBLESHOOTING.md) - We'll be growing this file over time, with your help. Please make sure
-to document any issues you run into and [let us know](CONTACT_US.md). 
-
-## More To Come!
-
-KaMP Kit is just the beginning. Our hope is that after KaMP Kit you’ll have a better sense of what a possible KMP implementation might look like.
-
-## Primary Maintainer
-
-[Brady Aiello](https://github.com/brady-aiello/)
-
-![](https://avatars.githubusercontent.com/u/22403330?s=140&v=4)
-
-*Ping me on twitter [@AielloBrady](https://twitter.com/@AielloBrady/) if you don't get a timely reply!* -Brady
+to document any issues you run into and [let us know](CONTACT_US.md).
 
 ---
 
@@ -174,10 +148,3 @@ We talked to a few teams early on who got to do a "hack week" with KMP. A common
 ### What We Can Do For You
 
 We have made KMP the focus of Touchlab. We had possibly the first KMP* app published in the iOS App Store, and have extensive experience in building libraries and the Kotlin platform, including contributions to Kotlin/Native itself. We can establish and accelerate your adoption of shared Kotlin code. See [touchlab.co](https://touchlab.co) for more info.
-
-### We're Hiring!
-
-Touchlab is looking for a Mobile Developer, with Android/Kotlin experience, who is eager to dive into Kotlin Multiplatform Mobile (KMM) development. Come join the remote-first team putting KMM in production. [More info here](https://go.touchlab.co/careers-gh).
-
-[![Touchlab](tl2.png)](https://touchlab.co)
-
