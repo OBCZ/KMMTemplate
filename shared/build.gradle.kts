@@ -114,8 +114,8 @@ kotlin {
         }
 
     cocoapods {
-        summary = "Common library for the KaMP starter kit"
-        homepage = "https://github.com/touchlab/KaMPKit"
+        summary = "RunWeather Android/iOS app"
+        homepage = "https://github.com/OBCZ/RunWeatherKmmApp"
         framework {
             isStatic = false // SwiftUI preview requires dynamic framework
         }
@@ -125,7 +125,7 @@ kotlin {
 }
 
 sqldelight {
-    database("KaMPKitDb") {
-        packageName = "co.touchlab.kampkit.db"
+    database("RunWeatherDb") {
+        packageName = "com.baarton.runweather.db"
     }
 }

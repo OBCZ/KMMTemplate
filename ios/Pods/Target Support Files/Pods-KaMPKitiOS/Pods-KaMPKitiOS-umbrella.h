@@ -11,6 +11,6 @@
 #endif
 
 
-FOUNDATION_EXPORT double Pods_KaMPKitiOSVersionNumber;
-FOUNDATION_EXPORT const unsigned char Pods_KaMPKitiOSVersionString[];
+FOUNDATION_EXPORT double Pods_RunWeatherVersionNumber;
+FOUNDATION_EXPORT const unsigned char Pods_RunWeatherVersionString[];
 

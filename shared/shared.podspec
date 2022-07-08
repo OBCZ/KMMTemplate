@@ -1,11 +1,11 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'shared'
     spec.version                  = '1.2'
-    spec.homepage                 = 'https://github.com/touchlab/KaMPKit'
+    spec.homepage                 = 'https://github.com/OBCZ/RunWeatherKmmApp'
     spec.source                   = { :http=> ''}
     spec.authors                  = ''
     spec.license                  = ''
-    spec.summary                  = 'Common library for the KaMP starter kit'
+    spec.summary                  = 'RunWeather Android/iOS app'
     spec.vendored_frameworks      = 'build/cocoapods/framework/shared.framework'
     spec.libraries                = 'c++'
     spec.ios.deployment_target = '12.4'
