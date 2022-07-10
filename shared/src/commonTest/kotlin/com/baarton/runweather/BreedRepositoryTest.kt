@@ -4,7 +4,7 @@ import app.cash.turbine.test
 import com.baarton.runweather.db.Breed
 import com.baarton.runweather.mock.ClockMock
 import com.baarton.runweather.mock.DogApiMock
-import com.baarton.runweather.models.BreedRepository
+import com.baarton.runweather.models.WeatherRepository
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.StaticConfig
 import com.russhwolf.settings.MockSettings
@@ -34,7 +34,7 @@ class BreedRepositoryTest {
     // Need to start at non-zero time because the default value for db timestamp is 0
     private val clock = ClockMock(Clock.System.now())
 
-    private val repository: BreedRepository = BreedRepository(dbHelper, settings, ktorApi, kermit, clock)
+    private val repository: WeatherRepository = WeatherRepository(dbHelper, settings, ktorApi, kermit, clock)
 
     companion object {
         private val appenzeller = Breed(1, "appenzeller", false)
@@ -53,8 +53,8 @@ class BreedRepositoryTest {
     @Test
     fun `Get breeds without cache`() = runBlocking {
         ktorApi.prepareResult(ktorApi.successResult())
-        repository.refreshBreedsIfStale()
-        repository.getBreeds().test {
+        repository.refreshWeatherIfStale()
+        repository.getWeather().test {
             assertEquals(breedsNoFavorite, awaitItem())
         }
     }
@@ -65,14 +65,14 @@ class BreedRepositoryTest {
         val resultWithExtraBreed = successResult.copy(message = successResult.message + ("extra" to emptyList()))
         ktorApi.prepareResult(resultWithExtraBreed)
 
-        dbHelper.insertBreeds(breedNames)
+        dbHelper.insert(breedNames)
         dbHelper.updateFavorite(australianLike.id, true)
 
-        repository.getBreeds().test {
+        repository.getWeather().test {
             assertEquals(breedsFavorite, awaitItem())
             expectNoEvents()
 
-            repository.refreshBreeds()
+            repository.refreshWeather()
             // id is 5 here because it incremented twice when trying to insert duplicate breeds
             assertEquals(breedsFavorite + Breed(5, "extra", false), awaitItem())
         }
@@ -80,17 +80,17 @@ class BreedRepositoryTest {
 
     @Test
     fun `Get updated breeds when stale and preserve favorites`() = runBlocking {
-        settings.putLong(BreedRepository.DB_TIMESTAMP_KEY, (clock.currentInstant - 2.hours).toEpochMilliseconds())
+        settings.putLong(WeatherRepository.DB_TIMESTAMP_KEY, (clock.currentInstant - 2.hours).toEpochMilliseconds())
 
         val successResult = ktorApi.successResult()
         val resultWithExtraBreed = successResult.copy(message = successResult.message + ("extra" to emptyList()))
         ktorApi.prepareResult(resultWithExtraBreed)
 
-        dbHelper.insertBreeds(breedNames)
+        dbHelper.insert(breedNames)
         dbHelper.updateFavorite(australianLike.id, true)
 
-        repository.refreshBreedsIfStale()
-        repository.getBreeds().test {
+        repository.refreshWeatherIfStale()
+        repository.getWeather().test {
             // id is 5 here because it incremented twice when trying to insert duplicate breeds
             assertEquals(breedsFavorite + Breed(5, "extra", false), awaitItem())
         }
@@ -98,10 +98,10 @@ class BreedRepositoryTest {
 
     @Test
     fun `Toggle favorite cached breed`() = runBlocking {
-        dbHelper.insertBreeds(breedNames)
+        dbHelper.insert(breedNames)
         dbHelper.updateFavorite(australianLike.id, true)
 
-        repository.getBreeds().test {
+        repository.getWeather().test {
             assertEquals(breedsFavorite, awaitItem())
             expectNoEvents()
 
@@ -112,13 +112,13 @@ class BreedRepositoryTest {
 
     @Test
     fun `No web call if data is not stale`() = runTest {
-        settings.putLong(BreedRepository.DB_TIMESTAMP_KEY, clock.currentInstant.toEpochMilliseconds())
+        settings.putLong(WeatherRepository.DB_TIMESTAMP_KEY, clock.currentInstant.toEpochMilliseconds())
         ktorApi.prepareResult(ktorApi.successResult())
 
-        repository.refreshBreedsIfStale()
+        repository.refreshWeatherIfStale()
         assertEquals(0, ktorApi.calledCount)
 
-        repository.refreshBreeds()
+        repository.refreshWeather()
         assertEquals(1, ktorApi.calledCount)
     }
 
@@ -127,18 +127,18 @@ class BreedRepositoryTest {
         ktorApi.throwOnCall(RuntimeException("Test error"))
 
         val throwable = assertFails {
-            repository.refreshBreeds()
+            repository.refreshWeather()
         }
         assertEquals("Test error", throwable.message)
     }
 
     @Test
     fun `Rethrow on API error when stale`() = runTest {
-        settings.putLong(BreedRepository.DB_TIMESTAMP_KEY, (clock.currentInstant - 2.hours).toEpochMilliseconds())
+        settings.putLong(WeatherRepository.DB_TIMESTAMP_KEY, (clock.currentInstant - 2.hours).toEpochMilliseconds())
         ktorApi.throwOnCall(RuntimeException("Test error"))
 
         val throwable = assertFails {
-            repository.refreshBreedsIfStale()
+            repository.refreshWeatherIfStale()
         }
         assertEquals("Test error", throwable.message)
     }

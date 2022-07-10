@@ -1,7 +1,7 @@
 package com.baarton.runweather.ktor
 
-import com.baarton.runweather.response.BreedResult
 import co.touchlab.stately.ensureNeverFrozen
+import com.baarton.runweather.models.WeatherData
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngine
@@ -11,9 +11,10 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.get
-import io.ktor.http.encodedPath
-import io.ktor.http.takeFrom
+import io.ktor.http.URLProtocol
+import io.ktor.http.path
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
 import co.touchlab.kermit.Logger as KermitLogger
 import io.ktor.client.plugins.logging.Logger as KtorLogger
 
@@ -22,7 +23,11 @@ class DogApiImpl(private val log: KermitLogger, engine: HttpClientEngine) : DogA
     private val client = HttpClient(engine) {
         expectSuccess = true
         install(ContentNegotiation) {
-            json()
+            json(Json {
+                isLenient = true
+                prettyPrint = true
+                ignoreUnknownKeys = true
+            })
         }
         install(Logging) {
             logger = object : KtorLogger {
@@ -45,8 +50,8 @@ class DogApiImpl(private val log: KermitLogger, engine: HttpClientEngine) : DogA
         ensureNeverFrozen()
     }
 
-    override suspend fun getJsonFromApi(): BreedResult {
-        log.d { "Fetching Breeds from network" }
+    override suspend fun getJsonFromApi(): WeatherData {
+        log.d { "Get current weather data from OpenWeather API." }
         return client.get {
             dogs("api/breeds/list/all")
         }.body()
@@ -54,8 +59,26 @@ class DogApiImpl(private val log: KermitLogger, engine: HttpClientEngine) : DogA
 
     private fun HttpRequestBuilder.dogs(path: String) {
         url {
-            takeFrom("https://dog.ceo/")
-            encodedPath = path
+            // takeFrom("https://dog.ceo/")
+            // encodedPath = path
+            // encodedParameters = ParametersBuilder()
+
+            protocol = URLProtocol.HTTPS
+            host = "api.openweathermap.org"
+            path("data", "2.5", "weather")
+            parameters.append("appid", "b0719071a899e4b1c350725d752ec252")
+            parameters.append("units", "standard")
+            parameters.append("lang", "cz")
+            parameters.append("lat", "50.0") //TODO
+            parameters.append("lon", "15.0") //TODO
+
         }
     }
+
+    // https://api.openweathermap.org/data/2.5/weather?appid=b0719071a899e4b1c350725d752ec252&lang=cz&units=standard&lat=50.0&lon=15.0
+
+    // https://api.openweathermap.org/data/2.5/onecall?appid=b0719071a899e4b1c350725d752ec252&lat=50&lon=15&exclude=minutely,hourly,daily,alerts
+    // https://api.openweathermap.org/data/2.5/weather?appid=b0719071a899e4b1c350725d752ec252&lat=50&lon=15
+
+
 }

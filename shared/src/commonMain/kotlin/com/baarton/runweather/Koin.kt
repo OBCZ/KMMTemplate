@@ -2,7 +2,7 @@ package com.baarton.runweather
 
 import com.baarton.runweather.ktor.DogApi
 import com.baarton.runweather.ktor.DogApiImpl
-import com.baarton.runweather.models.BreedRepository
+import com.baarton.runweather.models.WeatherRepository
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.StaticConfig
 import co.touchlab.kermit.platformLogWriter
@@ -24,6 +24,13 @@ import org.koin.dsl.module
 //TODO then start duplicating/mimicking UI stuff, platform specific stuff
 //TODO then review all files and its origin/contents
 //TODO verify architecture somehow, review dependencies
+
+//TODO after migration:
+// review logging messages, exceptions, nullability, edge cases
+// review all files (formatting, comments, naming variables/files, etc)
+// extracting/moving stuff/files further
+// review tests
+// get iOS working
 
 fun initKoin(appModule: Module): KoinApplication {
     val koinApplication = startKoin {
@@ -75,7 +82,7 @@ private val coreModule = module {
     factory { (tag: String?) -> if (tag != null) baseLogger.withTag(tag) else baseLogger }
 
     single {
-        BreedRepository(
+        WeatherRepository(
             get(),
             get(),
             get(),

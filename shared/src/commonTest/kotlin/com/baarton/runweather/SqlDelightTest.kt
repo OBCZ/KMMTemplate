@@ -15,7 +15,7 @@ class SqlDelightTest {
     private lateinit var dbHelper: DatabaseHelper
 
     private suspend fun DatabaseHelper.insertBreed(name: String) {
-        insertBreeds(listOf(name))
+        insert(listOf(name))
     }
 
     @BeforeTest
@@ -25,13 +25,13 @@ class SqlDelightTest {
             Logger,
             Dispatchers.Default
         )
-        dbHelper.deleteAll()
+        dbHelper.nuke()
         dbHelper.insertBreed("Beagle")
     }
 
     @Test
     fun `Select All Items Success`() = runTest {
-        val breeds = dbHelper.selectAllItems().first()
+        val breeds = dbHelper.getAll().first()
         assertNotNull(
             breeds.find { it.name == "Beagle" },
             "Could not retrieve Breed"
@@ -40,7 +40,7 @@ class SqlDelightTest {
 
     @Test
     fun `Select Item by Id Success`() = runTest {
-        val breeds = dbHelper.selectAllItems().first()
+        val breeds = dbHelper.getAll().first()
         val firstBreed = breeds.first()
         assertNotNull(
             dbHelper.selectById(firstBreed.id),
@@ -50,7 +50,7 @@ class SqlDelightTest {
 
     @Test
     fun `Update Favorite Success`() = runTest {
-        val breeds = dbHelper.selectAllItems().first()
+        val breeds = dbHelper.getAll().first()
         val firstBreed = breeds.first()
         dbHelper.updateFavorite(firstBreed.id, true)
         val newBreed = dbHelper.selectById(firstBreed.id).first().first()
@@ -68,11 +68,11 @@ class SqlDelightTest {
     fun `Delete All Success`() = runTest {
         dbHelper.insertBreed("Poodle")
         dbHelper.insertBreed("Schnauzer")
-        assertTrue(dbHelper.selectAllItems().first().isNotEmpty())
-        dbHelper.deleteAll()
+        assertTrue(dbHelper.getAll().first().isNotEmpty())
+        dbHelper.nuke()
 
         assertTrue(
-            dbHelper.selectAllItems().first().count() == 0,
+            dbHelper.getAll().first().count() == 0,
             "Delete All did not work"
         )
     }

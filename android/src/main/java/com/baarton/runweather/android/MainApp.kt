@@ -5,9 +5,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import com.baarton.runweather.AppInfo
-import com.baarton.runweather.android.BuildConfig
 import com.baarton.runweather.initKoin
-import com.baarton.runweather.models.BreedViewModel
+import com.baarton.runweather.models.WeatherViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
@@ -24,13 +23,13 @@ class MainApp : Application() {
                 // single<PlatformNetworkManager> { AndroidNetworkManager(get()) }
                 // single<PlatformLocationManager> { AndroidLocationManager(get()) }
 
-                viewModel { BreedViewModel(get(), get { parametersOf("BreedViewModel") }) }
+                viewModel { WeatherViewModel(get(), get { parametersOf("BreedViewModel") }) } //TODO
                 single<SharedPreferences> {
                     get<Context>().getSharedPreferences("RUNWEATHER_SETTINGS", Context.MODE_PRIVATE)
                 }
                 single<AppInfo> { AndroidAppInfo }
                 single {
-                    { Log.i("Startup", "Hello from Android/Kotlin!") }
+                    { Log.i("Koin Startup", "Android modules initialized") }
                 }
             }
         )

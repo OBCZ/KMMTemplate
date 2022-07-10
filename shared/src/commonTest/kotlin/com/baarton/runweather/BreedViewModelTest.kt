@@ -5,9 +5,9 @@ import app.cash.turbine.test
 import com.baarton.runweather.db.Breed
 import com.baarton.runweather.mock.ClockMock
 import com.baarton.runweather.mock.DogApiMock
-import com.baarton.runweather.models.BreedRepository
-import com.baarton.runweather.models.BreedViewModel
-import com.baarton.runweather.models.BreedViewState
+import com.baarton.runweather.models.WeatherRepository
+import com.baarton.runweather.models.WeatherViewModel
+import com.baarton.runweather.models.WeatherViewState
 import com.baarton.runweather.response.BreedResult
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.StaticConfig
@@ -37,20 +37,20 @@ class BreedViewModelTest {
     // Need to start at non-zero time because the default value for db timestamp is 0
     private val clock = ClockMock(Clock.System.now())
 
-    private val repository: BreedRepository = BreedRepository(dbHelper, settings, ktorApi, kermit, clock)
-    private val viewModel by lazy { BreedViewModel(repository, kermit) }
+    private val repository: WeatherRepository = WeatherRepository(dbHelper, settings, ktorApi, kermit, clock)
+    private val viewModel by lazy { WeatherViewModel(repository, kermit) }
 
     companion object {
         private val appenzeller = Breed(1, "appenzeller", false)
         private val australianNoLike = Breed(2, "australian", false)
         private val australianLike = Breed(2, "australian", true)
-        private val breedViewStateSuccessNoFavorite = BreedViewState(
-            breeds = listOf(appenzeller, australianNoLike)
+        private val weatherViewStateSuccessNoFavorite = WeatherViewState(
+            weather = listOf(appenzeller, australianNoLike)
         )
-        private val breedViewStateSuccessFavorite = BreedViewState(
-            breeds = listOf(appenzeller, australianLike)
+        private val weatherViewStateSuccessFavorite = WeatherViewState(
+            weather = listOf(appenzeller, australianLike)
         )
-        private val breedNames = breedViewStateSuccessNoFavorite.breeds?.map { it.name }.orEmpty()
+        private val breedNames = weatherViewStateSuccessNoFavorite.weather?.map { it.name }.orEmpty()
     }
 
     @BeforeTest
@@ -68,10 +68,10 @@ class BreedViewModelTest {
     fun `Get breeds without cache`() = runBlocking {
         ktorApi.prepareResult(ktorApi.successResult())
 
-        viewModel.breedState.test {
+        viewModel.weatherState.test {
             assertEquals(
-                breedViewStateSuccessNoFavorite,
-                awaitItemPrecededBy(BreedViewState(isLoading = true), BreedViewState(isEmpty = true))
+                weatherViewStateSuccessNoFavorite,
+                awaitItemPrecededBy(WeatherViewState(isLoading = true), WeatherViewState(isEmpty = true))
             )
         }
     }
@@ -80,92 +80,92 @@ class BreedViewModelTest {
     fun `Get breeds empty`() = runBlocking {
         ktorApi.prepareResult(BreedResult(emptyMap(), "success"))
 
-        viewModel.breedState.test {
+        viewModel.weatherState.test {
             assertEquals(
-                BreedViewState(isEmpty = true),
-                awaitItemPrecededBy(BreedViewState(isLoading = true))
+                WeatherViewState(isEmpty = true),
+                awaitItemPrecededBy(WeatherViewState(isLoading = true))
             )
         }
     }
 
     @Test
     fun `Get updated breeds with cache and preserve favorites`() = runBlocking {
-        settings.putLong(BreedRepository.DB_TIMESTAMP_KEY, clock.currentInstant.toEpochMilliseconds())
+        settings.putLong(WeatherRepository.DB_TIMESTAMP_KEY, clock.currentInstant.toEpochMilliseconds())
 
         val successResult = ktorApi.successResult()
         val resultWithExtraBreed = successResult.copy(message = successResult.message + ("extra" to emptyList()))
         ktorApi.prepareResult(resultWithExtraBreed)
 
-        dbHelper.insertBreeds(breedNames)
+        dbHelper.insert(breedNames)
         dbHelper.updateFavorite(australianLike.id, true)
 
-        viewModel.breedState.test {
-            assertEquals(breedViewStateSuccessFavorite, awaitItemPrecededBy(BreedViewState(isLoading = true)))
+        viewModel.weatherState.test {
+            assertEquals(weatherViewStateSuccessFavorite, awaitItemPrecededBy(WeatherViewState(isLoading = true)))
             expectNoEvents()
 
-            viewModel.refreshBreeds().join()
+            viewModel.refreshWeather().join()
             // id is 5 here because it incremented twice when trying to insert duplicate breeds
             assertEquals(
-                BreedViewState(breedViewStateSuccessFavorite.breeds?.plus(Breed(5, "extra", false))),
-                awaitItemPrecededBy(breedViewStateSuccessFavorite.copy(isLoading = true))
+                WeatherViewState(weatherViewStateSuccessFavorite.weather?.plus(Breed(5, "extra", false))),
+                awaitItemPrecededBy(weatherViewStateSuccessFavorite.copy(isLoading = true))
             )
         }
     }
 
     @Test
     fun `Get updated breeds when stale and preserve favorites`() = runBlocking {
-        settings.putLong(BreedRepository.DB_TIMESTAMP_KEY, (clock.currentInstant - 2.hours).toEpochMilliseconds())
+        settings.putLong(WeatherRepository.DB_TIMESTAMP_KEY, (clock.currentInstant - 2.hours).toEpochMilliseconds())
 
         val successResult = ktorApi.successResult()
         val resultWithExtraBreed = successResult.copy(message = successResult.message + ("extra" to emptyList()))
         ktorApi.prepareResult(resultWithExtraBreed)
 
-        dbHelper.insertBreeds(breedNames)
+        dbHelper.insert(breedNames)
         dbHelper.updateFavorite(australianLike.id, true)
 
-        viewModel.breedState.test {
+        viewModel.weatherState.test {
             // id is 5 here because it incremented twice when trying to insert duplicate breeds
             assertEquals(
-                BreedViewState(breedViewStateSuccessFavorite.breeds?.plus(Breed(5, "extra", false))),
-                awaitItemPrecededBy(BreedViewState(isLoading = true), breedViewStateSuccessFavorite)
+                WeatherViewState(weatherViewStateSuccessFavorite.weather?.plus(Breed(5, "extra", false))),
+                awaitItemPrecededBy(WeatherViewState(isLoading = true), weatherViewStateSuccessFavorite)
             )
         }
     }
 
     @Test
     fun `Toggle favorite cached breed`() = runBlocking {
-        settings.putLong(BreedRepository.DB_TIMESTAMP_KEY, clock.currentInstant.toEpochMilliseconds())
+        settings.putLong(WeatherRepository.DB_TIMESTAMP_KEY, clock.currentInstant.toEpochMilliseconds())
 
-        dbHelper.insertBreeds(breedNames)
+        dbHelper.insert(breedNames)
         dbHelper.updateFavorite(australianLike.id, true)
 
-        viewModel.breedState.test {
-            assertEquals(breedViewStateSuccessFavorite, awaitItemPrecededBy(BreedViewState(isLoading = true)))
+        viewModel.weatherState.test {
+            assertEquals(weatherViewStateSuccessFavorite, awaitItemPrecededBy(WeatherViewState(isLoading = true)))
             expectNoEvents()
 
             viewModel.updateBreedFavorite(australianLike).join()
             assertEquals(
-                breedViewStateSuccessNoFavorite,
-                awaitItemPrecededBy(breedViewStateSuccessFavorite.copy(isLoading = true))
+                weatherViewStateSuccessNoFavorite,
+                awaitItemPrecededBy(weatherViewStateSuccessFavorite.copy(isLoading = true))
             )
         }
     }
 
     @Test
     fun `No web call if data is not stale`() = runBlocking {
-        settings.putLong(BreedRepository.DB_TIMESTAMP_KEY, clock.currentInstant.toEpochMilliseconds())
+        settings.putLong(WeatherRepository.DB_TIMESTAMP_KEY, clock.currentInstant.toEpochMilliseconds())
         ktorApi.prepareResult(ktorApi.successResult())
-        dbHelper.insertBreeds(breedNames)
+        dbHelper.insert(breedNames)
 
-        viewModel.breedState.test {
-            assertEquals(breedViewStateSuccessNoFavorite, awaitItemPrecededBy(BreedViewState(isLoading = true)))
+        viewModel.weatherState.test {
+            assertEquals(weatherViewStateSuccessNoFavorite, awaitItemPrecededBy(WeatherViewState(isLoading = true)))
             assertEquals(0, ktorApi.calledCount)
             expectNoEvents()
 
-            viewModel.refreshBreeds().join()
+            viewModel.refreshWeather().join()
             assertEquals(
-                breedViewStateSuccessNoFavorite,
-                awaitItemPrecededBy(breedViewStateSuccessNoFavorite.copy(isLoading = true))
+                weatherViewStateSuccessNoFavorite,
+                awaitItemPrecededBy(weatherViewStateSuccessNoFavorite.copy(isLoading = true))
             )
             assertEquals(1, ktorApi.calledCount)
         }
@@ -175,33 +175,33 @@ class BreedViewModelTest {
     fun `Display API error on first run`() = runBlocking {
         ktorApi.throwOnCall(RuntimeException("Test error"))
 
-        viewModel.breedState.test {
+        viewModel.weatherState.test {
             assertEquals(
-                BreedViewState(error = "Unable to download breed list"),
-                awaitItemPrecededBy(BreedViewState(isLoading = true), BreedViewState(isEmpty = true))
+                WeatherViewState(error = "Unable to download breed list"),
+                awaitItemPrecededBy(WeatherViewState(isLoading = true), WeatherViewState(isEmpty = true))
             )
         }
     }
 
     @Test
     fun `Ignore API error with cache`() = runBlocking {
-        dbHelper.insertBreeds(breedNames)
-        settings.putLong(BreedRepository.DB_TIMESTAMP_KEY, (clock.currentInstant - 2.hours).toEpochMilliseconds())
+        dbHelper.insert(breedNames)
+        settings.putLong(WeatherRepository.DB_TIMESTAMP_KEY, (clock.currentInstant - 2.hours).toEpochMilliseconds())
         ktorApi.throwOnCall(RuntimeException("Test error"))
 
-        viewModel.breedState.test {
+        viewModel.weatherState.test {
             assertEquals(
-                breedViewStateSuccessNoFavorite,
-                awaitItemPrecededBy(BreedViewState(isLoading = true))
+                weatherViewStateSuccessNoFavorite,
+                awaitItemPrecededBy(WeatherViewState(isLoading = true))
             )
             expectNoEvents()
 
             ktorApi.prepareResult(ktorApi.successResult())
-            viewModel.refreshBreeds().join()
+            viewModel.refreshWeather().join()
 
             assertEquals(
-                breedViewStateSuccessNoFavorite,
-                awaitItemPrecededBy(breedViewStateSuccessNoFavorite.copy(isLoading = true))
+                weatherViewStateSuccessNoFavorite,
+                awaitItemPrecededBy(weatherViewStateSuccessNoFavorite.copy(isLoading = true))
             )
         }
     }
@@ -210,36 +210,36 @@ class BreedViewModelTest {
     fun `Ignore API error on refresh with cache`() = runBlocking {
         ktorApi.prepareResult(ktorApi.successResult())
 
-        viewModel.breedState.test {
+        viewModel.weatherState.test {
             assertEquals(
-                breedViewStateSuccessNoFavorite,
-                awaitItemPrecededBy(BreedViewState(isLoading = true), BreedViewState(isEmpty = true))
+                weatherViewStateSuccessNoFavorite,
+                awaitItemPrecededBy(WeatherViewState(isLoading = true), WeatherViewState(isEmpty = true))
             )
             expectNoEvents()
 
             ktorApi.throwOnCall(RuntimeException("Test error"))
-            viewModel.refreshBreeds().join()
+            viewModel.refreshWeather().join()
 
             assertEquals(
-                breedViewStateSuccessNoFavorite,
-                awaitItemPrecededBy(breedViewStateSuccessNoFavorite.copy(isLoading = true))
+                weatherViewStateSuccessNoFavorite,
+                awaitItemPrecededBy(weatherViewStateSuccessNoFavorite.copy(isLoading = true))
             )
         }
     }
 
     @Test
     fun `Show API error on refresh without cache`() = runBlocking {
-        settings.putLong(BreedRepository.DB_TIMESTAMP_KEY, clock.currentInstant.toEpochMilliseconds())
+        settings.putLong(WeatherRepository.DB_TIMESTAMP_KEY, clock.currentInstant.toEpochMilliseconds())
         ktorApi.throwOnCall(RuntimeException("Test error"))
 
-        viewModel.breedState.test {
-            assertEquals(BreedViewState(isEmpty = true), awaitItemPrecededBy(BreedViewState(isLoading = true)))
+        viewModel.weatherState.test {
+            assertEquals(WeatherViewState(isEmpty = true), awaitItemPrecededBy(WeatherViewState(isLoading = true)))
             expectNoEvents()
 
-            viewModel.refreshBreeds().join()
+            viewModel.refreshWeather().join()
             assertEquals(
-                BreedViewState(error = "Unable to refresh breed list"),
-                awaitItemPrecededBy(BreedViewState(isEmpty = true, isLoading = true))
+                WeatherViewState(error = "Unable to refresh breed list"),
+                awaitItemPrecededBy(WeatherViewState(isEmpty = true, isLoading = true))
             )
         }
     }
@@ -247,7 +247,7 @@ class BreedViewModelTest {
 
 // There's a race condition where intermediate states can get missed if the next state comes too fast.
 // This function addresses that by awaiting an item that may or may not be preceded by the specified other items
-private suspend fun FlowTurbine<BreedViewState>.awaitItemPrecededBy(vararg items: BreedViewState): BreedViewState {
+private suspend fun FlowTurbine<WeatherViewState>.awaitItemPrecededBy(vararg items: WeatherViewState): WeatherViewState {
     var nextItem = awaitItem()
     for (item in items) {
         if (item == nextItem) {

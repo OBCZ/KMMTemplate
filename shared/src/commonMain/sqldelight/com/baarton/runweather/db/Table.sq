@@ -1,24 +1,54 @@
-CREATE TABLE Breed (
-id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-name TEXT NOT NULL UNIQUE,
-favorite INTEGER AS Boolean NOT NULL DEFAULT 0
+import com.baarton.runweather.models.Weather;
+import com.baarton.runweather.models.WeatherData.MainData;
+import com.baarton.runweather.models.WeatherData.Rain;
+import com.baarton.runweather.models.WeatherData.Sys;
+import com.baarton.runweather.models.WeatherData.Wind;
+import kotlin.collections.List;
+
+
+CREATE TABLE CurrentWeather (
+-- timestamp TEXT AS Long NOT NULL,
+weatherList TEXT AS List<Weather> NOT NULL,
+locationName TEXT NOT NULL,
+mainData TEXT AS MainData NOT NULL,
+wind TEXT AS Wind NOT NULL,
+rain TEXT AS Rain,
+sys TEXT AS Sys NOT NULL
 );
 
-selectAll:
-SELECT * FROM Breed;
+insert:
+INSERT INTO CurrentWeather(weatherList, locationName, mainData, wind, rain, sys)
+VALUES(?, ?, ?, ?, ?, ?);
 
-selectById:
-SELECT * FROM Breed WHERE id = ?;
+getAll:
+SELECT * FROM CurrentWeather;
 
-selectByName:
-SELECT * FROM Breed WHERE name = ?;
+nuke:
+DELETE FROM CurrentWeather;
 
-insertBreed:
-INSERT OR IGNORE INTO Breed(name)
-VALUES (?);
 
-deleteAll:
-DELETE FROM Breed;
 
-updateFavorite:
-UPDATE Breed SET favorite = ? WHERE id = ?;
+-- CREATE TABLE Breed (
+-- id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+-- name TEXT NOT NULL UNIQUE,
+-- favorite INTEGER AS Boolean NOT NULL DEFAULT 0
+-- );
+--
+-- selectAll:
+-- SELECT * FROM Breed;
+--
+-- selectById:
+-- SELECT * FROM Breed WHERE id = ?;
+--
+-- selectByName:
+-- SELECT * FROM Breed WHERE name = ?;
+--
+-- insertBreed:
+-- INSERT OR IGNORE INTO Breed(name)
+-- VALUES (?);
+--
+-- deleteAll:
+-- DELETE FROM Breed;
+--
+-- updateFavorite:
+-- UPDATE Breed SET favorite = ? WHERE id = ?;

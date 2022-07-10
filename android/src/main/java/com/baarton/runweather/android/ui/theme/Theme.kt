@@ -33,6 +33,7 @@ private val LightColorPalette = lightColors(
     */
 )
 
+//TODO edit theme
 @Composable
 fun RunWeatherTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
