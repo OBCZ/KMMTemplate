@@ -1,7 +1,7 @@
 package com.baarton.runweather
 
-import com.baarton.runweather.ktor.DogApi
-import com.baarton.runweather.ktor.DogApiImpl
+import com.baarton.runweather.ktor.WeatherApi
+import com.baarton.runweather.ktor.WeatherApiImpl
 import com.baarton.runweather.models.WeatherRepository
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.StaticConfig
@@ -63,8 +63,8 @@ private val coreModule = module {
             Dispatchers.Default
         )
     }
-    single<DogApi> {
-        DogApiImpl(
+    single<WeatherApi> {
+        WeatherApiImpl(
             getWith("DogApiImpl"),
             get()
         )

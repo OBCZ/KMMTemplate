@@ -1,0 +1,93 @@
+<resources>
+
+    <string name="app_name" translatable="false">RunWeather</string>
+    <string name="app_copyright" translatable="false">OBCZ 2022</string>
+    <string name="app_settings">Settings</string>
+    <string name="app_ok">OK</string>
+
+    <string name="wind_direction_north">N</string>
+    <string name="wind_direction_northeast">NE</string>
+    <string name="wind_direction_east">E</string>
+    <string name="wind_direction_southeast">SE</string>
+    <string name="wind_direction_south">S</string>
+    <string name="wind_direction_southwest">SW</string>
+    <string name="wind_direction_west">W</string>
+    <string name="wind_direction_northwest">NW</string>
+
+    <string name="unit_celsius">°</string>
+    <string name="unit_kelvin">K</string>
+    <string name="unit_fahrenheit">°</string>
+    <string name="unit_millimeter">mm</string>
+    <string name="unit_inch">in</string>
+    <string name="unit_hectopascal">hPa</string>
+    <string name="unit_millibar">mbar</string>
+    <string name="unit_miles_per_hour">mi/h</string>
+    <string name="unit_meters_per_second">m/s</string>
+
+    <string name="main_tab_today">WEATHER</string>
+    <string name="main_tab_settings">SETTINGS</string>
+
+    <string name="fragment_permission_title">Approve Location Access</string>
+    <string name="fragment_permission_body">The fine location permission is needed for core functionality.\nIn order for this application to work, please approve access to your location via the button below.</string>
+    <string name="fragment_permission_denied_rationale">Fine location permission was denied, but is needed for core functionality. The application can not be started.</string>
+    <string name="fragment_permission_button">Approve</string>
+
+    <string name="fragment_weather_results_error">Got an error while fetching the data. I can\'t display anything, sorry. Check your Connection and/or Location settings.</string>
+    <string name="fragment_weather_results_refresh_button">Refresh</string>
+    <string name="fragment_weather_results_nothing">NO RESULTS</string>
+
+    <string name="fragment_weather_last_updated_text">Last update: %1$s</string>
+    <string name="fragment_weather_last_updated_now">Just now</string>
+    <string name="fragment_weather_last_updated_time">%1$d min ago</string>
+
+    <string name="weather_runners_info_header">Runners info</string>
+    <string name="weather_runners_info_alert_card_wind_moderate">Moderate Wind</string>
+    <string name="weather_runners_info_alert_card_wind_strong">Strong Wind</string>
+    <string name="weather_runners_info_alert_card_temp_ideal">Ideal Temp</string>
+    <string name="weather_runners_info_alert_card_temp_low">Low Temp</string>
+    <string name="weather_runners_info_alert_card_temp_high">High Temp</string>
+
+    <string name="weather_runners_info_data_top_layers_category">Torso Layers</string>
+    <string name="weather_runners_info_data_top_layers_one">One</string>
+    <string name="weather_runners_info_data_top_layers_two">Two</string>
+    <string name="weather_runners_info_data_top_layers_three">Three</string>
+    <string name="weather_runners_info_data_top_layers_four">Four</string>
+
+    <string name="weather_runners_info_data_bottom_layers_category">Legs Layers</string>
+    <string name="weather_runners_info_data_bottom_layers_shorts">Shorts</string>
+    <string name="weather_runners_info_data_bottom_layers_long_sleeved">Long sleeved</string>
+    <string name="weather_runners_info_data_bottom_layers_long_sleeved_double">Double long sleeved</string>
+
+    <string name="weather_runners_info_data_head_cover_category">Head Cover</string>
+    <string name="weather_runners_info_data_head_cover_none">None</string>
+    <string name="weather_runners_info_data_head_cover_ears">Ear cover</string>
+    <string name="weather_runners_info_data_head_cover_cap">Cap</string>
+
+    <string name="weather_runners_info_data_neck_cover_category">Neck Cover</string>
+    <string name="weather_runners_info_data_neck_cover_none">None</string>
+    <string name="weather_runners_info_data_neck_cover_weak">Weak</string>
+    <string name="weather_runners_info_data_neck_cover_strong">Strong</string>
+
+    <string name="weather_runners_info_data_gloves_category">Gloves</string>
+    <string name="weather_runners_info_data_gloves_no">No</string>
+    <string name="weather_runners_info_data_gloves_yes">Yes</string>
+
+    <string name="weather_runners_info_data_socks_category">Socks</string>
+    <string name="weather_runners_info_data_socks_normal">Normal</string>
+    <string name="weather_runners_info_data_socks_warm">Warm</string>
+
+    <string name="settings_units_title">Unit of temperature &amp; length</string>
+    <string name="settings_units_dialog_title">Pick temperature &amp; length unit</string>
+    <string name="setting_units_entry_metric">Celsius &amp; metric</string>
+    <string name="setting_units_entry_imperial">Fahrenheit &amp; imperial</string>
+
+    <string name="settings_poll_freq_title">Refresh frequency (min)</string>
+
+    <string name="setting_about_title">About application</string>
+    <string name="setting_about_summary">Version %1$s\n%2$s</string>
+
+    <string name="setting_units_key" translatable="false">weather_units</string>
+    <string name="setting_poll_freq_key" translatable="false">weather_poll_frequency</string>
+    <string name="setting_about_key" translatable="false">app_about</string>
+
+</resources>

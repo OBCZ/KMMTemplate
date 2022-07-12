@@ -4,7 +4,7 @@ import app.cash.turbine.FlowTurbine
 import app.cash.turbine.test
 import com.baarton.runweather.db.Breed
 import com.baarton.runweather.mock.ClockMock
-import com.baarton.runweather.mock.DogApiMock
+import com.baarton.runweather.mock.WeatherApiMock
 import com.baarton.runweather.models.WeatherRepository
 import com.baarton.runweather.models.WeatherViewModel
 import com.baarton.runweather.models.WeatherViewState
@@ -32,7 +32,7 @@ class BreedViewModelTest {
         Dispatchers.Default
     )
     private val settings = MockSettings()
-    private val ktorApi = DogApiMock()
+    private val ktorApi = WeatherApiMock()
 
     // Need to start at non-zero time because the default value for db timestamp is 0
     private val clock = ClockMock(Clock.System.now())

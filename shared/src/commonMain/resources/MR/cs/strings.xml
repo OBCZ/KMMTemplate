@@ -1,0 +1,87 @@
+<resources>
+
+    <string name="app_settings">Nastavení</string>
+    <string name="app_ok">OK</string>
+
+    <string name="wind_direction_north">S</string>
+    <string name="wind_direction_northeast">SV</string>
+    <string name="wind_direction_east">V</string>
+    <string name="wind_direction_southeast">JV</string>
+    <string name="wind_direction_south">J</string>
+    <string name="wind_direction_southwest">JZ</string>
+    <string name="wind_direction_west">Z</string>
+    <string name="wind_direction_northwest">SZ</string>
+
+    <string name="unit_celsius">°</string>
+    <string name="unit_kelvin">K</string>
+    <string name="unit_fahrenheit">°</string>
+    <string name="unit_millimeter">mm</string>
+    <string name="unit_inch">in</string>
+    <string name="unit_hectopascal">hPa</string>
+    <string name="unit_millibar">mbar</string>
+    <string name="unit_miles_per_hour">mi/h</string>
+    <string name="unit_meters_per_second">m/s</string>
+
+    <string name="main_tab_today">POČASÍ</string>
+    <string name="main_tab_settings">NASTAVENÍ</string>
+
+    <string name="fragment_permission_title">Schválit oprávnění pro Lokaci</string>
+    <string name="fragment_permission_body">Pro fungování aplikace je nutné schválit oprávnění pro přísstup k lokaci.\nProsím, schvalte toto oprávnění tlačítkem níže.</string>
+    <string name="fragment_permission_denied_rationale">Oprávnění proi přístup k lokaci bylo zamítnuto. Aplikace nemůže být spuštěna.</string>
+    <string name="fragment_permission_button">Schválit</string>
+
+    <string name="fragment_weather_results_error">Chyba během zpracovávání odpovědi. Nejsou k dispozici žádná data. Zkontrolujte své internetové připojení a/nebo nastavení lokace.</string>
+    <string name="fragment_weather_results_refresh_button">Načíst znovu</string>
+    <string name="fragment_weather_results_nothing">PRÁZDNÉ</string>
+
+    <string name="fragment_weather_last_updated_text">Poslední aktualizace: %1$s</string>
+    <string name="fragment_weather_last_updated_now">Právě nyní</string>
+    <string name="fragment_weather_last_updated_time">Před %1$d min</string>
+
+    <string name="weather_runners_info_header">Běžecké info</string>
+    <string name="weather_runners_info_alert_card_wind_moderate">Slabší vítr</string>
+    <string name="weather_runners_info_alert_card_wind_strong">Silný vítr</string>
+    <string name="weather_runners_info_alert_card_temp_ideal">Ideální teplota</string>
+    <string name="weather_runners_info_alert_card_temp_low">Nízká teplota</string>
+    <string name="weather_runners_info_alert_card_temp_high">Vysoká teplota</string>
+
+    <string name="weather_runners_info_data_top_layers_category">Vrstvy na tělo</string>
+    <string name="weather_runners_info_data_top_layers_one">Jedna</string>
+    <string name="weather_runners_info_data_top_layers_two">Dvě</string>
+    <string name="weather_runners_info_data_top_layers_three">Tři</string>
+    <string name="weather_runners_info_data_top_layers_four">Čtyři</string>
+
+    <string name="weather_runners_info_data_bottom_layers_category">Vrstvy na nohy</string>
+    <string name="weather_runners_info_data_bottom_layers_shorts">Kraťasy</string>
+    <string name="weather_runners_info_data_bottom_layers_long_sleeved">Dlouhý noháv</string>
+    <string name="weather_runners_info_data_bottom_layers_long_sleeved_double">Dvojitý dlouhý noháv</string>
+
+    <string name="weather_runners_info_data_head_cover_category">Ochrana hlavy</string>
+    <string name="weather_runners_info_data_head_cover_none">Žádná</string>
+    <string name="weather_runners_info_data_head_cover_ears">Čelenka</string>
+    <string name="weather_runners_info_data_head_cover_cap">Čepice</string>
+
+    <string name="weather_runners_info_data_neck_cover_category">Ochrana krku</string>
+    <string name="weather_runners_info_data_neck_cover_none">Žádná</string>
+    <string name="weather_runners_info_data_neck_cover_weak">Slabá</string>
+    <string name="weather_runners_info_data_neck_cover_strong">Silná</string>
+
+    <string name="weather_runners_info_data_gloves_category">Rukavice</string>
+    <string name="weather_runners_info_data_gloves_no">Ne</string>
+    <string name="weather_runners_info_data_gloves_yes">Ano</string>
+
+    <string name="weather_runners_info_data_socks_category">Ponožky</string>
+    <string name="weather_runners_info_data_socks_normal">Normální</string>
+    <string name="weather_runners_info_data_socks_warm">Teplé</string>
+
+    <string name="settings_units_title">Jednotky teploty &amp; délky</string>
+    <string name="settings_units_dialog_title">Vyberte jednotku teploty &amp; délky</string>
+    <string name="setting_units_entry_metric">Celsius &amp; metrické</string>
+    <string name="setting_units_entry_imperial">Fahrenheit &amp; imperiální</string>
+
+    <string name="settings_poll_freq_title">Frekvence obnovení (min)</string>
+
+    <string name="setting_about_title">O aplikaci</string>
+    <string name="setting_about_summary">Verze %1$s\n%2$s</string>
+
+</resources>

@@ -28,6 +28,7 @@ import com.baarton.runweather.android.R
 import com.baarton.runweather.db.CurrentWeather
 import com.baarton.runweather.models.WeatherViewModel
 import com.baarton.runweather.models.WeatherViewState
+import com.baarton.runweather.res.SharedRes
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
@@ -65,35 +66,36 @@ fun MainScreenContent(
         color = MaterialTheme.colors.background,
         modifier = Modifier.fillMaxSize()
     ) {
-        SwipeRefresh(
+        SwipeRefresh( //TODO do I want this swipe refresh?
             state = rememberSwipeRefreshState(isRefreshing = weatherState.isLoading),
             onRefresh = onRefresh
         ) {
             if (weatherState.isEmpty) {
-                Empty()
+                EmptyScreen()
             }
             val weather = weatherState.weather
-            if (weather != null && weather.size == 1) {
+            if (weather != null && weather.size == 1) { //TODO review this check
                 LaunchedEffect(weather) {
                     onSuccess(weather)
                 }
-                Success(successData = weather[0])
+                WeatherScreen(successData = weather[0])
             } else {
-                Error("More than one weather")
+                ErrorScreen("More than one weather")
             }
             val error = weatherState.error
             if (error != null) {
                 LaunchedEffect(error) {
                     onError(error)
                 }
-                Error(error)
+                ErrorScreen(error)
             }
         }
     }
 }
 
+//TODO review
 @Composable
-fun Empty() {
+fun EmptyScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -105,8 +107,9 @@ fun Empty() {
     }
 }
 
+//TODO review
 @Composable
-fun Error(error: String) {
+fun ErrorScreen(error: String) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -119,22 +122,23 @@ fun Error(error: String) {
 }
 
 @Composable
-fun Success(
+fun WeatherScreen(
     successData: CurrentWeather,
     // favoriteBreed: (Breed) -> Unit
 ) {
-    WeatherScreen(weatherData = successData)
-}
-
-@Composable
-fun WeatherScreen(weatherData: CurrentWeather/*, onItemClick: (Breed) -> Unit*/) {
     Column {
         Row(
             Modifier
                 // .clickable { onClick(breed) }
                 .padding(10.dp)
         ) {
-            Text(weatherData.toString(), Modifier.weight(1F))
+
+            // val text = StringDesc.Resource(MR.strings.my_string)
+
+            Text(successData.toString(), Modifier.weight(1F))
+            Text(text = stringResource(id = SharedRes.strings.app_name.resourceId)) //TODO example for string resources
+
+            //FIXME start with composing UI with svg resources and colors
         }
 
 

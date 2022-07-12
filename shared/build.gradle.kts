@@ -6,6 +6,7 @@ plugins {
     id("kotlinx-serialization")
     id("com.android.library")
     id("com.squareup.sqldelight")
+    id("dev.icerock.mobile.multiplatform-resources")
 }
 
 android {
@@ -28,6 +29,17 @@ android {
 }
 
 version = "1.2"
+
+//TODO verify function on iOS, see also
+// https://proandroiddev.com/exposing-the-separate-resources-module-to-ios-target-using-moko-resources-in-kmm-76b9c3d533
+// https://github.com/icerockdev/moko-resources
+multiplatformResources {
+    multiplatformResourcesPackage = "com.baarton.runweather.res" // required
+    multiplatformResourcesClassName = "SharedRes" // optional, default MR
+    // multiplatformResourcesVisibility = MRVisibility.Internal // optional, default Public
+    // iosBaseLocalizationRegion = "en" // optional, default "en"
+    // multiplatformResourcesSourceSet = "commonClientMain"  // optional, default "commonMain"
+}
 
 android {
     configurations {
@@ -74,11 +86,13 @@ kotlin {
                 implementation(libs.multiplatformSettings.common)
                 implementation(libs.kotlinx.dateTime)
                 api(libs.touchlab.kermit)
+                api("dev.icerock.moko:resources:0.20.1")
             }
         }
         val commonTest by getting {
             dependencies {
                 implementation(libs.bundles.shared.commonTest)
+                implementation("dev.icerock.moko:resources-test:0.20.1")
             }
         }
         val androidMain by getting {
@@ -86,6 +100,7 @@ kotlin {
                 implementation(libs.androidx.lifecycle.viewmodel)
                 implementation(libs.sqlDelight.android)
                 implementation(libs.ktor.client.okHttp)
+                api("dev.icerock.moko:resources-compose:0.20.1")
             }
         }
         val androidTest by getting {

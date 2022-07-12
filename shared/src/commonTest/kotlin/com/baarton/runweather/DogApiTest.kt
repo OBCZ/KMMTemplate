@@ -1,6 +1,6 @@
 package com.baarton.runweather
 
-import com.baarton.runweather.ktor.DogApiImpl
+import com.baarton.runweather.ktor.WeatherApiImpl
 import com.baarton.runweather.response.BreedResult
 import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Logger
@@ -36,9 +36,9 @@ class DogApiTest {
                 headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             )
         }
-        val dogApi = DogApiImpl(emptyLogger, engine)
+        val weatherApi = WeatherApiImpl(emptyLogger, engine)
 
-        val result = dogApi.getJsonFromApi()
+        val result = weatherApi.getJsonFromApi()
         assertEquals(
             BreedResult(
                 mapOf(
@@ -59,7 +59,7 @@ class DogApiTest {
                 status = HttpStatusCode.NotFound
             )
         }
-        val dogApi = DogApiImpl(emptyLogger, engine)
+        val dogApi = WeatherApiImpl(emptyLogger, engine)
 
         assertFailsWith<ClientRequestException> {
             dogApi.getJsonFromApi()

@@ -1,10 +1,10 @@
 package com.baarton.runweather.mock
 
-import com.baarton.runweather.ktor.DogApi
+import com.baarton.runweather.ktor.WeatherApi
 import com.baarton.runweather.response.BreedResult
 
 // TODO convert this to use Ktor's MockEngine
-class DogApiMock : DogApi {
+class WeatherApiMock : WeatherApi {
     private var nextResult: () -> BreedResult = { error("Uninitialized!") }
     var calledCount = 0
         private set

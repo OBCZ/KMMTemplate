@@ -3,6 +3,7 @@
 buildscript {
     repositories {
         google()
+        gradlePluginPortal()
         mavenCentral()
         maven("https://plugins.gradle.org/m2/")
     }
@@ -11,6 +12,7 @@ buildscript {
             as org.gradle.accessors.dm.LibrariesForLibs
         classpath(libs.bundles.gradlePlugins)
         classpath(kotlin("gradle-plugin", libs.versions.kotlin.get()))
+        classpath("dev.icerock.moko:resources-generator:0.20.1")
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build gradle files
     }

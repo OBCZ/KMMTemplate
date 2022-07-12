@@ -18,7 +18,7 @@ import kotlinx.serialization.json.Json
 import co.touchlab.kermit.Logger as KermitLogger
 import io.ktor.client.plugins.logging.Logger as KtorLogger
 
-class DogApiImpl(private val log: KermitLogger, engine: HttpClientEngine) : DogApi {
+class WeatherApiImpl(private val log: KermitLogger, engine: HttpClientEngine) : WeatherApi {
 
     private val client = HttpClient(engine) {
         expectSuccess = true
@@ -53,11 +53,11 @@ class DogApiImpl(private val log: KermitLogger, engine: HttpClientEngine) : DogA
     override suspend fun getJsonFromApi(): WeatherData {
         log.d { "Get current weather data from OpenWeather API." }
         return client.get {
-            dogs("api/breeds/list/all")
+            weather()
         }.body()
     }
 
-    private fun HttpRequestBuilder.dogs(path: String) {
+    private fun HttpRequestBuilder.weather() {
         url {
             // takeFrom("https://dog.ceo/")
             // encodedPath = path
@@ -66,11 +66,11 @@ class DogApiImpl(private val log: KermitLogger, engine: HttpClientEngine) : DogA
             protocol = URLProtocol.HTTPS
             host = "api.openweathermap.org"
             path("data", "2.5", "weather")
-            parameters.append("appid", "b0719071a899e4b1c350725d752ec252")
+            parameters.append("appid", "b0719071a899e4b1c350725d752ec252") //FIXME hide
             parameters.append("units", "standard")
             parameters.append("lang", "cz")
-            parameters.append("lat", "50.0") //TODO
-            parameters.append("lon", "15.0") //TODO
+            parameters.append("lat", "50.0") //TODO location manager
+            parameters.append("lon", "15.0") //TODO location manager
 
         }
     }

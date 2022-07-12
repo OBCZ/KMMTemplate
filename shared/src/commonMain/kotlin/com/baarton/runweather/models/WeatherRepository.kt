@@ -4,7 +4,7 @@ import co.touchlab.kermit.Logger
 import co.touchlab.stately.ensureNeverFrozen
 import com.baarton.runweather.DatabaseHelper
 import com.baarton.runweather.db.CurrentWeather
-import com.baarton.runweather.ktor.DogApi
+import com.baarton.runweather.ktor.WeatherApi
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Clock
@@ -12,7 +12,7 @@ import kotlinx.datetime.Clock
 class WeatherRepository(
     private val dbHelper: DatabaseHelper,
     private val settings: Settings,
-    private val dogApi: DogApi,
+    private val weatherApi: WeatherApi,
     log: Logger,
     private val clock: Clock
 ) {
@@ -36,7 +36,7 @@ class WeatherRepository(
     }
 
     suspend fun refreshWeather() {
-        val weatherResult = dogApi.getJsonFromApi()
+        val weatherResult = weatherApi.getJsonFromApi()
         log.v { "Weather network result: ${weatherResult.toString()}" }
         // val breedList = breedResult.message.keys.sorted().toList()
         // log.v { "Fetched ${breedList.size} breeds from network" }

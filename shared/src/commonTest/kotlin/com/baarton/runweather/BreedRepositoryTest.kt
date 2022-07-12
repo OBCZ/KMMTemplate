@@ -3,7 +3,7 @@ package com.baarton.runweather
 import app.cash.turbine.test
 import com.baarton.runweather.db.Breed
 import com.baarton.runweather.mock.ClockMock
-import com.baarton.runweather.mock.DogApiMock
+import com.baarton.runweather.mock.WeatherApiMock
 import com.baarton.runweather.models.WeatherRepository
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.StaticConfig
@@ -29,7 +29,7 @@ class BreedRepositoryTest {
         Dispatchers.Default
     )
     private val settings = MockSettings()
-    private val ktorApi = DogApiMock()
+    private val ktorApi = WeatherApiMock()
 
     // Need to start at non-zero time because the default value for db timestamp is 0
     private val clock = ClockMock(Clock.System.now())
