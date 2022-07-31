@@ -23,7 +23,7 @@ import org.koin.dsl.module
 //TODO then start extracting business logic to common
 //TODO then start duplicating/mimicking UI stuff, platform specific stuff
 //TODO then review all files and its origin/contents
-//TODO verify architecture somehow, review dependencies
+//TODO verify architecture somehow, review dependencies, cleanup gradle files
 
 //TODO after migration:
 // review logging messages, exceptions, nullability, edge cases
@@ -31,6 +31,13 @@ import org.koin.dsl.module
 // extracting/moving stuff/files further
 // review tests
 // get iOS working
+
+//TODO runners data enhancements
+// no categories' texts, only pictograms (cap, torso, legs etc.)
+// new categories - sunglasses etc.
+// might consider wind if cold to influence layers
+// might consider slow, fast workout to influence layers
+
 
 fun initKoin(appModule: Module): KoinApplication {
     val koinApplication = startKoin {

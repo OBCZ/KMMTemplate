@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- format: #RRGGBB[AA] or 0xRRGGBB[AA] or RRGGBB[AA] where [AA] - optional -->
+
+
+
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+
+    <color name="color_primary">#741085</color>
+    <color name="color_secondary">#ECF0F8</color>
+    <color name="color_tertiary">#3993DD</color>
+    <color name="color_yellow">#C5D86D</color>
+    <color name="color_orange">#FF934F</color>
+    <color name="color_red">#BA1200</color>
+    <color name="color_green">#4CB963</color>
+
+
+
+</resources>

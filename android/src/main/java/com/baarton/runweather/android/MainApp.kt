@@ -19,11 +19,11 @@ class MainApp : Application() {
             module {
                 single<Context> { this@MainApp }
 
-                //TODO define network nad location platform specific definitions
+                //TODO define network nad location platform specific definitions -> move to platformModule?
                 // single<PlatformNetworkManager> { AndroidNetworkManager(get()) }
                 // single<PlatformLocationManager> { AndroidLocationManager(get()) }
 
-                viewModel { WeatherViewModel(get(), get { parametersOf("BreedViewModel") }) } //TODO
+                viewModel { WeatherViewModel(get(), get(), get { parametersOf("BreedViewModel") }) } //TODO
                 single<SharedPreferences> {
                     get<Context>().getSharedPreferences("RUNWEATHER_SETTINGS", Context.MODE_PRIVATE)
                 }

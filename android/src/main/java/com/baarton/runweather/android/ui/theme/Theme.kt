@@ -7,10 +7,13 @@ import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 
 //TODO extract resources to shared
-// colors
-// icons
-// strings
-// dimensions ?
+// colors (YES)
+// png images (YES)
+// app icon (?)
+// icons (NO)
+// strings (YES)
+// dimensions (NO?)
+// dont forget to export moko resources for iOS, whatever that is, but it wont probably work without that
 
 private val DarkColorPalette = darkColors(
     primary = Purple200,

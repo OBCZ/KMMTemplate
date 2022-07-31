@@ -2,6 +2,8 @@ package com.baarton.runweather.models
 
 import co.touchlab.kermit.Logger
 import com.baarton.runweather.db.CurrentWeather
+import com.baarton.runweather.res.SharedRes
+import dev.icerock.moko.resources.StringResource
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -9,9 +11,12 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 
 class WeatherViewModel(
     private val weatherRepository: WeatherRepository,
+    private val clock: Clock,
     log: Logger
 ) : ViewModel() {
     private val log = log.withTag("WeatherViewModel")
@@ -32,6 +37,7 @@ class WeatherViewModel(
     private fun observeWeather() {
         // Refresh breeds, and emit any exception that was thrown so we can handle it downstream
         val refreshFlow = flow<Throwable?> {
+            // delay(2000) //TODO config delay here or in refreshWeatherIfStale() method?
             try {
                 weatherRepository.refreshWeatherIfStale()
                 emit(null)
@@ -51,6 +57,7 @@ class WeatherViewModel(
                         }
                         WeatherViewState(
                             isLoading = false,
+                            lastUpdated = timeStampMins(weatherRepository.getLastDownloadTime()),
                             weather = weather.takeIf { it.isNotEmpty() },
                             error = errorMessage.takeIf { weather.isEmpty() },
                             isEmpty = weather.isEmpty() && errorMessage == null
@@ -90,10 +97,25 @@ class WeatherViewModel(
             }
         }
     }
+
+    private fun timeStampMins(dataTimestamp: Long): Long {
+        val diff = clock.now() - Instant.fromEpochMilliseconds(dataTimestamp)
+        return diff.inWholeMinutes
+    }
+
+}
+
+//TODO probably needs to be moved somewhere - UIUtils in common module?
+fun lastUpdatedResId(timestampAge: Long): Pair<StringResource, Long?> {
+    return when(timestampAge) {
+        0L -> SharedRes.strings.fragment_weather_last_updated_now to null
+        else -> SharedRes.strings.fragment_weather_last_updated_time to timestampAge
+    }
 }
 
 data class WeatherViewState(
     val weather: List<CurrentWeather>? = null,
+    val lastUpdated: Long = 0L,
     val error: String? = null,
     val isLoading: Boolean = false,
     val isEmpty: Boolean = false

@@ -1,10 +1,13 @@
 package com.baarton.runweather.android.ui
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -17,17 +20,24 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.flowWithLifecycle
 import co.touchlab.kermit.Logger
 import com.baarton.runweather.android.R
 import com.baarton.runweather.db.CurrentWeather
+import com.baarton.runweather.models.Weather
+import com.baarton.runweather.models.WeatherData
 import com.baarton.runweather.models.WeatherViewModel
 import com.baarton.runweather.models.WeatherViewState
+import com.baarton.runweather.models.lastUpdatedResId
 import com.baarton.runweather.res.SharedRes
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -74,13 +84,16 @@ fun MainScreenContent(
                 EmptyScreen()
             }
             val weather = weatherState.weather
-            if (weather != null && weather.size == 1) { //TODO review this check
+            if (weather == null) { //TODO review this check
+                ErrorScreen("Weather null")
+            } else if (weather.size == 1) {
                 LaunchedEffect(weather) {
                     onSuccess(weather)
                 }
-                WeatherScreen(successData = weather[0])
+                WeatherScreen(weather[0], weatherState)
             } else {
-                ErrorScreen("More than one weather")
+                WeatherScreen(weather[weather.size - 1], weatherState)
+                // ErrorScreen("More than one weather")
             }
             val error = weatherState.error
             if (error != null) {
@@ -121,29 +134,165 @@ fun ErrorScreen(error: String) {
     }
 }
 
+//TODO how much can I extract with iOS to common from the UI building blocks (expect/actual abstraction)?
 @Composable
 fun WeatherScreen(
     successData: CurrentWeather,
-    // favoriteBreed: (Breed) -> Unit
+    state: WeatherViewState
 ) {
+    //TODO img background
     Column {
+        //TODO network, location row 1
         Row(
             Modifier
-                // .clickable { onClick(breed) }
-                .padding(10.dp)
+                .align(CenterHorizontally)
+                .padding(4.dp)
+                .weight(1f)
+                .fillMaxWidth()
         ) {
+            // TODO Img 1, Img 1, Text 8
+            //
+            Image(
+                modifier = Modifier
+                    .align(CenterVertically)
+                    .padding(8.dp)
+                    .weight(1f),
+                imageVector = ImageVector.vectorResource(id = R.drawable.ic_location_on_24_primary),
+                contentDescription = "TODO"
+            )
+            Image(
+                modifier = Modifier
+                    .align(CenterVertically)
+                    .padding(8.dp)
+                    .weight(1f),
+                imageVector = ImageVector.vectorResource(id = R.drawable.ic_network_on_24_primary),
+                contentDescription = "TODO"
+            )
+            Text(
+                modifier = Modifier
+                    .align(CenterVertically)
+                    .padding(8.dp)
+                    .weight(8f),
+                text = lastUpdatedText(state.lastUpdated)
+            )
+            //TODO example for string resources
 
-            // val text = StringDesc.Resource(MR.strings.my_string)
-
-            Text(successData.toString(), Modifier.weight(1F))
-            Text(text = stringResource(id = SharedRes.strings.app_name.resourceId)) //TODO example for string resources
-
-            //FIXME start with composing UI with svg resources and colors
         }
 
+        //TODO data row 5
+        Row(
+            modifier = Modifier
+                .weight(5f)
+                .fillMaxWidth()
 
+        ) {
+            Column() {
+                //TODO data rows
+                // always info Img, num slow Text, num fast Text
+                Row() {
+                    // header row
+
+                }
+                Row() {
+                    // torso row
+                }
+                Row() {
+                    // legs row
+                }
+                //...
+
+            }
+            Column() {
+                //TODO 7 rows
+                // Img, Text
+                Row() {
+                    // humidity row
+                }
+                Row() {
+                    // rainfall row
+                }
+                //...
+            }
+
+        }
+
+        //TODO warning row 2
+        Row(
+            modifier = Modifier
+                .weight(2f)
+                .fillMaxWidth()
+        ) {
+            //TODO temp warning
+            Column() {
+                Row() {
+                    // Img, Img
+                }
+                Row() {
+                    // Text
+                }
+            }
+            //TODO wind warning
+            Column() {
+                Row() {
+                    // Img, Img
+                }
+                Row() {
+                    // Text
+                }
+            }
+        }
+
+        //TODO main data row 2
+        Row(
+            modifier = Modifier
+                .weight(2f)
+                .fillMaxWidth()
+        ) {
+
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(6f)
+            ) { // 3
+                Text(successData.locationName)
+                Row {
+                    //TODO img from service
+                    Image(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_about_24_primary),
+                        contentDescription = "TODO"
+                    )
+                    Text(text = successData.weatherList[0].description)
+                    // Img, Text
+                }
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(4f)
+            ) { // 2
+                Text(text = successData.mainData.temperature)
+                // Text
+            }
+        }
 
     }
+}
+
+//TODO can we extract more?
+@Composable
+fun lastUpdatedText(lastUpdated: Long): String {
+    val pair = lastUpdatedResId(lastUpdated)
+    val lastUpdatedValue = pair.second?.let {
+        stringResource(id = pair.first.resourceId, formatArgs = arrayOf(it))
+    } ?: run {
+        stringResource(id = pair.first.resourceId)
+    }
+
+    return stringResource(
+        id = SharedRes.strings.fragment_weather_last_updated_text.resourceId,
+        formatArgs = arrayOf(
+            lastUpdatedValue
+        ))
 }
 
 // @Composable
@@ -184,12 +333,33 @@ fun WeatherScreen(
 @Preview
 @Composable
 fun MainScreenContentPreview_Success() {
-    // MainScreenContent(
-        // dogsState = BreedViewState(
-        //     breeds = listOf(
-        //         Breed(0, "appenzeller", false),
-        //         Breed(1, "australian", true)
-        //     )
-        // )
-    // )
+    MainScreenContent(
+        weatherState = WeatherViewState(
+            weather = listOf(
+                CurrentWeather(
+                    weatherList = listOf(
+                        Weather(
+                            weatherId = "803",
+                            title = "Clouds",
+                            description = "oblačno",
+                            iconId = "04d"
+                        )
+                    ),
+                    locationName = "Kouřim",
+                    mainData = WeatherData.MainData(
+                        temperature = "300.82",
+                        pressure = "1019",
+                        humidity = "38"
+                    ),
+                    wind = WeatherData.Wind(speed = "4.27", deg = "277"),
+                    rain = null,
+                    sys = WeatherData.Sys(
+                        sunrise = "1657681500",
+                        sunset = "1657739161"
+                    )
+                )
+
+            )
+        )
+    )
 }
