@@ -19,7 +19,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="DataExtractionRules">
         <activity
-            android:name="com.baarton.runweather.android.MainActivity"
+            android:name="com.baarton.runweather.android.ui.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

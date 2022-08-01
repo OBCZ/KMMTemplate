@@ -22,7 +22,8 @@ android {
         }
     }
 
-    lint {
+    //TODO review options here https://developer.android.com/reference/tools/gradle-api/4.1/com/android/build/api/dsl/LintOptions
+    lintOptions {
         isWarningsAsErrors = true
         isAbortOnError = true
     }

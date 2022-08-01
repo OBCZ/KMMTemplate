@@ -1,4 +1,4 @@
-package com.baarton.runweather.android.ui
+package com.baarton.runweather.android.ui.composables
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
@@ -19,7 +19,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
@@ -41,12 +40,18 @@ import com.baarton.runweather.models.lastUpdatedResId
 import com.baarton.runweather.res.SharedRes
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import org.koin.androidx.compose.inject
+import org.koin.androidx.compose.viewModel
+import org.koin.core.parameter.parametersOf
+
 
 @Composable
-fun MainScreen(
-    viewModel: WeatherViewModel,
-    log: Logger
+fun WeatherFragmentScreen(
 ) {
+    //TODO we can inject like that into composables
+    val viewModel: WeatherViewModel by viewModel()
+    val log: Logger by inject { parametersOf("WeatherFragment") }
+
     val lifecycleOwner = LocalLifecycleOwner.current
     val lifecycleAwareDogsFlow = remember(viewModel.weatherState, lifecycleOwner) {
         viewModel.weatherState.flowWithLifecycle(lifecycleOwner.lifecycle)
@@ -55,7 +60,7 @@ fun MainScreen(
     @SuppressLint("StateFlowValueCalledInComposition") // False positive lint check when used inside collectAsState()
     val weatherState by lifecycleAwareDogsFlow.collectAsState(viewModel.weatherState.value)
 
-    MainScreenContent(
+    WeatherFragmentScreenContent(
         weatherState = weatherState,
         onRefresh = { viewModel.refreshWeather() },
         onSuccess = { data -> log.v { "View updating with ${data.size} weather" } },
@@ -65,7 +70,7 @@ fun MainScreen(
 }
 
 @Composable
-fun MainScreenContent(
+private fun WeatherFragmentScreenContent(
     weatherState: WeatherViewState,
     onRefresh: () -> Unit = {},
     onSuccess: (List<CurrentWeather>) -> Unit = {},
@@ -108,13 +113,13 @@ fun MainScreenContent(
 
 //TODO review
 @Composable
-fun EmptyScreen() {
+private fun EmptyScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = CenterHorizontally,
     ) {
         Text(stringResource(R.string.empty_breeds))
     }
@@ -122,13 +127,13 @@ fun EmptyScreen() {
 
 //TODO review
 @Composable
-fun ErrorScreen(error: String) {
+private fun ErrorScreen(error: String) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = CenterHorizontally,
     ) {
         Text(text = error)
     }
@@ -136,7 +141,7 @@ fun ErrorScreen(error: String) {
 
 //TODO how much can I extract with iOS to common from the UI building blocks (expect/actual abstraction)?
 @Composable
-fun WeatherScreen(
+private fun WeatherScreen(
     successData: CurrentWeather,
     state: WeatherViewState
 ) {
@@ -280,7 +285,7 @@ fun WeatherScreen(
 
 //TODO can we extract more?
 @Composable
-fun lastUpdatedText(lastUpdated: Long): String {
+private fun lastUpdatedText(lastUpdated: Long): String {
     val pair = lastUpdatedResId(lastUpdated)
     val lastUpdatedValue = pair.second?.let {
         stringResource(id = pair.first.resourceId, formatArgs = arrayOf(it))
@@ -333,7 +338,7 @@ fun lastUpdatedText(lastUpdated: Long): String {
 @Preview
 @Composable
 fun MainScreenContentPreview_Success() {
-    MainScreenContent(
+    WeatherFragmentScreenContent(
         weatherState = WeatherViewState(
             weather = listOf(
                 CurrentWeather(
