@@ -1,5 +1,7 @@
 package com.baarton.runweather.android.ui.composables
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,43 +9,33 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.baarton.runweather.android.R
+import com.baarton.runweather.res.SharedRes
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 
-private val tabs = listOf(
-    TabItem.Home,
-    TabItem.Settings,
-    TabItem.Contacts
-)
-
-sealed class TabItem(
-    val index:Int,
-    val icon: ImageVector,
-    val title: String,
+enum class TabItem(
+    val index: Int,
+    @DrawableRes val iconResId: Int,
+    @StringRes val titleResId: Int,
     val screenToLoad: @Composable () -> Unit
 ) {
-    //TODO change according to my needs
-    object Home : TabItem(0, Icons.Default.Home, "Home", {
+    WEATHER(0, R.drawable.ic_sunny_24_secondary, SharedRes.strings.main_tab_today.resourceId, {
         WeatherFragmentScreen()
-    })
-    object Contacts : TabItem(2, Icons.Default.ShoppingCart, "Cart", {
-        ContactScreenForTab()
-    })
-    object Settings : TabItem(1, Icons.Default.Settings, "Settings", {
-        SettingsScreenForTab()
+    }),
+    SETTINGS(1, R.drawable.ic_settings_24_secondary, SharedRes.strings.main_tab_settings.resourceId, {
+            SettingsScreenForTab()
     })
 }
 
@@ -55,32 +47,30 @@ fun MainFragmentScreen() {
     Column(content = {
 
         IconWithTextTabLayout(
-            tabs,
             selectedIndex = pagerState.currentPage,
             onPageSelected = { tabItem: TabItem ->
                 coroutineScope.launch {
                     pagerState.animateScrollToPage(tabItem.index)
                 }
             })
-        TabPage(tabItems = tabs, pagerState = pagerState)
+        TabPage(pagerState = pagerState)
     })
 }
 
 @ExperimentalPagerApi
 @Composable
 fun IconWithTextTabLayout(
-    tabs: List<TabItem>,
     selectedIndex: Int,
     onPageSelected: ((tabItem: TabItem) -> Unit)
 ) {
     TabRow(selectedTabIndex = selectedIndex) {
-        tabs.forEachIndexed { index, tabItem ->
+        TabItem.values().forEachIndexed { index, tabItem ->
             Tab(selected = index == selectedIndex, onClick = {
                 onPageSelected(tabItem)
             }, text = {
-                Text(text = tabItem.title)
+                Text(text = stringResource(id = tabItem.titleResId))
             }, icon = {
-                Icon(tabItem.icon, "")
+                Icon(ImageVector.vectorResource(id = tabItem.iconResId), "TODO")
             })
         }
     }
@@ -88,24 +78,13 @@ fun IconWithTextTabLayout(
 
 @ExperimentalPagerApi
 @Composable
-fun TabPage(pagerState: PagerState, tabItems: List<TabItem>) {
+fun TabPage(pagerState: PagerState) {
     HorizontalPager(
-        count = tabs.size,
+        count = TabItem.values().size,
         state = pagerState
     ) { index ->
-        tabItems[index].screenToLoad()
+        TabItem.values().first { index == it.index }.screenToLoad()
     }
-}
-
-@Composable
-fun ContactScreenForTab() {
-    Column(
-        content = {
-            Text(text = "You are in Contact Us Screen")
-        }, modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    )
 }
 
 @Composable
