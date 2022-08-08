@@ -27,7 +27,10 @@ class WeatherRepository(
         ensureNeverFrozen()
     }
 
-    fun getWeather(): Flow<List<CurrentWeather>> = dbHelper.getAll()
+    fun getWeather(): Flow<List<CurrentWeather>> {
+        log.d("Get WeatherData from DB.")
+        return dbHelper.getAll()
+    }
 
     fun getLastDownloadTime(): Long {
         return settings.getLong(DB_TIMESTAMP_KEY, 0)
@@ -48,6 +51,7 @@ class WeatherRepository(
 
         if (weatherResult.locationName.isNotBlank()) {
             dbHelper.insert(weatherResult)
+            log.v { "WeatherData result put to DB." }
         }
     }
 
@@ -57,7 +61,7 @@ class WeatherRepository(
 
     private fun isWeatherListStale(): Boolean {
         val lastDownloadTimeMS = getLastDownloadTime()
-        val oneHourMS = 60 * 60 * 1000
+        val oneHourMS =  30 * 1000
         val stale = lastDownloadTimeMS + oneHourMS < clock.now().toEpochMilliseconds()
         if (!stale) {
             log.i { "Weather not fetched from network. Recently updated" }

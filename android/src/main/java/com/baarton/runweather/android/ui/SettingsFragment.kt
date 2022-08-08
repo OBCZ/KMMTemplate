@@ -1,4 +1,4 @@
-package com.baarton.runweather.ui
+package com.baarton.runweather.android.ui
 
 //TODO this should be fixed
 // class SettingsFragment : PreferenceFragmentCompat() {

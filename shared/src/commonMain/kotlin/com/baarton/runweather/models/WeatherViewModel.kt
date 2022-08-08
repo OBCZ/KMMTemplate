@@ -4,11 +4,17 @@ import co.touchlab.kermit.Logger
 import com.baarton.runweather.db.CurrentWeather
 import com.baarton.runweather.res.SharedRes
 import dev.icerock.moko.resources.StringResource
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
@@ -21,6 +27,9 @@ class WeatherViewModel(
 ) : ViewModel() {
     private val log = log.withTag("WeatherViewModel")
 
+    private val pollingDispatcher: CoroutineDispatcher = Dispatchers.Default/*Executors.newFixedThreadPool(5).asCoroutineDispatcher()*/
+    private var isClosed = false
+
     private val mutableWeatherState: MutableStateFlow<WeatherViewState> =
         MutableStateFlow(WeatherViewState(isLoading = true))
 
@@ -30,26 +39,42 @@ class WeatherViewModel(
         observeWeather()
     }
 
+
     override fun onCleared() {
+        log.i("Close polling.")
+        isClosed = true
+        pollingDispatcher.cancel()
         log.v("Clearing WeatherViewModel")
     }
 
     private fun observeWeather() {
         // Refresh breeds, and emit any exception that was thrown so we can handle it downstream
-        val refreshFlow = flow<Throwable?> {
-            // delay(2000) //TODO config delay here or in refreshWeatherIfStale() method?
-            try {
-                weatherRepository.refreshWeatherIfStale()
-                emit(null)
-            } catch (exception: Exception) {
-                emit(exception)
+        val refreshFlow = channelFlow<Throwable?> {
+            while (!isClosed) {
+                log.i("Get WeatherData for poll send.")
+                try {
+                    log.i("Try to refresh WeatherData.")
+                    weatherRepository.refreshWeatherIfStale()
+                    send(null)
+                } catch (exception: Exception) {
+                    send(exception)
+                }
+                log.i("Delaying next poll.")
+
+                delay(5000)
             }
-        }
+        }.flowOn(pollingDispatcher).cancellable()
+        //TODO check when polling closes (phone lock, etc) and its config in general
 
         viewModelScope.launch {
+            log.d { "WeatherData refresh coroutine launch." }
+
             combine(refreshFlow, weatherRepository.getWeather()) { throwable, weather -> throwable to weather }
                 .collect { (error, weather) ->
+                    log.d("Weather collected")
                     mutableWeatherState.update { previousState ->
+                        log.d { "Updating weather state." }
+
                         val errorMessage = if (error != null) {
                             "Unable to download weather list"
                         } else {
@@ -79,12 +104,6 @@ class WeatherViewModel(
             }
         }
     }
-
-    // fun updateBreedFavorite(breed: Breed): Job {
-    //     return viewModelScope.launch {
-    //         breedRepository.updateBreedFavorite(breed)
-    //     }
-    // }
 
     private fun handleWeatherError(throwable: Throwable) {
         log.e(throwable) { "Error downloading weather list" }
