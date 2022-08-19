@@ -1,30 +1,79 @@
 package com.baarton.runweather.mock
 
 import com.baarton.runweather.ktor.WeatherApi
-import com.baarton.runweather.response.BreedResult
+import com.baarton.runweather.models.Weather
+import com.baarton.runweather.models.WeatherData
 
-// TODO convert this to use Ktor's MockEngine
+sealed class MockResponses {
+    abstract fun get(): WeatherData
+}
+
+object BRNO1 : MockResponses() {
+    override fun get(): WeatherData = lazy {
+        WeatherData(
+            listOf(Weather("800", "Clear", "clear sky", "01d")),
+            "Brno",
+            WeatherData.MainData("265.90", "1021", "45"),
+            WeatherData.Wind("4.6", "345"),
+            null,
+            WeatherData.Sys("1646803774", "1646844989")
+        )
+    }.value
+}
+
+object BRNO2 : MockResponses() {
+    override fun get(): WeatherData = lazy {
+        WeatherData(
+            listOf(Weather("800", "Clear", "clear sky", "01d")),
+            "Brno",
+            WeatherData.MainData("260.90", "1025", "55"),
+            WeatherData.Wind("4.7", "355"),
+            null,
+            WeatherData.Sys("1646806774", "1646842989")
+        )
+    }.value
+}
+
+object BRNO3 : MockResponses() {
+    override fun get(): WeatherData = lazy {
+        WeatherData(
+            listOf(Weather("800", "Clear", "clear sky", "01d")),
+            "Brno",
+            WeatherData.MainData("268.90", "1020", "35"),
+            WeatherData.Wind("4.5", "305"),
+            null,
+            WeatherData.Sys("1646800774", "1646849989")
+        )
+    }.value
+}
+
+object EMPTY : MockResponses() {
+    override fun get(): WeatherData = lazy {
+        WeatherData(
+            listOf(),
+            "",
+            WeatherData.MainData("", "", ""),
+            WeatherData.Wind("", ""),
+            null,
+            WeatherData.Sys("", "")
+        )
+    }.value
+}
+
 class WeatherApiMock : WeatherApi {
-    private var nextResult: () -> BreedResult = { error("Uninitialized!") }
+
+    private var nextResult: () -> WeatherData = { error("Uninitialized!") }
     var calledCount = 0
         private set
 
-    override suspend fun getJsonFromApi(): BreedResult {
+    override suspend fun getJsonFromApi(): WeatherData {
         val result = nextResult()
         calledCount++
         return result
     }
 
-    fun successResult(): BreedResult {
-        val map = HashMap<String, List<String>>().apply {
-            put("appenzeller", emptyList())
-            put("australian", listOf("shepherd"))
-        }
-        return BreedResult(map, "success")
-    }
-
-    fun prepareResult(breedResult: BreedResult) {
-        nextResult = { breedResult }
+    fun prepareResult(weatherResult: WeatherData) {
+        nextResult = { weatherResult }
     }
 
     fun throwOnCall(throwable: Throwable) {

@@ -14,6 +14,8 @@ import kotlinx.serialization.Serializable
  * > threeHour [mm]
  */
 
+//TODO cleanup
+
 // @Entity(tableName = "current_weather")
 @Serializable
 data class WeatherData(

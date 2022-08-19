@@ -72,7 +72,7 @@ private val coreModule = module {
     }
     single<WeatherApi> {
         WeatherApiImpl(
-            getWith("DogApiImpl"),
+            getWith("WeatherApiImpl"),
             get()
         )
     }
@@ -93,7 +93,7 @@ private val coreModule = module {
             get(),
             get(),
             get(),
-            getWith("BreedRepository"),
+            getWith("WeatherRepository"),
             get()
         )
     }

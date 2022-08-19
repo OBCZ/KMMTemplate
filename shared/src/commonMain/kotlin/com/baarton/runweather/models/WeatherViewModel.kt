@@ -23,11 +23,11 @@ import kotlinx.datetime.Instant
 class WeatherViewModel(
     private val weatherRepository: WeatherRepository,
     private val clock: Clock,
+    private val pollingDispatcher: CoroutineDispatcher = Dispatchers.Default,
     log: Logger
 ) : ViewModel() {
     private val log = log.withTag("WeatherViewModel")
 
-    private val pollingDispatcher: CoroutineDispatcher = Dispatchers.Default/*Executors.newFixedThreadPool(5).asCoroutineDispatcher()*/
     private var isClosed = false
 
     private val mutableWeatherState: MutableStateFlow<WeatherViewState> =
@@ -39,7 +39,6 @@ class WeatherViewModel(
         observeWeather()
     }
 
-
     override fun onCleared() {
         log.i("Close polling.")
         isClosed = true
@@ -48,7 +47,6 @@ class WeatherViewModel(
     }
 
     private fun observeWeather() {
-        // Refresh breeds, and emit any exception that was thrown so we can handle it downstream
         val refreshFlow = channelFlow<Throwable?> {
             while (!isClosed) {
                 log.i("Get WeatherData for poll send.")
@@ -60,16 +58,16 @@ class WeatherViewModel(
                     send(exception)
                 }
                 log.i("Delaying next poll.")
-
                 delay(5000)
             }
-        }.flowOn(pollingDispatcher).cancellable()
-        //TODO check when polling closes (phone lock, etc) and its config in general
+        }.flowOn(pollingDispatcher).cancellable() //TODO check when polling closes (phone lock, etc) and its config in general
 
         viewModelScope.launch {
             log.d { "WeatherData refresh coroutine launch." }
-
-            combine(refreshFlow, weatherRepository.getWeather()) { throwable, weather -> throwable to weather }
+            combine(
+                refreshFlow,
+                weatherRepository.getWeather()
+            ) { throwable, weather -> throwable to weather }
                 .collect { (error, weather) ->
                     log.d("Weather collected")
                     mutableWeatherState.update { previousState ->
@@ -121,12 +119,11 @@ class WeatherViewModel(
         val diff = clock.now() - Instant.fromEpochMilliseconds(dataTimestamp)
         return diff.inWholeMinutes
     }
-
 }
 
 //TODO probably needs to be moved somewhere - UIUtils in common module?
 fun lastUpdatedResId(timestampAge: Long): Pair<StringResource, Long?> {
-    return when(timestampAge) {
+    return when (timestampAge) {
         0L -> SharedRes.strings.fragment_weather_last_updated_now to null
         else -> SharedRes.strings.fragment_weather_last_updated_time to timestampAge
     }

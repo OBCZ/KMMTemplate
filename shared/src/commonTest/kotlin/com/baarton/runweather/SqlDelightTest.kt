@@ -1,6 +1,9 @@
 package com.baarton.runweather
 
 import co.touchlab.kermit.Logger
+import com.baarton.runweather.mock.BRNO1
+import com.baarton.runweather.mock.BRNO2
+import com.baarton.runweather.mock.BRNO3
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -14,9 +17,9 @@ class SqlDelightTest {
 
     private lateinit var dbHelper: DatabaseHelper
 
-    private suspend fun DatabaseHelper.insertBreed(name: String) {
-        insert(listOf(name))
-    }
+    // private suspend fun DatabaseHelper.insertBreed(name: String) {
+    //     insert(listOf(name))
+    // }
 
     @BeforeTest
     fun setup() = runTest {
@@ -26,53 +29,53 @@ class SqlDelightTest {
             Dispatchers.Default
         )
         dbHelper.nuke()
-        dbHelper.insertBreed("Beagle")
+        dbHelper.insert(BRNO1.get())
     }
 
     @Test
     fun `Select All Items Success`() = runTest {
-        val breeds = dbHelper.getAll().first()
+        val weatherList = dbHelper.getAll().first()
         assertNotNull(
-            breeds.find { it.name == "Beagle" },
-            "Could not retrieve Breed"
+            weatherList.find { it.locationName == "Brno" },
+            "Could not retrieve Weather"
         )
     }
 
-    @Test
-    fun `Select Item by Id Success`() = runTest {
-        val breeds = dbHelper.getAll().first()
-        val firstBreed = breeds.first()
-        assertNotNull(
-            dbHelper.selectById(firstBreed.id),
-            "Could not retrieve Breed by Id"
-        )
-    }
+    // @Test
+    // fun `Select Item by Id Success`() = runTest {
+    //     val weatherList = dbHelper.getAll().first()
+    //     val firstWeather = weatherList.first()
+    //     assertNotNull(
+    //         dbHelper.selectById(firstWeather.id),
+    //         "Could not retrieve Breed by Id"
+    //     )
+    // }
 
-    @Test
-    fun `Update Favorite Success`() = runTest {
-        val breeds = dbHelper.getAll().first()
-        val firstBreed = breeds.first()
-        dbHelper.updateFavorite(firstBreed.id, true)
-        val newBreed = dbHelper.selectById(firstBreed.id).first().first()
-        assertNotNull(
-            newBreed,
-            "Could not retrieve Breed by Id"
-        )
-        assertTrue(
-            newBreed.favorite,
-            "Favorite Did Not Save"
-        )
-    }
+    // @Test
+    // fun `Update Favorite Success`() = runTest {
+    //     val breeds = dbHelper.getAll().first()
+    //     val firstBreed = breeds.first()
+    //     dbHelper.updateFavorite(firstBreed.id, true)
+    //     val newBreed = dbHelper.selectById(firstBreed.id).first().first()
+    //     assertNotNull(
+    //         newBreed,
+    //         "Could not retrieve Breed by Id"
+    //     )
+    //     assertTrue(
+    //         newBreed.favorite,
+    //         "Favorite Did Not Save"
+    //     )
+    // }
 
     @Test
     fun `Delete All Success`() = runTest {
-        dbHelper.insertBreed("Poodle")
-        dbHelper.insertBreed("Schnauzer")
+        dbHelper.insert(BRNO2.get())
+        dbHelper.insert(BRNO3.get())
         assertTrue(dbHelper.getAll().first().isNotEmpty())
         dbHelper.nuke()
 
         assertTrue(
-            dbHelper.getAll().first().count() == 0,
+            dbHelper.getAll().first().isEmpty(),
             "Delete All did not work"
         )
     }

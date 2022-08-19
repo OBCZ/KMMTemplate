@@ -23,7 +23,7 @@ class MainApp : Application() {
                 // single<PlatformNetworkManager> { AndroidNetworkManager(get()) }
                 // single<PlatformLocationManager> { AndroidLocationManager(get()) }
 
-                viewModel { WeatherViewModel(get(), get(), get { parametersOf("BreedViewModel") }) } //TODO
+                viewModel { WeatherViewModel(get(), get(), log = get { parametersOf("WeatherViewModel") }) } //TODO
                 single<SharedPreferences> {
                     get<Context>().getSharedPreferences("RUNWEATHER_SETTINGS", Context.MODE_PRIVATE)
                 }

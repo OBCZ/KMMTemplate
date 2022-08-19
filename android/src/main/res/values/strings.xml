@@ -1,6 +1,4 @@
 <resources>
     <string name="app_name">RunWeather</string>
-    <string name="favorite_breed">Favorite %1$s</string>
-    <string name="unfavorite_breed">Unfavorite %1$s</string>
-    <string name="empty_breeds">Sorry, no doggos found</string>
+    <string name="empty_weather">Sorry, no weather available now</string>
 </resources>

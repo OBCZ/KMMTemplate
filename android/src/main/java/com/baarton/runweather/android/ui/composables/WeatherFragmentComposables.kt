@@ -121,7 +121,7 @@ private fun EmptyScreen() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = CenterHorizontally,
     ) {
-        Text(stringResource(R.string.empty_breeds))
+        Text(stringResource(R.string.empty_weather))
     }
 }
 

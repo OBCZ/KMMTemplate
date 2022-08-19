@@ -1,6 +1,7 @@
 package com.baarton.runweather.android.ui
 
 //TODO this should be fixed
+// move from this to Compose and call val settings: Settings
 // class SettingsFragment : PreferenceFragmentCompat() {
 //
 //     private val viewModel: SettingsViewModel by viewModel()
