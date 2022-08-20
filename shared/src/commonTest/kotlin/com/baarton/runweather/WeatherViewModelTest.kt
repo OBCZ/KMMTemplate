@@ -17,6 +17,8 @@ import com.baarton.runweather.models.WeatherViewState
 import com.russhwolf.settings.MockSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.Clock
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -38,7 +40,7 @@ class WeatherViewModelTest {
     private val clock = ClockMock(Clock.System.now())
 
     private val repository: WeatherRepository = WeatherRepository(dbHelper, settings, apiMock, kermit, clock)
-    private val viewModel by lazy { WeatherViewModel(repository, clock, Dispatchers.Unconfined, kermit) }
+    private val viewModel by lazy { WeatherViewModel(repository, clock, kermit) }
 
 
 
@@ -67,12 +69,12 @@ class WeatherViewModelTest {
 
     @BeforeTest
     fun setup() {
-        // Dispatchers.setMain(Dispatchers.Unconfined)
+        Dispatchers.setMain(Dispatchers.Unconfined)
     }
 
     @AfterTest
     fun tearDown() {
-        // Dispatchers.resetMain()
+        Dispatchers.resetMain()
         testDbConnection.close()
     }
 

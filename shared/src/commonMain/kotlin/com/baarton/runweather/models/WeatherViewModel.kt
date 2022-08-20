@@ -23,12 +23,12 @@ import kotlinx.datetime.Instant
 class WeatherViewModel(
     private val weatherRepository: WeatherRepository,
     private val clock: Clock,
-    private val pollingDispatcher: CoroutineDispatcher = Dispatchers.Default,
     log: Logger
 ) : ViewModel() {
     private val log = log.withTag("WeatherViewModel")
 
     private var isClosed = false
+    private val pollingDispatcher: CoroutineDispatcher = Dispatchers.Default
 
     private val mutableWeatherState: MutableStateFlow<WeatherViewState> =
         MutableStateFlow(WeatherViewState(isLoading = true))
