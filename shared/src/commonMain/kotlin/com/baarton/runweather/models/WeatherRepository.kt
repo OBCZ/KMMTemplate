@@ -59,7 +59,7 @@ class WeatherRepository(
 
     private fun isWeatherListStale(): Boolean {
         val lastDownload = getLastDownloadTime()
-        val threshold = settings.getLong(WEATHER_REFRESH_THRESHOLD_KEY, 2).minutes //TODO 2 - 15 mins - dont forget to connect this with Setting Fragment, what about debug?
+        val threshold = settings.getLong(WEATHER_REFRESH_THRESHOLD_KEY, 2).minutes //TODO 2 - 15 mins - dont forget to connect this with Setting Fragment, what about debug and test?
         val stale = lastDownload + threshold < clock.now().toEpochMilliseconds().milliseconds
         if (!stale) {
             log.i { "Weather not fetched from network. Recently updated" }

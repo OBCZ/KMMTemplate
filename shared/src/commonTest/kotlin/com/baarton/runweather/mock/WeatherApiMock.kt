@@ -62,31 +62,31 @@ object EMPTY : MockResponses() {
 
 class WeatherApiMock : WeatherApi {
 
-    private var nextResult: ArrayDeque<() -> WeatherData> = initQueue()
+    private var resultQueue: ArrayDeque<() -> WeatherData> = initQueue()
     var calledCount = 0
         private set
 
     override suspend fun getJsonFromApi(): WeatherData {
-        val result = nextResult.removeFirst()()
+        val result = resultQueue.removeFirst()()
         calledCount++
         return result
     }
 
     fun reset() {
-        nextResult = initQueue()
+        resultQueue = initQueue()
         calledCount = 0
     }
 
     fun prepareResult(weatherResult: WeatherData) {
-        nextResult = ArrayDeque(listOf({ weatherResult }))
+        resultQueue = ArrayDeque(listOf({ weatherResult }))
     }
 
     fun prepareResult(weatherResults: List<WeatherData>) {
-        nextResult = ArrayDeque(weatherResults.map { { it } })
+        resultQueue = ArrayDeque(weatherResults.map { { it } })
     }
 
     fun throwOnCall(throwable: Throwable) {
-        nextResult = ArrayDeque(listOf({ throw throwable }))
+        resultQueue = ArrayDeque(listOf({ throw throwable }))
     }
 
     private fun initQueue(): ArrayDeque<() -> WeatherData> {

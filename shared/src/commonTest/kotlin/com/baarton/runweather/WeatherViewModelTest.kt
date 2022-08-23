@@ -22,36 +22,31 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.hours
 
+
 class WeatherViewModelTest {
+
     private var kermit = Logger(StaticConfig())
     private var testDbConnection = testDbConnection()
-    private var dbHelper = DatabaseHelper(
-        testDbConnection,
-        kermit,
-        Dispatchers.Default
-    )
+    private var dbHelper = DatabaseHelper(testDbConnection, kermit, Dispatchers.Default)
     private val settings = MockSettings()
     private val apiMock = WeatherApiMock()
-
-    // Need to start at non-zero time because the default value for db timestamp is 0
     private val clock = ClockMock(Clock.System.now())
-
-    private val repository: WeatherRepository =
-        WeatherRepository(dbHelper, settings, apiMock, kermit, clock)
+    private val repository: WeatherRepository = WeatherRepository(dbHelper, settings, apiMock, kermit, clock)
     private val testConfig: Config = TestConfig
+
     private val viewModel by lazy { WeatherViewModel(testConfig, repository, clock, kermit) }
 
     companion object {
 
         private val weatherSuccessStateBrno1 = WeatherViewState(
-            weather =
-            CurrentWeather(
+            weather = CurrentWeather(
                 listOf(Weather("800", "Clear", "clear sky", "01d")),
                 "Brno",
                 WeatherData.MainData("265.90", "1021", "45"),
@@ -59,12 +54,10 @@ class WeatherViewModelTest {
                 null,
                 WeatherData.Sys("1646803774", "1646844989")
             )
-
         )
 
         private val weatherSuccessStateBrno2 = WeatherViewState(
-            weather =
-            CurrentWeather(
+            weather = CurrentWeather(
                 listOf(Weather("800", "Clear", "clear sky", "01d")),
                 "Brno",
                 WeatherData.MainData("260.90", "1025", "55"),
@@ -72,7 +65,6 @@ class WeatherViewModelTest {
                 null,
                 WeatherData.Sys("1646806774", "1646842989")
             )
-
         )
     }
 
@@ -118,10 +110,7 @@ class WeatherViewModelTest {
     @Test
     fun `Get weather with cache and update from network call`() = runBlocking {
         apiMock.prepareResult(listOf(BRNO2.get()))
-        settings.putLong(
-            WeatherRepository.DB_TIMESTAMP_KEY,
-            clock.currentInstant.toEpochMilliseconds()
-        )
+        setDataAge(clock.currentInstant)
         dbHelper.insert(BRNO1.get())
 
         assertEquals(0, apiMock.calledCount)
@@ -134,7 +123,7 @@ class WeatherViewModelTest {
             assertEquals(0, apiMock.calledCount)
             expectNoEvents()
 
-            enforceDataIsStale()
+            setDataAge(clock.currentInstant - 2.hours)
 
             assertEquals(
                 weatherSuccessStateBrno2,
@@ -158,7 +147,7 @@ class WeatherViewModelTest {
             )
             assertEquals(1, apiMock.calledCount)
 
-            enforceDataIsStale()
+            setDataAge(clock.currentInstant - 2.hours)
 
             assertEquals(
                 weatherSuccessStateBrno2,
@@ -185,21 +174,9 @@ class WeatherViewModelTest {
         }
     }
 
-    private fun enforceDataIsStale() {
-        settings.putLong(
-            WeatherRepository.DB_TIMESTAMP_KEY,
-            (clock.currentInstant - 2.hours).toEpochMilliseconds()
-        )
-    }
-
-
-    //TODO assert last updated preferably everywhere
-    // I might assert next state change in the state flow
-
-    //FIXME get other tests working
     @Test
     fun `Display API error on first run`() = runBlocking {
-        settings.putLong(WeatherRepository.DB_TIMESTAMP_KEY, (clock.currentInstant - 2.hours).toEpochMilliseconds())
+        setDataAge(clock.currentInstant - 2.hours)
         apiMock.throwOnCall(RuntimeException("Test error"))
 
         viewModel.weatherState.test {
@@ -210,67 +187,70 @@ class WeatherViewModelTest {
         }
     }
 
-    //
-    // @Test
-    // fun `Ignore API error with cache`() = runBlocking {
-    //     dbHelper.insert(breedNames)
-    //     settings.putLong(WeatherRepository.DB_TIMESTAMP_KEY, (clock.currentInstant - 2.hours).toEpochMilliseconds())
-    //     apiMock.throwOnCall(RuntimeException("Test error"))
-    //
-    //     viewModel.weatherState.test {
-    //         assertEquals(
-    //             weatherViewSuccessState,
-    //             awaitItemPrecededBy(WeatherViewState(isLoading = true))
-    //         )
-    //         expectNoEvents()
-    //
-    //         apiMock.prepareResult(apiMock.brno())
-    //         viewModel.refreshWeather().join()
-    //
-    //         assertEquals(
-    //             weatherViewSuccessState,
-    //             awaitItemPrecededBy(weatherViewSuccessState.copy(isLoading = true))
-    //         )
-    //     }
-    // }
-    //
-    // @Test
-    // fun `Ignore API error on refresh with cache`() = runBlocking {
-    //     apiMock.prepareResult(apiMock.brno())
-    //
-    //     viewModel.weatherState.test {
-    //         assertEquals(
-    //             weatherViewSuccessState,
-    //             awaitItemPrecededBy(WeatherViewState(isLoading = true), WeatherViewState(isEmpty = true))
-    //         )
-    //         expectNoEvents()
-    //
-    //         apiMock.throwOnCall(RuntimeException("Test error"))
-    //         viewModel.refreshWeather().join()
-    //
-    //         assertEquals(
-    //             weatherViewSuccessState,
-    //             awaitItemPrecededBy(weatherViewSuccessState.copy(isLoading = true))
-    //         )
-    //     }
-    // }
-    //
-    // @Test
-    // fun `Show API error on refresh without cache`() = runBlocking {
-    //     settings.putLong(WeatherRepository.DB_TIMESTAMP_KEY, clock.currentInstant.toEpochMilliseconds())
-    //     apiMock.throwOnCall(RuntimeException("Test error"))
-    //
-    //     viewModel.weatherState.test {
-    //         assertEquals(WeatherViewState(isEmpty = true), awaitItemPrecededBy(WeatherViewState(isLoading = true)))
-    //         expectNoEvents()
-    //
-    //         viewModel.refreshWeather().join()
-    //         assertEquals(
-    //             WeatherViewState(error = "Unable to refresh breed list"),
-    //             awaitItemPrecededBy(WeatherViewState(isEmpty = true, isLoading = true))
-    //         )
-    //     }
-    // }
+    @Test
+    fun `Ignore API error with cache`() = runBlocking {
+        dbHelper.insert(BRNO1.get())
+        setDataAge(clock.currentInstant - 2.hours)
+        apiMock.throwOnCall(RuntimeException("Test error"))
+
+        viewModel.weatherState.test(2000) {
+            assertEquals(
+                weatherSuccessStateBrno1.copy(lastUpdated = 2.hours),
+                awaitItemPrecededBy(WeatherViewState(isLoading = true))
+            )
+            expectNoEvents()
+
+            apiMock.prepareResult(BRNO2.get())
+
+            assertEquals(
+                weatherSuccessStateBrno2,
+                awaitItemPrecededBy(weatherSuccessStateBrno1)
+            )
+        }
+    }
+
+    @Test
+    fun `Ignore API error on refresh with cache`() = runBlocking {
+        apiMock.prepareResult(BRNO1.get())
+
+        viewModel.weatherState.test(2000) {
+            assertEquals(
+                weatherSuccessStateBrno1,
+                awaitItemPrecededBy(WeatherViewState(isLoading = true), WeatherViewState(isEmpty = true))
+            )
+            expectNoEvents()
+
+            apiMock.throwOnCall(RuntimeException("Test error"))
+            viewModel.refreshWeather().join()
+
+            assertEquals(
+                weatherSuccessStateBrno1,
+                awaitItemPrecededBy(weatherSuccessStateBrno1.copy(isLoading = true))
+            )
+        }
+    }
+
+    @Test
+    fun `Show API error on refresh without cache`() = runBlocking {
+        setDataAge(clock.currentInstant)
+        apiMock.throwOnCall(RuntimeException("Test error"))
+
+        viewModel.weatherState.test {
+            assertEquals(WeatherViewState(isEmpty = true), awaitItemPrecededBy(WeatherViewState(isLoading = true)))
+            expectNoEvents()
+
+            viewModel.refreshWeather().join()
+            assertEquals(
+                WeatherViewState(error = "Unable to refresh weather list"),
+                awaitItemPrecededBy(WeatherViewState(isEmpty = true, isLoading = true))
+            )
+        }
+    }
+
+    private fun setDataAge(instant: Instant) {
+        settings.putLong(WeatherRepository.DB_TIMESTAMP_KEY, instant.toEpochMilliseconds())
+    }
+
 }
 
 // There's a race condition where intermediate states can get missed if the next state comes too fast.
