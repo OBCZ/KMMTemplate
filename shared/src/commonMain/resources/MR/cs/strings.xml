@@ -36,7 +36,8 @@
 
     <string name="fragment_weather_last_updated_text">Poslední aktualizace: %1$s</string>
     <string name="fragment_weather_last_updated_now">Právě nyní</string>
-    <string name="fragment_weather_last_updated_time">Před %1$d min</string>
+    <string name="fragment_weather_last_updated_min_time">Před %1$d min</string>
+    <string name="fragment_weather_last_updated_sec_time">Před %1$d sek</string>
 
     <string name="weather_runners_info_header">Běžecké info</string>
     <string name="weather_runners_info_alert_card_wind_moderate">Slabší vítr</string>

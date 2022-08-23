@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import com.baarton.runweather.AppInfo
+import com.baarton.runweather.Config
 import com.baarton.runweather.initKoin
 import com.baarton.runweather.models.WeatherViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -23,9 +24,9 @@ class MainApp : Application() {
                 // single<PlatformNetworkManager> { AndroidNetworkManager(get()) }
                 // single<PlatformLocationManager> { AndroidLocationManager(get()) }
 
-                viewModel { WeatherViewModel(get(), get(), get { parametersOf("WeatherViewModel") }) } //TODO
+                viewModel { WeatherViewModel(get(), get(), get(), get { parametersOf("WeatherViewModel") }) }
                 single<SharedPreferences> {
-                    get<Context>().getSharedPreferences("RUNWEATHER_SETTINGS", Context.MODE_PRIVATE)
+                    get<Context>().getSharedPreferences(get<Config>().preferences, Context.MODE_PRIVATE)
                 }
                 single<AppInfo> { AndroidAppInfo }
                 single {
@@ -38,4 +39,5 @@ class MainApp : Application() {
 
 object AndroidAppInfo : AppInfo {
     override val appId: String = BuildConfig.APPLICATION_ID
+    override val debug: Boolean = BuildConfig.DEBUG
 }

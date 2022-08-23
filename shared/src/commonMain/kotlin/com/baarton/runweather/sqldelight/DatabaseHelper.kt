@@ -1,15 +1,14 @@
-package com.baarton.runweather
+package com.baarton.runweather.sqldelight
 
 import co.touchlab.kermit.Logger
 import com.baarton.runweather.db.CurrentWeather
 import com.baarton.runweather.db.RunWeatherDb
 import com.baarton.runweather.models.Weather
 import com.baarton.runweather.models.WeatherData
-import com.baarton.runweather.sqldelight.transactionWithContext
 import com.squareup.sqldelight.ColumnAdapter
 import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.runtime.coroutines.asFlow
-import com.squareup.sqldelight.runtime.coroutines.mapToList
+import com.squareup.sqldelight.runtime.coroutines.mapToOneOrNull
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -112,31 +111,22 @@ class DatabaseHelper(
 
         )
 
-    fun getAll(): Flow<List<CurrentWeather>> =
+    fun getAll(): Flow<CurrentWeather?> =
         dbRef.tableQueries
             .getAll()
             .asFlow()
-            .mapToList()
+            .mapToOneOrNull()
             .flowOn(backgroundDispatcher)
 
     suspend fun insert(weatherData: WeatherData) {
         log.d { "Inserting weather for ${weatherData.locationName} into database" }
         dbRef.transactionWithContext(backgroundDispatcher) {
-            // breeds.forEach { breed ->
+            dbRef.tableQueries.nuke()
             with(weatherData) {
                 dbRef.tableQueries.insert(weatherList, locationName, mainData, wind, rain, sys)
-
             }
-            // }
         }
     }
-
-    // fun selectById(id: Long): Flow<List<WeatherData>> =
-    //     dbRef.tableQueries
-    //         .selectById(id)
-    //         .asFlow()
-    //         .mapToList()
-    //         .flowOn(backgroundDispatcher)
 
     suspend fun nuke() {
         log.i { "Database Cleared" }
@@ -145,10 +135,4 @@ class DatabaseHelper(
         }
     }
 
-    // suspend fun updateFavorite(breedId: Long, favorite: Boolean) {
-    //     log.i { "Breed $breedId: Favorited $favorite" }
-    //     dbRef.transactionWithContext(backgroundDispatcher) {
-    //         dbRef.tableQueries.updateFavorite(favorite, breedId)
-    //     }
-    // }
 }

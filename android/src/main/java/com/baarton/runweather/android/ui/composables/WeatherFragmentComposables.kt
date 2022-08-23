@@ -43,7 +43,7 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import org.koin.androidx.compose.inject
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
-
+import kotlin.time.Duration
 
 @Composable
 fun WeatherFragmentScreen(
@@ -63,7 +63,7 @@ fun WeatherFragmentScreen(
     WeatherFragmentScreenContent(
         weatherState = weatherState,
         onRefresh = { viewModel.refreshWeather() },
-        onSuccess = { data -> log.v { "View updating with ${data.size} weather" } },
+        onSuccess = { data -> log.v { "View updating with data:\n$data" } },
         onError = { exception -> log.e { "Displaying error: $exception" } },
         // onFavorite = { viewModel.updateBreedFavorite(it) }
     )
@@ -73,7 +73,7 @@ fun WeatherFragmentScreen(
 private fun WeatherFragmentScreenContent(
     weatherState: WeatherViewState,
     onRefresh: () -> Unit = {},
-    onSuccess: (List<CurrentWeather>) -> Unit = {},
+    onSuccess: (CurrentWeather) -> Unit = {},
     onError: (String) -> Unit = {},
     // onFavorite: (Breed) -> Unit = {}
 ) {
@@ -91,14 +91,11 @@ private fun WeatherFragmentScreenContent(
             val weather = weatherState.weather
             if (weather == null) { //TODO review this check
                 ErrorScreen("Weather null")
-            } else if (weather.size == 1) {
+            } else {
                 LaunchedEffect(weather) {
                     onSuccess(weather)
                 }
-                WeatherScreen(weather[0], weatherState)
-            } else {
-                WeatherScreen(weather[weather.size - 1], weatherState)
-                // ErrorScreen("More than one weather")
+                WeatherScreen(weather, weatherState)
             }
             val error = weatherState.error
             if (error != null) {
@@ -285,7 +282,7 @@ private fun WeatherScreen(
 
 //TODO can we extract more?
 @Composable
-private fun lastUpdatedText(lastUpdated: Long): String {
+private fun lastUpdatedText(lastUpdated: Duration): String {
     val pair = lastUpdatedResId(lastUpdated)
     val lastUpdatedValue = pair.second?.let {
         stringResource(id = pair.first.resourceId, formatArgs = arrayOf(it))
@@ -297,7 +294,8 @@ private fun lastUpdatedText(lastUpdated: Long): String {
         id = SharedRes.strings.fragment_weather_last_updated_text.resourceId,
         formatArgs = arrayOf(
             lastUpdatedValue
-        ))
+        )
+    )
 }
 
 // @Composable
@@ -340,30 +338,28 @@ private fun lastUpdatedText(lastUpdated: Long): String {
 fun MainScreenContentPreview_Success() {
     WeatherFragmentScreenContent(
         weatherState = WeatherViewState(
-            weather = listOf(
-                CurrentWeather(
-                    weatherList = listOf(
-                        Weather(
-                            weatherId = "803",
-                            title = "Clouds",
-                            description = "oblačno",
-                            iconId = "04d"
-                        )
-                    ),
-                    locationName = "Kouřim",
-                    mainData = WeatherData.MainData(
-                        temperature = "300.82",
-                        pressure = "1019",
-                        humidity = "38"
-                    ),
-                    wind = WeatherData.Wind(speed = "4.27", deg = "277"),
-                    rain = null,
-                    sys = WeatherData.Sys(
-                        sunrise = "1657681500",
-                        sunset = "1657739161"
+            weather =
+            CurrentWeather(
+                weatherList = listOf(
+                    Weather(
+                        weatherId = "803",
+                        title = "Clouds",
+                        description = "oblačno",
+                        iconId = "04d"
                     )
+                ),
+                locationName = "Kouřim",
+                mainData = WeatherData.MainData(
+                    temperature = "300.82",
+                    pressure = "1019",
+                    humidity = "38"
+                ),
+                wind = WeatherData.Wind(speed = "4.27", deg = "277"),
+                rain = null,
+                sys = WeatherData.Sys(
+                    sunrise = "1657681500",
+                    sunset = "1657739161"
                 )
-
             )
         )
     )

@@ -38,7 +38,8 @@
 
     <string name="fragment_weather_last_updated_text">Last update: %1$s</string>
     <string name="fragment_weather_last_updated_now">Just now</string>
-    <string name="fragment_weather_last_updated_time">%1$d min ago</string>
+    <string name="fragment_weather_last_updated_min_time">%1$d min ago</string>
+    <string name="fragment_weather_last_updated_sec_time">%1$d sec ago</string>
 
     <string name="weather_runners_info_header">Runners info</string>
     <string name="weather_runners_info_alert_card_wind_moderate">Moderate Wind</string>

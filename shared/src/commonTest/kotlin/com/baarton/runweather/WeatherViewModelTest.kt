@@ -6,6 +6,7 @@ import co.touchlab.kermit.Logger
 import co.touchlab.kermit.StaticConfig
 import com.baarton.runweather.db.CurrentWeather
 import com.baarton.runweather.mock.BRNO1
+import com.baarton.runweather.mock.BRNO2
 import com.baarton.runweather.mock.ClockMock
 import com.baarton.runweather.mock.EMPTY
 import com.baarton.runweather.mock.WeatherApiMock
@@ -14,6 +15,7 @@ import com.baarton.runweather.models.WeatherData
 import com.baarton.runweather.models.WeatherRepository
 import com.baarton.runweather.models.WeatherViewModel
 import com.baarton.runweather.models.WeatherViewState
+import com.baarton.runweather.sqldelight.DatabaseHelper
 import com.russhwolf.settings.MockSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -24,6 +26,7 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.hours
 
 class WeatherViewModelTest {
     private var kermit = Logger(StaticConfig())
@@ -39,32 +42,38 @@ class WeatherViewModelTest {
     // Need to start at non-zero time because the default value for db timestamp is 0
     private val clock = ClockMock(Clock.System.now())
 
-    private val repository: WeatherRepository = WeatherRepository(dbHelper, settings, apiMock, kermit, clock)
-    private val viewModel by lazy { WeatherViewModel(repository, clock, kermit) }
-
-
+    private val repository: WeatherRepository =
+        WeatherRepository(dbHelper, settings, apiMock, kermit, clock)
+    private val testConfig: Config = TestConfig
+    private val viewModel by lazy { WeatherViewModel(testConfig, repository, clock, kermit) }
 
     companion object {
 
-        // private val australianNoLike = CurrentWeather(2, "australian", false)
-        // private val australianLike = CurrentWeather(2, "australian", true)
-        private val weatherViewSuccessState = WeatherViewState(
-            weather = listOf(
-                CurrentWeather(
-                    listOf(Weather("800", "Clear", "clear sky", "01d")),
-                    "Brno",
-                    WeatherData.MainData("265.90", "1021", "45"),
-                    WeatherData.Wind("4.6", "345"),
-                    null,
-                    WeatherData.Sys("1646803774", "1646844989")
-                )
+        private val weatherSuccessStateBrno1 = WeatherViewState(
+            weather =
+            CurrentWeather(
+                listOf(Weather("800", "Clear", "clear sky", "01d")),
+                "Brno",
+                WeatherData.MainData("265.90", "1021", "45"),
+                WeatherData.Wind("4.6", "345"),
+                null,
+                WeatherData.Sys("1646803774", "1646844989")
             )
-        )
-        // private val weatherViewStateSuccessFavorite = WeatherViewState(
-        //     weather = listOf(brno, australianLike)
-        // )
 
-        // private val breedNames = weatherViewSuccessState.weather?.get(0). { it.name }.orEmpty()
+        )
+
+        private val weatherSuccessStateBrno2 = WeatherViewState(
+            weather =
+            CurrentWeather(
+                listOf(Weather("800", "Clear", "clear sky", "01d")),
+                "Brno",
+                WeatherData.MainData("260.90", "1025", "55"),
+                WeatherData.Wind("4.7", "355"),
+                null,
+                WeatherData.Sys("1646806774", "1646842989")
+            )
+
+        )
     }
 
     @BeforeTest
@@ -75,6 +84,7 @@ class WeatherViewModelTest {
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
+        apiMock.reset()
         testDbConnection.close()
     }
 
@@ -96,108 +106,110 @@ class WeatherViewModelTest {
 
         viewModel.weatherState.test {
             assertEquals(
-                weatherViewSuccessState,
+                weatherSuccessStateBrno1,
+                awaitItemPrecededBy(
+                    WeatherViewState(isLoading = true),
+                    WeatherViewState(isEmpty = true)
+                )
+            )
+        }
+    }
+
+    @Test
+    fun `Get weather with cache and update from network call`() = runBlocking {
+        apiMock.prepareResult(listOf(BRNO2.get()))
+        settings.putLong(
+            WeatherRepository.DB_TIMESTAMP_KEY,
+            clock.currentInstant.toEpochMilliseconds()
+        )
+        dbHelper.insert(BRNO1.get())
+
+        assertEquals(0, apiMock.calledCount)
+
+        viewModel.weatherState.test(2000) {
+            assertEquals(
+                weatherSuccessStateBrno1,
+                awaitItemPrecededBy(WeatherViewState(isLoading = true))
+            )
+            assertEquals(0, apiMock.calledCount)
+            expectNoEvents()
+
+            enforceDataIsStale()
+
+            assertEquals(
+                weatherSuccessStateBrno2,
+                awaitItemPrecededBy(weatherSuccessStateBrno1.copy(isLoading = true))
+            )
+            assertEquals(1, apiMock.calledCount)
+        }
+    }
+
+    @Test
+    fun `Get weather via poll - updated from network call`() = runBlocking {
+        apiMock.prepareResult(listOf(BRNO1.get(), BRNO2.get()))
+
+        viewModel.weatherState.test(2000) {
+            assertEquals(
+                weatherSuccessStateBrno1,
+                awaitItemPrecededBy(
+                    WeatherViewState(isLoading = true),
+                    WeatherViewState(isEmpty = true)
+                )
+            )
+            assertEquals(1, apiMock.calledCount)
+
+            enforceDataIsStale()
+
+            assertEquals(
+                weatherSuccessStateBrno2,
+                awaitItemPrecededBy(weatherSuccessStateBrno1)
+            )
+            assertEquals(2, apiMock.calledCount)
+        }
+    }
+
+    @Test
+    fun `Get weather via poll - not updated from network call`() = runBlocking {
+        apiMock.prepareResult(listOf(BRNO1.get(), BRNO2.get()))
+
+        viewModel.weatherState.test(2000) {
+            assertEquals(
+                weatherSuccessStateBrno1,
+                awaitItemPrecededBy(
+                    WeatherViewState(isLoading = true),
+                    WeatherViewState(isEmpty = true)
+                )
+            )
+            assertEquals(1, apiMock.calledCount)
+            expectNoEvents()
+        }
+    }
+
+    private fun enforceDataIsStale() {
+        settings.putLong(
+            WeatherRepository.DB_TIMESTAMP_KEY,
+            (clock.currentInstant - 2.hours).toEpochMilliseconds()
+        )
+    }
+
+
+    //TODO assert last updated preferably everywhere
+    // I might assert next state change in the state flow
+
+    //FIXME get other tests working
+    @Test
+    fun `Display API error on first run`() = runBlocking {
+        settings.putLong(WeatherRepository.DB_TIMESTAMP_KEY, (clock.currentInstant - 2.hours).toEpochMilliseconds())
+        apiMock.throwOnCall(RuntimeException("Test error"))
+
+        viewModel.weatherState.test {
+            assertEquals(
+                WeatherViewState(lastUpdated = 2.hours, error = "Unable to download weather list."),
                 awaitItemPrecededBy(WeatherViewState(isLoading = true), WeatherViewState(isEmpty = true))
             )
         }
     }
 
-    //FIXME get other tests working
-    ////
-    // @Test
-    // fun `Get updated breeds with cache and preserve favorites`() = runBlocking {
-    //     settings.putLong(WeatherRepository.DB_TIMESTAMP_KEY, clock.currentInstant.toEpochMilliseconds())
-    //
-    //     val successResult = apiMock.brno()
-    //     val resultWithExtraBreed = successResult.copy(message = successResult.message + ("extra" to emptyList()))
-    //     apiMock.prepareResult(resultWithExtraBreed)
-    //
-    //     dbHelper.insert(breedNames)
-    //     // dbHelper.updateFavorite(australianLike.id, true)
-    //
-    //     viewModel.weatherState.test {
-    //         assertEquals(weatherViewStateSuccessFavorite, awaitItemPrecededBy(WeatherViewState(isLoading = true)))
-    //         expectNoEvents()
-    //
-    //         viewModel.refreshWeather().join()
-    //         // id is 5 here because it incremented twice when trying to insert duplicate breeds
-    //         assertEquals(
-    //             WeatherViewState(weatherViewStateSuccessFavorite.weather?.plus(CurrentWeather(5, "extra", false))),
-    //             awaitItemPrecededBy(weatherViewStateSuccessFavorite.copy(isLoading = true))
-    //         )
-    //     }
-    // }
-    //
-    // @Test
-    // fun `Get updated breeds when stale and preserve favorites`() = runBlocking {
-    //     settings.putLong(WeatherRepository.DB_TIMESTAMP_KEY, (clock.currentInstant - 2.hours).toEpochMilliseconds())
-    //
-    //     val successResult = apiMock.brno()
-    //     val resultWithExtraBreed = successResult.copy(message = successResult.message + ("extra" to emptyList()))
-    //     apiMock.prepareResult(resultWithExtraBreed)
-    //
-    //     dbHelper.insert(breedNames)
-    //     dbHelper.updateFavorite(australianLike.id, true)
-    //
-    //     viewModel.weatherState.test {
-    //         // id is 5 here because it incremented twice when trying to insert duplicate breeds
-    //         assertEquals(
-    //             WeatherViewState(weatherViewStateSuccessFavorite.weather?.plus(CurrentWeather(5, "extra", false))),
-    //             awaitItemPrecededBy(WeatherViewState(isLoading = true), weatherViewStateSuccessFavorite)
-    //         )
-    //     }
-    // }
-    //
-    // // @Test
-    // // fun `Toggle favorite cached breed`() = runBlocking {
-    // //     settings.putLong(WeatherRepository.DB_TIMESTAMP_KEY, clock.currentInstant.toEpochMilliseconds())
-    // //
-    // //     dbHelper.insert(breedNames)
-    // //     dbHelper.updateFavorite(australianLike.id, true)
-    // //
-    // //     viewModel.weatherState.test {
-    // //         assertEquals(weatherViewStateSuccessFavorite, awaitItemPrecededBy(WeatherViewState(isLoading = true)))
-    // //         expectNoEvents()
-    // //
-    // //         viewModel.updateBreedFavorite(australianLike).join()
-    // //         assertEquals(
-    // //             weatherViewSuccessState,
-    // //             awaitItemPrecededBy(weatherViewStateSuccessFavorite.copy(isLoading = true))
-    // //         )
-    // //     }
-    // // }
-    //
-    // @Test
-    // fun `No web call if data is not stale`() = runBlocking {
-    //     settings.putLong(WeatherRepository.DB_TIMESTAMP_KEY, clock.currentInstant.toEpochMilliseconds())
-    //     apiMock.prepareResult(apiMock.brno())
-    //     dbHelper.insert(breedNames)
-    //
-    //     viewModel.weatherState.test {
-    //         assertEquals(weatherViewSuccessState, awaitItemPrecededBy(WeatherViewState(isLoading = true)))
-    //         assertEquals(0, apiMock.calledCount)
-    //         expectNoEvents()
-    //
-    //         viewModel.refreshWeather().join()
-    //         assertEquals(
-    //             weatherViewSuccessState,
-    //             awaitItemPrecededBy(weatherViewSuccessState.copy(isLoading = true))
-    //         )
-    //         assertEquals(1, apiMock.calledCount)
-    //     }
-    // }
-    //
-    // @Test
-    // fun `Display API error on first run`() = runBlocking {
-    //     apiMock.throwOnCall(RuntimeException("Test error"))
-    //
-    //     viewModel.weatherState.test {
-    //         assertEquals(
-    //             WeatherViewState(error = "Unable to download breed list"),
-    //             awaitItemPrecededBy(WeatherViewState(isLoading = true), WeatherViewState(isEmpty = true))
-    //         )
-    //     }
-    // }
     //
     // @Test
     // fun `Ignore API error with cache`() = runBlocking {

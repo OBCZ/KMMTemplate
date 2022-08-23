@@ -6,6 +6,7 @@ import com.baarton.runweather.models.WeatherRepository
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.StaticConfig
 import co.touchlab.kermit.platformLogWriter
+import com.baarton.runweather.sqldelight.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.datetime.Clock
 import org.koin.core.KoinApplication
@@ -23,7 +24,8 @@ import org.koin.dsl.module
 //TODO then start extracting business logic to common
 //TODO then start duplicating/mimicking UI stuff, platform specific stuff
 //TODO then review all files and its origin/contents
-//TODO verify architecture somehow, review dependencies, cleanup gradle files
+//TODO verify architecture somehow (KoinComponent extending instead of constructor arguments ? will it be good for unit testing ? - if not, should I do some integration tests Robolectric with KoinTest?)
+//TODO review dependencies, cleanup gradle files
 
 //TODO after migration:
 // review logging messages, exceptions, nullability, edge cases
@@ -57,7 +59,11 @@ fun initKoin(appModule: Module): KoinApplication {
     val kermit = koin.get<Logger> { parametersOf(null) }
     // AppInfo is a Kotlin interface with separate Android and iOS implementations
     val appInfo = koin.get<AppInfo>()
-    kermit.v { "App Id ${appInfo.appId}" }
+    kermit.v {
+        "Modules initialized.\n" +
+            "App Id: ${appInfo.appId}\n" +
+            "DEBUG: ${appInfo.debug}"
+    }
 
     return koinApplication
 }
@@ -78,6 +84,9 @@ private val coreModule = module {
     }
     single<Clock> {
         Clock.System
+    }
+    single<Config> {
+        AppConfig(get())
     }
 
     //TODO investigate

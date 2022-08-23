@@ -10,6 +10,7 @@ import com.baarton.runweather.mock.WeatherApiMock
 import com.baarton.runweather.models.Weather
 import com.baarton.runweather.models.WeatherData
 import com.baarton.runweather.models.WeatherRepository
+import com.baarton.runweather.sqldelight.DatabaseHelper
 import com.russhwolf.settings.MockSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -32,13 +33,13 @@ class WeatherRepositoryTest {
         Dispatchers.Default
     )
     private val settings = MockSettings()
-    private val ktorApi = WeatherApiMock()
+    private val apiMock = WeatherApiMock()
 
     // Need to start at non-zero time because the default value for db timestamp is 0
     private val clock = ClockMock(Clock.System.now())
 
     private val repository: WeatherRepository =
-        WeatherRepository(dbHelper, settings, ktorApi, kermit, clock)
+        WeatherRepository(dbHelper, settings, apiMock, kermit, clock)
 
     companion object {
         // private val appenzeller = Breed(1, "appenzeller", false)
@@ -51,24 +52,23 @@ class WeatherRepositoryTest {
 
     @AfterTest
     fun tearDown() = runTest {
+        apiMock.reset()
         testDbConnection.close()
     }
 
     @Test
     fun `Get weather without cache`() = runBlocking {
-        ktorApi.prepareResult(BRNO1.get())
+        apiMock.prepareResult(BRNO1.get())
         repository.refreshWeatherIfStale()
         repository.getWeather().test {
             assertEquals(
-                listOf(
-                    CurrentWeather(
-                        listOf(Weather("800", "Clear", "clear sky", "01d")),
-                        "Brno",
-                        WeatherData.MainData("265.90", "1021", "45"),
-                        WeatherData.Wind("4.6", "345"),
-                        null,
-                        WeatherData.Sys("1646803774", "1646844989")
-                    )
+                CurrentWeather(
+                    listOf(Weather("800", "Clear", "clear sky", "01d")),
+                    "Brno",
+                    WeatherData.MainData("265.90", "1021", "45"),
+                    WeatherData.Wind("4.6", "345"),
+                    null,
+                    WeatherData.Sys("1646803774", "1646844989")
                 ), awaitItem()
             )
         }
@@ -131,18 +131,18 @@ class WeatherRepositoryTest {
             WeatherRepository.DB_TIMESTAMP_KEY,
             clock.currentInstant.toEpochMilliseconds()
         )
-        ktorApi.prepareResult(BRNO1.get())
+        apiMock.prepareResult(BRNO1.get())
 
         repository.refreshWeatherIfStale()
-        assertEquals(0, ktorApi.calledCount)
+        assertEquals(0, apiMock.calledCount)
 
         repository.refreshWeather()
-        assertEquals(1, ktorApi.calledCount)
+        assertEquals(1, apiMock.calledCount)
     }
 
     @Test
     fun `Rethrow on API error`() = runTest {
-        ktorApi.throwOnCall(RuntimeException("Test error"))
+        apiMock.throwOnCall(RuntimeException("Test error"))
 
         val throwable = assertFails {
             repository.refreshWeather()
@@ -156,7 +156,7 @@ class WeatherRepositoryTest {
             WeatherRepository.DB_TIMESTAMP_KEY,
             (clock.currentInstant - 2.hours).toEpochMilliseconds()
         )
-        ktorApi.throwOnCall(RuntimeException("Test error"))
+        apiMock.throwOnCall(RuntimeException("Test error"))
 
         val throwable = assertFails {
             repository.refreshWeatherIfStale()

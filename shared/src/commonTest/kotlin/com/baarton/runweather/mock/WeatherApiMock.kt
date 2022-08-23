@@ -62,21 +62,34 @@ object EMPTY : MockResponses() {
 
 class WeatherApiMock : WeatherApi {
 
-    private var nextResult: () -> WeatherData = { error("Uninitialized!") }
+    private var nextResult: ArrayDeque<() -> WeatherData> = initQueue()
     var calledCount = 0
         private set
 
     override suspend fun getJsonFromApi(): WeatherData {
-        val result = nextResult()
+        val result = nextResult.removeFirst()()
         calledCount++
         return result
     }
 
+    fun reset() {
+        nextResult = initQueue()
+        calledCount = 0
+    }
+
     fun prepareResult(weatherResult: WeatherData) {
-        nextResult = { weatherResult }
+        nextResult = ArrayDeque(listOf({ weatherResult }))
+    }
+
+    fun prepareResult(weatherResults: List<WeatherData>) {
+        nextResult = ArrayDeque(weatherResults.map { { it } })
     }
 
     fun throwOnCall(throwable: Throwable) {
-        nextResult = { throw throwable }
+        nextResult = ArrayDeque(listOf({ throw throwable }))
+    }
+
+    private fun initQueue(): ArrayDeque<() -> WeatherData> {
+        return ArrayDeque(listOf({ error("Uninitialized!") }))
     }
 }

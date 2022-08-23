@@ -4,6 +4,7 @@ import co.touchlab.kermit.Logger
 import com.baarton.runweather.mock.BRNO1
 import com.baarton.runweather.mock.BRNO2
 import com.baarton.runweather.mock.BRNO3
+import com.baarton.runweather.sqldelight.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -16,10 +17,6 @@ import kotlin.test.assertTrue
 class SqlDelightTest {
 
     private lateinit var dbHelper: DatabaseHelper
-
-    // private suspend fun DatabaseHelper.insertBreed(name: String) {
-    //     insert(listOf(name))
-    // }
 
     @BeforeTest
     fun setup() = runTest {
@@ -36,46 +33,21 @@ class SqlDelightTest {
     fun `Select All Items Success`() = runTest {
         val weatherList = dbHelper.getAll().first()
         assertNotNull(
-            weatherList.find { it.locationName == "Brno" },
+            weatherList,
             "Could not retrieve Weather"
         )
+        assertTrue { weatherList.locationName == "Brno" }
     }
-
-    // @Test
-    // fun `Select Item by Id Success`() = runTest {
-    //     val weatherList = dbHelper.getAll().first()
-    //     val firstWeather = weatherList.first()
-    //     assertNotNull(
-    //         dbHelper.selectById(firstWeather.id),
-    //         "Could not retrieve Breed by Id"
-    //     )
-    // }
-
-    // @Test
-    // fun `Update Favorite Success`() = runTest {
-    //     val breeds = dbHelper.getAll().first()
-    //     val firstBreed = breeds.first()
-    //     dbHelper.updateFavorite(firstBreed.id, true)
-    //     val newBreed = dbHelper.selectById(firstBreed.id).first().first()
-    //     assertNotNull(
-    //         newBreed,
-    //         "Could not retrieve Breed by Id"
-    //     )
-    //     assertTrue(
-    //         newBreed.favorite,
-    //         "Favorite Did Not Save"
-    //     )
-    // }
 
     @Test
     fun `Delete All Success`() = runTest {
         dbHelper.insert(BRNO2.get())
         dbHelper.insert(BRNO3.get())
-        assertTrue(dbHelper.getAll().first().isNotEmpty())
+        assertTrue(dbHelper.getAll().first() != null)
         dbHelper.nuke()
 
         assertTrue(
-            dbHelper.getAll().first().isEmpty(),
+            dbHelper.getAll().first() == null,
             "Delete All did not work"
         )
     }

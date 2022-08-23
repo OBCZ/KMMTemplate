@@ -2,12 +2,15 @@ package com.baarton.runweather.models
 
 import co.touchlab.kermit.Logger
 import co.touchlab.stately.ensureNeverFrozen
-import com.baarton.runweather.DatabaseHelper
 import com.baarton.runweather.db.CurrentWeather
 import com.baarton.runweather.ktor.WeatherApi
+import com.baarton.runweather.sqldelight.DatabaseHelper
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Clock
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 
 class WeatherRepository(
     private val dbHelper: DatabaseHelper,
@@ -21,19 +24,20 @@ class WeatherRepository(
 
     companion object {
         internal const val DB_TIMESTAMP_KEY = "DbTimestampKey"
+        internal const val WEATHER_REFRESH_THRESHOLD_KEY = "WeatherRefreshThresholdKey"
     }
 
     init {
         ensureNeverFrozen()
     }
 
-    fun getWeather(): Flow<List<CurrentWeather>> {
+    fun getWeather(): Flow<CurrentWeather?> {
         log.d("Get WeatherData from DB.")
         return dbHelper.getAll()
     }
 
-    fun getLastDownloadTime(): Long {
-        return settings.getLong(DB_TIMESTAMP_KEY, 0)
+    fun getLastDownloadTime(): Duration {
+        return settings.getLong(DB_TIMESTAMP_KEY, 0).milliseconds
     }
 
     suspend fun refreshWeatherIfStale() {
@@ -44,25 +48,19 @@ class WeatherRepository(
 
     suspend fun refreshWeather() {
         val weatherResult = weatherApi.getJsonFromApi()
-        log.v { "Weather network result: $weatherResult" }
-        // val breedList = breedResult.message.keys.sorted().toList()
-        // log.v { "Fetched ${breedList.size} breeds from network" }
+        log.d { "Weather network result: $weatherResult" }
         settings.putLong(DB_TIMESTAMP_KEY, clock.now().toEpochMilliseconds())
 
         if (weatherResult.locationName.isNotBlank()) {
             dbHelper.insert(weatherResult)
-            log.v { "WeatherData result put to DB." }
+            log.d { "WeatherData result put to DB." }
         }
     }
 
-    // suspend fun updateBreedFavorite(breed: Breed) {
-    //     dbHelper.updateFavorite(breed.id, !breed.favorite)
-    // }
-
     private fun isWeatherListStale(): Boolean {
-        val lastDownloadTimeMS = getLastDownloadTime()
-        val oneHourMS =  30 * 1000
-        val stale = lastDownloadTimeMS + oneHourMS < clock.now().toEpochMilliseconds()
+        val lastDownload = getLastDownloadTime()
+        val threshold = settings.getLong(WEATHER_REFRESH_THRESHOLD_KEY, 2).minutes //TODO 2 - 15 mins - dont forget to connect this with Setting Fragment, what about debug?
+        val stale = lastDownload + threshold < clock.now().toEpochMilliseconds().milliseconds
         if (!stale) {
             log.i { "Weather not fetched from network. Recently updated" }
         }
