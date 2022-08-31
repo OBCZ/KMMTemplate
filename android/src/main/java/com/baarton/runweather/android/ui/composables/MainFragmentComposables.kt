@@ -2,17 +2,13 @@ package com.baarton.runweather.android.ui.composables
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Icon
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -35,7 +31,7 @@ enum class TabItem(
         WeatherFragmentScreen()
     }),
     SETTINGS(1, R.drawable.ic_settings_24_secondary, SharedRes.strings.main_tab_settings.resourceId, {
-            SettingsScreenForTab()
+        SettingsFragmentScreen()
     })
 }
 
@@ -85,17 +81,6 @@ fun TabPage(pagerState: PagerState) {
     ) { index ->
         TabItem.values().first { index == it.index }.screenToLoad()
     }
-}
-
-@Composable
-fun SettingsScreenForTab() {
-    Column(
-        content = {
-            Text(text = "You are in Settings Screen")
-        }, modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    )
 }
 
 @ExperimentalPagerApi

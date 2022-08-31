@@ -53,19 +53,18 @@ fun WeatherFragmentScreen(
     val log: Logger by inject { parametersOf("WeatherFragment") }
 
     val lifecycleOwner = LocalLifecycleOwner.current
-    val lifecycleAwareDogsFlow = remember(viewModel.weatherState, lifecycleOwner) {
+    val lifecycleAwareWeatherFlow = remember(viewModel.weatherState, lifecycleOwner) {
         viewModel.weatherState.flowWithLifecycle(lifecycleOwner.lifecycle)
     }
 
     @SuppressLint("StateFlowValueCalledInComposition") // False positive lint check when used inside collectAsState()
-    val weatherState by lifecycleAwareDogsFlow.collectAsState(viewModel.weatherState.value)
+    val weatherState by lifecycleAwareWeatherFlow.collectAsState(viewModel.weatherState.value)
 
     WeatherFragmentScreenContent(
         weatherState = weatherState,
         onRefresh = { viewModel.refreshWeather() },
         onSuccess = { data -> log.v { "View updating with data:\n$data" } },
         onError = { exception -> log.e { "Displaying error: $exception" } },
-        // onFavorite = { viewModel.updateBreedFavorite(it) }
     )
 }
 
@@ -75,7 +74,6 @@ private fun WeatherFragmentScreenContent(
     onRefresh: () -> Unit = {},
     onSuccess: (CurrentWeather) -> Unit = {},
     onError: (String) -> Unit = {},
-    // onFavorite: (Breed) -> Unit = {}
 ) {
     Surface(
         color = MaterialTheme.colors.background,
@@ -297,41 +295,6 @@ private fun lastUpdatedText(lastUpdated: Duration): String {
         )
     )
 }
-
-// @Composable
-// fun DogRow(breed: CurrentWeather/*, onClick: (Breed) -> Unit*/) {
-//     Row(
-//         Modifier
-//             // .clickable { onClick(breed) }
-//             .padding(10.dp)
-//     ) {
-//         Text(breed.name, Modifier.weight(1F))
-//         FavoriteIcon(breed)
-//     }
-// }
-
-// @Composable
-// fun FavoriteIcon(breed: Breed) {
-//     Crossfade(
-//         targetState = !breed.favorite,
-//         animationSpec = TweenSpec(
-//             durationMillis = 500,
-//             easing = FastOutSlowInEasing
-//         )
-//     ) { fav ->
-//         if (fav) {
-//             Image(
-//                 painter = painterResource(id = R.drawable.ic_favorite_border_24px),
-//                 contentDescription = stringResource(R.string.favorite_breed, breed.name)
-//             )
-//         } else {
-//             Image(
-//                 painter = painterResource(id = R.drawable.ic_favorite_24px),
-//                 contentDescription = stringResource(R.string.unfavorite_breed, breed.name)
-//             )
-//         }
-//     }
-// }
 
 @Preview
 @Composable

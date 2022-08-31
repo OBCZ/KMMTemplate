@@ -83,7 +83,7 @@ class WeatherViewModel(
                         }
                         WeatherViewState(
                             isLoading = false,
-                            lastUpdated = timeStampDuration(weatherRepository.getLastDownloadTime()), //FIXME save only millis, accessors will compute what they need
+                            lastUpdated = timeStampDuration(weatherRepository.getLastDownloadTime()),
                             weather = weather.takeIf { it != null },
                             error = errorMessage.takeIf { weather == null },
                             isEmpty = weather == null && errorMessage == null

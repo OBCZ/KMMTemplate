@@ -59,10 +59,6 @@ class WeatherApiImpl(private val log: KermitLogger, engine: HttpClientEngine) : 
 
     private fun HttpRequestBuilder.weather() {
         url {
-            // takeFrom("https://dog.ceo/")
-            // encodedPath = path
-            // encodedParameters = ParametersBuilder()
-
             protocol = URLProtocol.HTTPS
             host = "api.openweathermap.org"
             path("data", "2.5", "weather")
@@ -71,7 +67,6 @@ class WeatherApiImpl(private val log: KermitLogger, engine: HttpClientEngine) : 
             parameters.append("lang", "cz")
             parameters.append("lat", "50.0") //TODO location manager
             parameters.append("lon", "15.0") //TODO location manager
-
         }
     }
 
