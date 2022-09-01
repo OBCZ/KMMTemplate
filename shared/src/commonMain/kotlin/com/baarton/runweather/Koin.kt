@@ -102,6 +102,7 @@ private val coreModule = module {
             get(),
             get(),
             get(),
+            get(),
             getWith("WeatherRepository"),
             get()
         )

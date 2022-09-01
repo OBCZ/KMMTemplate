@@ -30,15 +30,17 @@ import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.hours
 
 
+//TODO tests with weather data thresholds from Config
 class WeatherViewModelTest {
 
     private var kermit = Logger(StaticConfig())
     private var testDbConnection = testDbConnection()
     private var dbHelper = DatabaseHelper(testDbConnection, kermit, Dispatchers.Default)
     private val settings = MockSettings()
+    private val config = TestConfig
     private val apiMock = WeatherApiMock()
     private val clock = ClockMock(Clock.System.now())
-    private val repository: WeatherRepository = WeatherRepository(dbHelper, settings, apiMock, kermit, clock)
+    private val repository: WeatherRepository = WeatherRepository(dbHelper, settings, config, apiMock, kermit, clock)
     private val testConfig: Config = TestConfig
 
     private val viewModel by lazy { WeatherViewModel(testConfig, repository, clock, kermit) }

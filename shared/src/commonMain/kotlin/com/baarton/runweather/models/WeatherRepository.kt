@@ -2,19 +2,22 @@ package com.baarton.runweather.models
 
 import co.touchlab.kermit.Logger
 import co.touchlab.stately.ensureNeverFrozen
+import com.baarton.runweather.Config
 import com.baarton.runweather.db.CurrentWeather
 import com.baarton.runweather.ktor.WeatherApi
+import com.baarton.runweather.models.SettingsViewModel.Companion.REFRESH_DURATION_TAG
 import com.baarton.runweather.sqldelight.DatabaseHelper
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.minutes
+
 
 class WeatherRepository(
     private val dbHelper: DatabaseHelper,
     private val settings: Settings,
+    private val config: Config,
     private val weatherApi: WeatherApi,
     log: Logger,
     private val clock: Clock
@@ -24,7 +27,6 @@ class WeatherRepository(
 
     companion object {
         internal const val DB_TIMESTAMP_KEY = "DbTimestampKey"
-        internal const val WEATHER_REFRESH_THRESHOLD_KEY = "WeatherRefreshThresholdKey"
     }
 
     init {
@@ -59,7 +61,7 @@ class WeatherRepository(
 
     private fun isWeatherListStale(): Boolean {
         val lastDownload = getLastDownloadTime()
-        val threshold = settings.getLong(WEATHER_REFRESH_THRESHOLD_KEY, 2).minutes //TODO 2 - 15 mins - dont forget to connect this with Setting Fragment, what about debug and test?
+        val threshold = Duration.parseIsoString(settings.getString(REFRESH_DURATION_TAG, config.weatherDataMinimumThreshold.toIsoString()))
         val stale = lastDownload + threshold < clock.now().toEpochMilliseconds().milliseconds
         if (!stale) {
             log.i { "Weather not fetched from network. Recently updated" }

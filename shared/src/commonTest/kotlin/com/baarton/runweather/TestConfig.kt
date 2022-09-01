@@ -8,6 +8,8 @@ object TestConfig : Config {
 
     override val preferences: String = "RUNWEATHER_SETTINGS_TEST"
     override val weatherDataRequestInterval: Duration = 1.seconds
+    override val weatherDataMinimumThreshold: Duration = 2.seconds
+    override val weatherDataMaximumThreshold: Duration = 15.seconds
     override val weatherDataRefreshDistance: Float = 50f
     override val locationDataIdealRequestInterval: Duration = 2.seconds
     override val locationDataFastestRequestInterval: Duration = 1.seconds

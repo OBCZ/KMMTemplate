@@ -1,54 +1,77 @@
 package com.baarton.runweather.models
 
 import co.touchlab.kermit.Logger
-import com.baarton.runweather.db.CurrentWeather
+import com.baarton.runweather.Config
 import com.russhwolf.settings.Settings
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.minutes
+
 
 class SettingsViewModel(
-    val settings: Settings,
+    private val settings: Settings,
+    private val config: Config,
     log: Logger
 ) : ViewModel() {
 
-    //need some variable that will contain state
-    //init state from init, recreation or from preferences?
-    //on user change, do appropriate setting change through [setting] call
+    companion object {
+        const val DATA_UNIT_TAG = "DataUnit"
+        const val REFRESH_DURATION_TAG = "RefreshDuration"
+    }
 
-    private val log = log.withTag("WeatherViewModel")
+    private val log = log.withTag("SettingsViewModel")
 
     private val mutableSettingsState: MutableStateFlow<SettingsViewState> =
-        MutableStateFlow(SettingsViewState())
+        MutableStateFlow(
+            SettingsViewState(
+                DataUnit.valueOf(settings.getString(DATA_UNIT_TAG, DataUnit.METRIC.name)),
+                Duration.parseIsoString(
+                    settings.getString(
+                        REFRESH_DURATION_TAG,
+                        config.weatherDataMinimumThreshold.toIsoString()
+                    )
+                )
+            )
+        )
 
     val settingsState: StateFlow<SettingsViewState> = mutableSettingsState
-
-    init {
-        observeSettings()
-    }
 
     override fun onCleared() {
         log.v("Clearing SettingsViewModel")
     }
 
-    private fun observeSettings() {
-        //TODO flow declaration
+    fun setDataUnit(/*dataUnit: DataUnit*/) {
+        mutableSettingsState.update { state ->
+            state.copy(
+                unitSetting = when (mutableSettingsState.value.unitSetting) {
+                    DataUnit.METRIC -> DataUnit.IMPERIAL
+                    DataUnit.IMPERIAL -> DataUnit.METRIC
+                }
+            ).also { newState ->
+                settings.putString(DATA_UNIT_TAG, newState.unitSetting.name)
+            }
+        }
+    }
+
+    fun setRefreshInterval(newDuration: Duration) {
+        mutableSettingsState.update { state ->
+            state.copy(refreshSetting = newDuration).also { newState ->
+                settings.putString(REFRESH_DURATION_TAG, newState.refreshSetting.toIsoString())
+            }
+        }
+    }
+
+    fun refreshValueRange(): ClosedFloatingPointRange<Float> {
+        return config.weatherDataMinimumThreshold.inWholeMinutes.toFloat()..config.weatherDataMaximumThreshold.inWholeMinutes.toFloat()
+    }
+
+    fun refreshSteps(): Int {
+        return (config.weatherDataMaximumThreshold - config.weatherDataMinimumThreshold).inWholeMinutes.toInt()
     }
 }
 
-
-
-
-//TODO need to initialize from Settings
 data class SettingsViewState(
-    val unitSetting: DataUnit = DataUnit.METRIC,
-    val refreshSetting: Duration = 2.minutes
+    val unitSetting: DataUnit,
+    val refreshSetting: Duration
 )
-
-enum class DataUnit {
-    METRIC,
-    IMPERIAL
-}
