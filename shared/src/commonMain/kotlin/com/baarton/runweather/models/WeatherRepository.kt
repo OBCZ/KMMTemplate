@@ -62,10 +62,18 @@ class WeatherRepository(
     private fun isWeatherListStale(): Boolean {
         val lastDownload = getLastDownloadTime()
         val threshold = Duration.parseIsoString(settings.getString(REFRESH_DURATION_TAG, config.weatherDataMinimumThreshold.toIsoString()))
-        val stale = lastDownload + threshold < clock.now().toEpochMilliseconds().milliseconds
-        if (!stale) {
-            log.i { "Weather not fetched from network. Recently updated" }
+        val now = clock.now().toEpochMilliseconds().milliseconds
+        log.d { "Resolving staleness of data.\n" +
+            "Saved data timestamp: $lastDownload\n" +
+            "-------Timestamp now: $now\n" +
+            "-----------Threshold: $threshold" }
+        return (lastDownload + threshold < now).also {
+            if (!it) {
+                log.i { "Weather not fetched from network. Recently updated" }
+            } else {
+                log.i { "Weather data is stale. Will fetch from network." }
+            }
         }
-        return stale
     }
+
 }

@@ -39,7 +39,7 @@ class WeatherViewModelTest {
     private val settings = MockSettings()
     private val config = TestConfig
     private val apiMock = WeatherApiMock()
-    private val clock = ClockMock(Clock.System.now())
+    private val clock = ClockMock(Clock.System.now()) //TODO consider using real clock also here
     private val repository: WeatherRepository = WeatherRepository(dbHelper, settings, config, apiMock, kermit, clock)
     private val testConfig: Config = TestConfig
 

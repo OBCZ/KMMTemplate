@@ -2,6 +2,7 @@ package com.baarton.runweather
 
 import kotlin.time.Duration
 
+
 interface Config {
 
     /*
