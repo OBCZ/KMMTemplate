@@ -237,7 +237,7 @@ class WeatherViewModelTest {
     fun `Ignore API error on refresh with cache`() = runBlocking {
         apiMock.prepareResult(BRNO1.get())
 
-        viewModel.weatherState.test(4000) {
+        viewModel.weatherState.test(2000) {
             assertEquals(
                 weatherSuccessStateBrno1.copy(
                     lastUpdated = 0.seconds
