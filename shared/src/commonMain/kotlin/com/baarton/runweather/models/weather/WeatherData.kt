@@ -1,7 +1,8 @@
-package com.baarton.runweather.models
+package com.baarton.runweather.models.weather
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+
 
 /*
  * All units are intended to be metric and the requests sent should be kept to reflect this:
@@ -13,45 +14,19 @@ import kotlinx.serialization.Serializable
  * > oneHour [mm]
  * > threeHour [mm]
  */
-
-//TODO cleanup
-
-// @Entity(tableName = "current_weather")
 @Serializable
 data class WeatherData(
 
-    /*
-     * Database primary key. Assigned on INSERT. Does not come from the API.
-     */
-    // @PrimaryKey
-    // val dbId: Int,
-
-    /*
-     * Record timestamp. Assigned before an API request. Does not come from the API.
-     */
-    // var timestamp: Long,
-
-    // @ColumnInfo(name = "weatherList")
     @SerialName("weather")
     val weatherList: List<Weather>,
-
-    // @ColumnInfo(name = "locationName")
     @SerialName("name")
     val locationName: String,
-
-    // @Embedded
     @SerialName("main")
     val mainData: MainData,
-
-    // @Embedded
     @SerialName("wind")
     val wind: Wind,
-
-    // @Embedded
     @SerialName("rain")
     val rain: Rain? = null,
-
-    // @Embedded
     @SerialName("sys")
     val sys: Sys
 ) {
@@ -125,4 +100,5 @@ data class WeatherData(
         @SerialName("sunset")
         val sunset: String
     )
+
 }

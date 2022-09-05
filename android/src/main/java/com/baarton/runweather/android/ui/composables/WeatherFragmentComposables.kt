@@ -31,9 +31,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.flowWithLifecycle
 import co.touchlab.kermit.Logger
 import com.baarton.runweather.android.R
-import com.baarton.runweather.db.CurrentWeather
-import com.baarton.runweather.models.Weather
-import com.baarton.runweather.models.WeatherData
+import com.baarton.runweather.db.PersistedWeather
+import com.baarton.runweather.models.weather.Weather
+import com.baarton.runweather.models.weather.WeatherData
 import com.baarton.runweather.models.WeatherViewModel
 import com.baarton.runweather.models.WeatherViewState
 import com.baarton.runweather.models.lastUpdatedResId
@@ -72,7 +72,7 @@ fun WeatherFragmentScreen(
 private fun WeatherFragmentScreenContent(
     weatherState: WeatherViewState,
     onRefresh: () -> Unit = {},
-    onSuccess: (CurrentWeather) -> Unit = {},
+    onSuccess: (PersistedWeather) -> Unit = {},
     onError: (String) -> Unit = {},
 ) {
     Surface(
@@ -83,9 +83,6 @@ private fun WeatherFragmentScreenContent(
             state = rememberSwipeRefreshState(isRefreshing = weatherState.isLoading),
             onRefresh = onRefresh
         ) {
-            if (weatherState.isEmpty) {
-                EmptyScreen()
-            }
             val weather = weatherState.weather
             if (weather == null) { //TODO review this check
                 ErrorScreen("Weather null")
@@ -137,7 +134,7 @@ private fun ErrorScreen(error: String) {
 //TODO how much can I extract with iOS to common from the UI building blocks (expect/actual abstraction)?
 @Composable
 private fun WeatherScreen(
-    successData: CurrentWeather,
+    successData: PersistedWeather,
     state: WeatherViewState
 ) {
     //TODO img background
@@ -280,7 +277,7 @@ private fun WeatherScreen(
 
 //TODO can we extract more?
 @Composable
-private fun lastUpdatedText(lastUpdated: Duration): String {
+private fun lastUpdatedText(lastUpdated: Duration?): String {
     val pair = lastUpdatedResId(lastUpdated)
     val lastUpdatedValue = pair.second?.let {
         stringResource(id = pair.first.resourceId, formatArgs = arrayOf(it))
@@ -302,7 +299,7 @@ fun MainScreenContentPreview_Success() {
     WeatherFragmentScreenContent(
         weatherState = WeatherViewState(
             weather =
-            CurrentWeather(
+            PersistedWeather(
                 weatherList = listOf(
                     Weather(
                         weatherId = "803",

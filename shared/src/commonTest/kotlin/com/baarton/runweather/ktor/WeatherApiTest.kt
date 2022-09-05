@@ -1,12 +1,11 @@
-package com.baarton.runweather
+package com.baarton.runweather.ktor
 
 import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.LoggerConfig
 import co.touchlab.kermit.Severity
-import com.baarton.runweather.ktor.WeatherApiImpl
-import com.baarton.runweather.models.Weather
-import com.baarton.runweather.models.WeatherData
+import com.baarton.runweather.models.weather.Weather
+import com.baarton.runweather.models.weather.WeatherData
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.plugins.ClientRequestException

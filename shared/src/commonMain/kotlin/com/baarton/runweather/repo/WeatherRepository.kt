@@ -1,14 +1,15 @@
-package com.baarton.runweather.models
+package com.baarton.runweather.repo
 
 import co.touchlab.kermit.Logger
 import co.touchlab.stately.ensureNeverFrozen
 import com.baarton.runweather.Config
-import com.baarton.runweather.db.CurrentWeather
 import com.baarton.runweather.ktor.WeatherApi
 import com.baarton.runweather.models.SettingsViewModel.Companion.REFRESH_DURATION_TAG
+import com.baarton.runweather.models.weather.CurrentWeather
 import com.baarton.runweather.sqldelight.DatabaseHelper
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -35,20 +36,18 @@ class WeatherRepository(
 
     fun getWeather(): Flow<CurrentWeather?> {
         log.d("Get WeatherData from DB.")
-        return dbHelper.getAll()
-    }
-
-    fun getLastDownloadTime(): Duration {
-        return settings.getLong(DB_TIMESTAMP_KEY, 0).milliseconds
-    }
-
-    suspend fun refreshWeatherIfStale() {
-        if (isWeatherListStale()) {
-            refreshWeather()
+        return dbHelper.getAll().map {
+            it?.let { CurrentWeather(it, getLastDownloadTime()) }
         }
     }
 
     suspend fun refreshWeather() {
+        if (isWeatherListStale()) {
+            doRefreshWeather()
+        }
+    }
+
+    private suspend fun doRefreshWeather() {
         val weatherResult = weatherApi.getJsonFromApi()
         log.d { "Weather network result: $weatherResult" }
         settings.putLong(DB_TIMESTAMP_KEY, clock.now().toEpochMilliseconds())
@@ -74,6 +73,10 @@ class WeatherRepository(
                 log.i { "Weather data is stale. Will fetch from network." }
             }
         }
+    }
+
+    private fun getLastDownloadTime(): Duration {
+        return settings.getLong(DB_TIMESTAMP_KEY, 0).milliseconds
     }
 
 }

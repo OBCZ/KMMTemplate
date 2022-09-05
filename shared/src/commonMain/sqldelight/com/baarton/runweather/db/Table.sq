@@ -1,12 +1,12 @@
-import com.baarton.runweather.models.Weather;
-import com.baarton.runweather.models.WeatherData.MainData;
-import com.baarton.runweather.models.WeatherData.Rain;
-import com.baarton.runweather.models.WeatherData.Sys;
-import com.baarton.runweather.models.WeatherData.Wind;
+import com.baarton.runweather.models.weather.Weather;
+import com.baarton.runweather.models.weather.WeatherData.MainData;
+import com.baarton.runweather.models.weather.WeatherData.Rain;
+import com.baarton.runweather.models.weather.WeatherData.Sys;
+import com.baarton.runweather.models.weather.WeatherData.Wind;
 import kotlin.collections.List;
 
 
-CREATE TABLE CurrentWeather (
+CREATE TABLE PersistedWeather (
 -- timestamp TEXT AS Long NOT NULL,
 weatherList TEXT AS List<Weather> NOT NULL,
 locationName TEXT NOT NULL,
@@ -17,14 +17,14 @@ sys TEXT AS Sys NOT NULL
 );
 
 insert:
-INSERT INTO CurrentWeather(weatherList, locationName, mainData, wind, rain, sys)
+INSERT INTO PersistedWeather(weatherList, locationName, mainData, wind, rain, sys)
 VALUES(?, ?, ?, ?, ?, ?);
 
 getAll:
-SELECT * FROM CurrentWeather;
+SELECT * FROM PersistedWeather;
 
 nuke:
-DELETE FROM CurrentWeather;
+DELETE FROM PersistedWeather;
 
 
 

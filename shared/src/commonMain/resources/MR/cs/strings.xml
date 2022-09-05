@@ -2,6 +2,7 @@
 
     <string name="app_settings">Nastavení</string>
     <string name="app_ok">OK</string>
+    <string name="app_n_a">N/A</string>
 
     <string name="wind_direction_north">S</string>
     <string name="wind_direction_northeast">SV</string>

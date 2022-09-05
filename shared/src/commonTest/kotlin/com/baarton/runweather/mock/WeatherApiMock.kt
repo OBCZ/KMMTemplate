@@ -1,18 +1,20 @@
 package com.baarton.runweather.mock
 
 import com.baarton.runweather.ktor.WeatherApi
-import com.baarton.runweather.models.Weather
-import com.baarton.runweather.models.WeatherData
+import com.baarton.runweather.models.weather.Weather
+import com.baarton.runweather.models.weather.WeatherData
+
 
 sealed class MockResponses {
     abstract fun get(): WeatherData
 }
 
+
 object BRNO1 : MockResponses() {
     override fun get(): WeatherData = lazy {
         WeatherData(
             listOf(Weather("800", "Clear", "clear sky", "01d")),
-            "Brno",
+            "Brno1",
             WeatherData.MainData("265.90", "1021", "45"),
             WeatherData.Wind("4.6", "345"),
             null,
@@ -21,11 +23,12 @@ object BRNO1 : MockResponses() {
     }.value
 }
 
+
 object BRNO2 : MockResponses() {
     override fun get(): WeatherData = lazy {
         WeatherData(
             listOf(Weather("800", "Clear", "clear sky", "01d")),
-            "Brno",
+            "Brno2",
             WeatherData.MainData("260.90", "1025", "55"),
             WeatherData.Wind("4.7", "355"),
             null,
@@ -34,11 +37,12 @@ object BRNO2 : MockResponses() {
     }.value
 }
 
+
 object BRNO3 : MockResponses() {
     override fun get(): WeatherData = lazy {
         WeatherData(
             listOf(Weather("800", "Clear", "clear sky", "01d")),
-            "Brno",
+            "Brno3",
             WeatherData.MainData("268.90", "1020", "35"),
             WeatherData.Wind("4.5", "305"),
             null,
@@ -47,18 +51,6 @@ object BRNO3 : MockResponses() {
     }.value
 }
 
-object EMPTY : MockResponses() {
-    override fun get(): WeatherData = lazy {
-        WeatherData(
-            listOf(),
-            "",
-            WeatherData.MainData("", "", ""),
-            WeatherData.Wind("", ""),
-            null,
-            WeatherData.Sys("", "")
-        )
-    }.value
-}
 
 class WeatherApiMock : WeatherApi {
 
@@ -92,4 +84,5 @@ class WeatherApiMock : WeatherApi {
     private fun initQueue(): ArrayDeque<() -> WeatherData> {
         return ArrayDeque(listOf({ error("Uninitialized!") }))
     }
+
 }

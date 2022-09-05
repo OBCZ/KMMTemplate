@@ -1,7 +1,7 @@
 package com.baarton.runweather.ktor
 
 import co.touchlab.stately.ensureNeverFrozen
-import com.baarton.runweather.models.WeatherData
+import com.baarton.runweather.models.weather.WeatherData
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngine

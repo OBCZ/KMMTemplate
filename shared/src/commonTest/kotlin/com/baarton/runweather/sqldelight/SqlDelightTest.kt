@@ -1,10 +1,12 @@
-package com.baarton.runweather
+package com.baarton.runweather.sqldelight
 
 import co.touchlab.kermit.Logger
+import com.baarton.runweather.AndroidJUnit4
+import com.baarton.runweather.RunWith
 import com.baarton.runweather.mock.BRNO1
 import com.baarton.runweather.mock.BRNO2
 import com.baarton.runweather.mock.BRNO3
-import com.baarton.runweather.sqldelight.DatabaseHelper
+import com.baarton.runweather.testDbConnection
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -36,7 +38,7 @@ class SqlDelightTest {
             weatherList,
             "Could not retrieve Weather"
         )
-        assertTrue { weatherList.locationName == "Brno" }
+        assertTrue { weatherList.locationName == "Brno1" }
     }
 
     @Test

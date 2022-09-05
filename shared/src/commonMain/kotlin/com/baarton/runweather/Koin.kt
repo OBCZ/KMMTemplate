@@ -2,7 +2,7 @@ package com.baarton.runweather
 
 import com.baarton.runweather.ktor.WeatherApi
 import com.baarton.runweather.ktor.WeatherApiImpl
-import com.baarton.runweather.models.WeatherRepository
+import com.baarton.runweather.repo.WeatherRepository
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.StaticConfig
 import co.touchlab.kermit.platformLogWriter

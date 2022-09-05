@@ -3,6 +3,9 @@ package com.baarton.runweather.mock
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 
-class ClockMock(var currentInstant: Instant) : Clock {
-    override fun now(): Instant = currentInstant
+class ClockMock : Clock {
+
+    var mockedInstant: Instant? = null
+
+    override fun now(): Instant = mockedInstant ?: Clock.System.now()
 }

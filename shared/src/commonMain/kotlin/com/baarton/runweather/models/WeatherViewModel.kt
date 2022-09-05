@@ -2,7 +2,9 @@ package com.baarton.runweather.models
 
 import co.touchlab.kermit.Logger
 import com.baarton.runweather.Config
-import com.baarton.runweather.db.CurrentWeather
+import com.baarton.runweather.db.PersistedWeather
+import com.baarton.runweather.models.weather.CurrentWeather
+import com.baarton.runweather.repo.WeatherRepository
 import com.baarton.runweather.res.SharedRes
 import dev.icerock.moko.resources.StringResource
 import kotlinx.coroutines.CoroutineDispatcher
@@ -21,6 +23,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+
 
 class WeatherViewModel(
     private val config: Config,
@@ -53,9 +56,14 @@ class WeatherViewModel(
         val refreshFlow = channelFlow<Throwable?> {
             while (!isClosed) {
                 log.i("Get WeatherData for poll send.")
+                mutableWeatherState.update {
+                    it.copy(isLoading = true).also {
+                        log.d { "State updated with $it" }
+                    }
+                }
                 try {
                     log.i("Try to refresh WeatherData.")
-                    weatherRepository.refreshWeatherIfStale()
+                    weatherRepository.refreshWeather()
                     send(null)
                 } catch (exception: Exception) {
                     send(exception)
@@ -63,7 +71,8 @@ class WeatherViewModel(
                 log.i("Delaying next poll.")
                 delay(config.weatherDataRequestInterval)
             }
-        }.flowOn(pollingDispatcher).cancellable() //TODO check when polling closes (phone lock, etc) and its config in general
+        }.flowOn(pollingDispatcher)
+            .cancellable() //TODO check when polling closes (phone lock, etc) and its config in general
 
         viewModelScope.launch {
             log.d { "WeatherData refresh coroutine launch." }
@@ -74,28 +83,45 @@ class WeatherViewModel(
                 .collect { (error, weather) ->
                     log.d("Weather collected.")
                     mutableWeatherState.update { previousState ->
-                        log.d { "Updating weather state." }
-
                         val errorMessage = if (error != null) {
                             "Unable to download weather list."
                         } else {
                             previousState.error
                         }
-                        WeatherViewState(
-                            isLoading = false,
-                            lastUpdated = timeStampDuration(weatherRepository.getLastDownloadTime()),
-                            weather = weather.takeIf { it != null },
-                            error = errorMessage.takeIf { weather == null },
-                            isEmpty = weather == null && errorMessage == null
-                        )
+
+                        if (shouldUpdateState(previousState, weather) || error != null) {
+                            WeatherViewState(
+                                isLoading = false,
+                                lastUpdated = weather?.let { timeStampDuration(it.timestamp) },
+                                weather = weather?.persistedWeather,
+                                error = errorMessage.takeIf { weather == null }
+                            ).also {
+                                log.d { "Updating weather state with $it." }
+                            }
+                        } else {
+                            previousState.also {
+                                log.d { "Weather state not updated." }
+                            }
+                        }
                     }
                 }
         }
     }
 
+    private fun shouldUpdateState(
+        previousState: WeatherViewState,
+        weather: CurrentWeather?
+    ): Boolean {
+        return previousState.weather != weather?.persistedWeather ||
+            previousState.lastUpdated != weather?.timestamp?.let { timeStampDuration(it) }
+    }
+
     fun refreshWeather(): Job {
-        // Set loading state, which will be cleared when the repository re-emits
-        mutableWeatherState.update { it.copy(isLoading = true) }
+        mutableWeatherState.update {
+            it.copy(isLoading = true).also {
+                log.d { "State updated with $it" }
+            }
+        }
         return viewModelScope.launch {
             log.v { "refreshWeather" }
             try {
@@ -114,6 +140,8 @@ class WeatherViewModel(
             } else {
                 // Just let it fail silently if we have a cache
                 it.copy(isLoading = false)
+            }.also {
+                log.d { "State updated with $it" }
             }
         }
     }
@@ -124,8 +152,9 @@ class WeatherViewModel(
 }
 
 //TODO probably needs to be moved somewhere - UIUtils in common module?
-fun lastUpdatedResId(timestampAge: Duration): Pair<StringResource, Long?> {
-    return when (timestampAge.inWholeSeconds) {
+fun lastUpdatedResId(timestampAge: Duration?): Pair<StringResource, Long?> {
+    return when (timestampAge?.inWholeSeconds) {
+        null -> SharedRes.strings.app_n_a to null
         0L -> SharedRes.strings.fragment_weather_last_updated_now to null
         in 1L..59L -> SharedRes.strings.fragment_weather_last_updated_sec_time to timestampAge.inWholeSeconds
         else -> SharedRes.strings.fragment_weather_last_updated_min_time to timestampAge.inWholeMinutes
@@ -133,9 +162,8 @@ fun lastUpdatedResId(timestampAge: Duration): Pair<StringResource, Long?> {
 }
 
 data class WeatherViewState(
-    val weather: CurrentWeather? = null,
-    val lastUpdated: Duration = 0.milliseconds,
+    val weather: PersistedWeather? = null,
+    val lastUpdated: Duration? = null,
     val error: String? = null,
-    val isLoading: Boolean = false,
-    val isEmpty: Boolean = false
+    val isLoading: Boolean = false
 )

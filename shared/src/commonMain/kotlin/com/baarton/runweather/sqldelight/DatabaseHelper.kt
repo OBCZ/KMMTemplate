@@ -1,10 +1,10 @@
 package com.baarton.runweather.sqldelight
 
 import co.touchlab.kermit.Logger
-import com.baarton.runweather.db.CurrentWeather
+import com.baarton.runweather.db.PersistedWeather
 import com.baarton.runweather.db.RunWeatherDb
-import com.baarton.runweather.models.Weather
-import com.baarton.runweather.models.WeatherData
+import com.baarton.runweather.models.weather.Weather
+import com.baarton.runweather.models.weather.WeatherData
 import com.squareup.sqldelight.ColumnAdapter
 import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.runtime.coroutines.asFlow
@@ -21,7 +21,7 @@ class DatabaseHelper(
     private val dbRef: RunWeatherDb =
         RunWeatherDb(
             //TODO review/extract adapters and their default values
-            sqlDriver, CurrentWeatherAdapter = CurrentWeather.Adapter(
+            sqlDriver, PersistedWeatherAdapter = PersistedWeather.Adapter(
                 weatherListAdapter = object : ColumnAdapter<List<Weather>, String> {
 
                     override fun encode(value: List<Weather>): String {
@@ -111,7 +111,7 @@ class DatabaseHelper(
 
         )
 
-    fun getAll(): Flow<CurrentWeather?> =
+    fun getAll(): Flow<PersistedWeather?> =
         dbRef.tableQueries
             .getAll()
             .asFlow()

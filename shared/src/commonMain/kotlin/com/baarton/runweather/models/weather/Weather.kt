@@ -1,4 +1,4 @@
-package com.baarton.runweather.models
+package com.baarton.runweather.models.weather
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

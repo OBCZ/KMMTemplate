@@ -1,6 +1,6 @@
 package com.baarton.runweather
 
-import com.baarton.runweather.models.WeatherRepository
+import com.baarton.runweather.repo.WeatherRepository
 import com.baarton.runweather.models.WeatherViewModel
 import com.baarton.runweather.models.CallbackViewModel
 import co.touchlab.kermit.Logger
