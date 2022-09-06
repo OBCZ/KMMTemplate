@@ -18,6 +18,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
+
 class WeatherApiTest {
     private val emptyLogger = Logger(
         config = object : LoggerConfig {
@@ -115,4 +116,5 @@ class WeatherApiTest {
             weatherApi.getJsonFromApi()
         }
     }
+
 }

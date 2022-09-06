@@ -33,6 +33,7 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
+
 class WeatherViewModelTest {
 
     private var kermit = Logger(StaticConfig())

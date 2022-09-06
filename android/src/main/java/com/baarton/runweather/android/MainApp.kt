@@ -38,6 +38,7 @@ class MainApp : Application() {
             }
         )
     }
+
 }
 
 object AndroidAppInfo : AppInfo {

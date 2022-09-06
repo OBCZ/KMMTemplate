@@ -15,7 +15,7 @@ import org.koin.test.check.checkModules
 import kotlin.test.AfterTest
 import kotlin.test.Test
 
-//TODO tests' classes need thorough review and cleanup
+
 @RunWith(AndroidJUnit4::class)
 @Category(CheckModuleTest::class)
 class KoinTest {
@@ -38,4 +38,5 @@ class KoinTest {
     fun breakdown() {
         stopKoin()
     }
+
 }
