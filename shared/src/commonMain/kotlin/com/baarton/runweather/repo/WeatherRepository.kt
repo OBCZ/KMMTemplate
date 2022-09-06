@@ -4,7 +4,7 @@ import co.touchlab.kermit.Logger
 import co.touchlab.stately.ensureNeverFrozen
 import com.baarton.runweather.Config
 import com.baarton.runweather.ktor.WeatherApi
-import com.baarton.runweather.models.SettingsViewModel.Companion.REFRESH_DURATION_TAG
+import com.baarton.runweather.models.SettingsViewModel.Companion.WEATHER_DATA_THRESHOLD_TAG
 import com.baarton.runweather.models.weather.CurrentWeather
 import com.baarton.runweather.sqldelight.DatabaseHelper
 import com.russhwolf.settings.Settings
@@ -60,7 +60,7 @@ class WeatherRepository(
 
     private fun isWeatherListStale(): Boolean {
         val lastDownload = getLastDownloadTime()
-        val threshold = Duration.parseIsoString(settings.getString(REFRESH_DURATION_TAG, config.weatherDataMinimumThreshold.toIsoString()))
+        val threshold = Duration.parseIsoString(settings.getString(WEATHER_DATA_THRESHOLD_TAG, config.weatherDataMinimumThreshold.toIsoString()))
         val now = clock.now().toEpochMilliseconds().milliseconds
         log.d { "Resolving staleness of data.\n" +
             "Saved data timestamp: $lastDownload\n" +

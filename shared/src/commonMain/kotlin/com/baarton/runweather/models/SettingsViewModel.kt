@@ -17,7 +17,7 @@ class SettingsViewModel(
 
     companion object {
         const val DATA_UNIT_TAG = "DataUnit"
-        const val REFRESH_DURATION_TAG = "RefreshDuration"
+        const val WEATHER_DATA_THRESHOLD_TAG = "RefreshDuration"
     }
 
     private val log = log.withTag("SettingsViewModel")
@@ -28,7 +28,7 @@ class SettingsViewModel(
                 DataUnit.valueOf(settings.getString(DATA_UNIT_TAG, DataUnit.METRIC.name)),
                 Duration.parseIsoString(
                     settings.getString(
-                        REFRESH_DURATION_TAG,
+                        WEATHER_DATA_THRESHOLD_TAG,
                         config.weatherDataMinimumThreshold.toIsoString()
                     )
                 )
@@ -57,7 +57,7 @@ class SettingsViewModel(
     fun setRefreshInterval(newDuration: Duration) {
         mutableSettingsState.update { state ->
             state.copy(refreshSetting = newDuration).also { newState ->
-                settings.putString(REFRESH_DURATION_TAG, newState.refreshSetting.toIsoString())
+                settings.putString(WEATHER_DATA_THRESHOLD_TAG, newState.refreshSetting.toIsoString())
             }
         }
     }

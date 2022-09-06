@@ -103,26 +103,59 @@ class WeatherRepositoryTest {
     }
 
     @Test
-    fun `No web call if data is not stale and web call after delay with edited setting`() =
-        runTest {
-            settings.putLong(DB_TIMESTAMP_KEY, clock.now().toEpochMilliseconds())
-            settings.putString(SettingsViewModel.REFRESH_DURATION_TAG, 5.seconds.toIsoString())
-            apiMock.prepareResult(BRNO1.get())
+    fun `No web call if data is not stale and web call after delay - edited setting 1`() = runTest {
+        settings.putLong(DB_TIMESTAMP_KEY, clock.now().toEpochMilliseconds())
+        settings.putString(
+            SettingsViewModel.WEATHER_DATA_THRESHOLD_TAG,
+            5.seconds.toIsoString()
+        )
+        apiMock.prepareResult(BRNO1.get())
 
-            runBlocking {
-                delay(2000)
-            }
-
-            repository.refreshWeather()
-            assertEquals(0, apiMock.calledCount)
-
-            runBlocking {
-                delay(3000)
-            }
-
-            repository.refreshWeather()
-            assertEquals(1, apiMock.calledCount)
+        runBlocking {
+            delay(2000)
         }
+
+        repository.refreshWeather()
+        assertEquals(0, apiMock.calledCount)
+
+        runBlocking {
+            delay(3000)
+        }
+
+        repository.refreshWeather()
+        assertEquals(1, apiMock.calledCount)
+    }
+
+    @Test
+    fun `No web call if data is not stale and web call after delay - edited setting 2`() = runTest {
+        settings.putLong(DB_TIMESTAMP_KEY, clock.now().toEpochMilliseconds())
+        settings.putString(
+            SettingsViewModel.WEATHER_DATA_THRESHOLD_TAG,
+            5.seconds.toIsoString()
+        )
+        apiMock.prepareResult(BRNO1.get())
+
+        runBlocking {
+            delay(1000)
+        }
+
+        repository.refreshWeather()
+        assertEquals(0, apiMock.calledCount)
+
+        runBlocking {
+            delay(1000)
+        }
+
+        repository.refreshWeather()
+        assertEquals(0, apiMock.calledCount)
+
+        runBlocking {
+            delay(3000)
+        }
+
+        repository.refreshWeather()
+        assertEquals(1, apiMock.calledCount)
+    }
 
     @Test
     fun `Rethrow on API error`() = runTest {

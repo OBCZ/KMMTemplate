@@ -33,8 +33,6 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-
-//TODO tests with weather data thresholds from Config
 class WeatherViewModelTest {
 
     private var kermit = Logger(StaticConfig())
@@ -79,14 +77,14 @@ class WeatherViewModelTest {
     @BeforeTest
     fun setup() {
         setDataAge(Clock.System.now() - 2.hours)
-        clock.mockedInstant = Clock.System.now()
+        clock.mockClock(Clock.System.now())
         Dispatchers.setMain(Dispatchers.Unconfined)
     }
 
     @AfterTest
     fun tearDown() {
         dataTimestamp = null
-        clock.mockedInstant = null
+        clock.mockClock(null)
         Dispatchers.resetMain()
         apiMock.reset()
         testDbConnection.close()
@@ -119,7 +117,7 @@ class WeatherViewModelTest {
         viewModel.weatherState.test(2000) {
             assertEquals(
                 weatherSuccessStateBrno1.copy(
-                    lastUpdated = (clock.mockedInstant!!.toEpochMilliseconds() - dataTimestamp!!.toEpochMilliseconds()).milliseconds
+                    lastUpdated = (clock.getMockedClock()!!.toEpochMilliseconds() - dataTimestamp!!.toEpochMilliseconds()).milliseconds
                 ),
                 awaitItemAfter(WeatherViewState(isLoading = true))
             )
@@ -134,7 +132,7 @@ class WeatherViewModelTest {
                 ),
                 awaitItemAfterLast(
                     weatherSuccessStateBrno1.copy(
-                        lastUpdated = (clock.mockedInstant!!.toEpochMilliseconds() - dataTimestamp!!.toEpochMilliseconds()).milliseconds,
+                        lastUpdated = (clock.getMockedClock()!!.toEpochMilliseconds() - dataTimestamp!!.toEpochMilliseconds()).milliseconds,
                         isLoading = true
                     )
                 )
