@@ -7,6 +7,7 @@ import com.squareup.sqldelight.android.AndroidSqliteDriver
 import com.squareup.sqldelight.db.SqlDriver
 import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
 
+
 internal actual fun testDbConnection(): SqlDriver {
     // Try to use the android driver (which only works if we're on robolectric).
     // Fall back to jdbc if that fails.

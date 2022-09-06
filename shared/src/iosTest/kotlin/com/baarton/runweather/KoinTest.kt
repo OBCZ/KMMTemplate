@@ -8,6 +8,7 @@ import platform.Foundation.NSUserDefaults
 import kotlin.test.AfterTest
 import kotlin.test.Test
 
+
 class KoinTest {
     @Test
     fun checkAllModules() {
@@ -24,4 +25,5 @@ class KoinTest {
     fun breakdown() {
         stopKoin()
     }
+
 }
