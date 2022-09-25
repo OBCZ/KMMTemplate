@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.update
 import kotlin.time.Duration
 
 
+//TODO tests
 class SettingsViewModel(
     private val settings: Settings,
     private val config: Config,
@@ -41,7 +42,7 @@ class SettingsViewModel(
         log.v("Clearing SettingsViewModel")
     }
 
-    fun setDataUnit(/*dataUnit: DataUnit*/) {
+    fun setDataUnit() {
         mutableSettingsState.update { state ->
             state.copy(
                 unitSetting = when (mutableSettingsState.value.unitSetting) {

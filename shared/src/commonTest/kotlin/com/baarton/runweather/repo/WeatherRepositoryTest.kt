@@ -57,7 +57,7 @@ class WeatherRepositoryTest {
 
     @Test
     fun `Get weather without cache`() = runBlocking {
-        apiMock.prepareResult(BRNO1.get())
+        apiMock.prepareResults(BRNO1.data)
         repository.refreshWeather()
         repository.getWeather().test {
             val item = awaitItem()
@@ -80,7 +80,7 @@ class WeatherRepositoryTest {
     @Test
     fun `No web call if data is not stale`() = runTest {
         settings.putLong(DB_TIMESTAMP_KEY, clock.now().toEpochMilliseconds())
-        apiMock.prepareResult(BRNO1.get())
+        apiMock.prepareResults(BRNO1.data)
 
         repository.refreshWeather()
         assertEquals(0, apiMock.calledCount)
@@ -89,7 +89,7 @@ class WeatherRepositoryTest {
     @Test
     fun `No web call if data is not stale and web call after delay`() = runTest {
         settings.putLong(DB_TIMESTAMP_KEY, clock.now().toEpochMilliseconds())
-        apiMock.prepareResult(BRNO1.get())
+        apiMock.prepareResults(BRNO1.data)
 
         repository.refreshWeather()
         assertEquals(0, apiMock.calledCount)
@@ -109,7 +109,7 @@ class WeatherRepositoryTest {
             SettingsViewModel.WEATHER_DATA_THRESHOLD_TAG,
             5.seconds.toIsoString()
         )
-        apiMock.prepareResult(BRNO1.get())
+        apiMock.prepareResults(BRNO1.data)
 
         runBlocking {
             delay(2000)
@@ -133,7 +133,7 @@ class WeatherRepositoryTest {
             SettingsViewModel.WEATHER_DATA_THRESHOLD_TAG,
             5.seconds.toIsoString()
         )
-        apiMock.prepareResult(BRNO1.get())
+        apiMock.prepareResults(BRNO1.data)
 
         runBlocking {
             delay(1000)
@@ -159,12 +159,12 @@ class WeatherRepositoryTest {
 
     @Test
     fun `Rethrow on API error`() = runTest {
-        apiMock.throwOnCall(RuntimeException("Test error"))
+        apiMock.prepareResults(RuntimeException("Test error"))
 
         val throwable = assertFails {
             repository.refreshWeather()
         }
-        assertEquals("Test error", throwable.message)
+        assertEquals("Weather API has thrown an Exception: Test error", throwable.message)
     }
 
     @Test
@@ -173,12 +173,12 @@ class WeatherRepositoryTest {
             DB_TIMESTAMP_KEY,
             (Clock.System.now() - 2.hours).toEpochMilliseconds()
         )
-        apiMock.throwOnCall(RuntimeException("Test error"))
+        apiMock.prepareResults(RuntimeException("Test error"))
 
         val throwable = assertFails {
             repository.refreshWeather()
         }
-        assertEquals("Test error", throwable.message)
+        assertEquals("Weather API has thrown an Exception: Test error", throwable.message)
     }
 
 }

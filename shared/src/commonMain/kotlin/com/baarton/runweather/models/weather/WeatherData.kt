@@ -31,6 +31,10 @@ data class WeatherData(
     val sys: Sys
 ) {
 
+    fun isEmptyOrIncomplete(): Boolean {
+        return weatherList.isEmpty() || locationName.isBlank() || mainData.isBlank() || wind.isBlank() || sys.isBlank()
+    }
+
     @Serializable
     data class MainData(
 
@@ -51,7 +55,11 @@ data class WeatherData(
          */
         @SerialName("humidity")
         val humidity: String
-    )
+    ) {
+        fun isBlank(): Boolean {
+            return temperature.isBlank() || pressure.isBlank() || humidity.isBlank()
+        }
+    }
 
     @Serializable
     data class Wind(
@@ -67,7 +75,11 @@ data class WeatherData(
          */
         @SerialName("deg")
         val deg: String
-    )
+    ) {
+        fun isBlank(): Boolean {
+            return speed.isBlank() || deg.isBlank()
+        }
+    }
 
     @Serializable
     data class Rain(
@@ -99,6 +111,9 @@ data class WeatherData(
          */
         @SerialName("sunset")
         val sunset: String
-    )
-
+    ) {
+        fun isBlank(): Boolean {
+            return sunrise.isBlank() || sunset.isBlank()
+        }
+    }
 }

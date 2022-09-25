@@ -1,6 +1,5 @@
 package com.baarton.runweather.android.ui.composables
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -40,7 +39,6 @@ fun SettingsFragmentScreen(
         viewModel.settingsState.flowWithLifecycle(lifecycleOwner.lifecycle)
     }
 
-    @SuppressLint("StateFlowValueCalledInComposition") // False positive lint check when used inside collectAsState()
     val settingsState by lifecycleAwareWeatherFlow.collectAsState(viewModel.settingsState.value)
 
     SettingsFragmentScreenContent(

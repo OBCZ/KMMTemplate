@@ -3,15 +3,18 @@ package com.baarton.runweather.sqldelight
 import co.touchlab.kermit.Logger
 import com.baarton.runweather.AndroidJUnit4
 import com.baarton.runweather.RunWith
+import com.baarton.runweather.db.PersistedWeather
 import com.baarton.runweather.mock.BRNO1
 import com.baarton.runweather.mock.BRNO2
 import com.baarton.runweather.mock.BRNO3
+import com.baarton.runweather.mock.BRNO4
 import com.baarton.runweather.testDbConnection
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -29,24 +32,75 @@ class SqlDelightTest {
             Dispatchers.Default
         )
         dbHelper.nuke()
-        dbHelper.insert(BRNO1.get())
+        dbHelper.insert(BRNO1.data)
     }
 
     @Test
-    fun `Select All Items Success`() = runTest {
-        val weatherList = dbHelper.getAll().first()
-        assertNotNull(
-            weatherList,
-            "Could not retrieve Weather"
-        )
-        assertTrue { weatherList.locationName == "Brno1" }
+    fun `Select first from all items`() = runTest {
+        val firstItem = dbHelper.getAll().first()
+        assertNotNull(firstItem, "Could not retrieve Weather")
+
+        with(firstItem) {
+            assertTrue { locationName == "Brno1" }
+            assertTrue { weatherList.size == 1 }
+            assertTrue { weatherList[0].description == "clear sky" }
+            assertTrue { weatherList[0].weatherId == "800" }
+            assertTrue { weatherList[0].title == "Clear" }
+            assertTrue { weatherList[0].iconId == "01d" }
+            assertTrue { mainData.pressure == "1021" }
+            assertTrue { mainData.humidity == "45" }
+            assertTrue { mainData.temperature == "265.90" }
+            assertTrue { rain == null }
+            assertTrue { sys.sunrise == "1646803774" }
+            assertTrue { sys.sunset == "1646844989" }
+        }
     }
 
     @Test
-    fun `Delete All Success`() = runTest {
-        dbHelper.insert(BRNO2.get())
-        dbHelper.insert(BRNO3.get())
-        assertTrue(dbHelper.getAll().first() != null)
+    fun `Select first from all with Rain`() = runTest {
+        dbHelper.insert(BRNO4.data)
+        val firstItem = dbHelper.getAll().first()
+        assertNotNull(firstItem, "Could not retrieve Weather")
+
+        with(firstItem) {
+            assertTrue { locationName == "Brno Rain" }
+            assertTrue { weatherList.size == 2 }
+            assertTrue { weatherList[0].description == "heavy rain" }
+            assertTrue { weatherList[0].weatherId == "900" }
+            assertTrue { weatherList[0].title == "Rain" }
+            assertTrue { weatherList[0].iconId == "05d" }
+            assertTrue { weatherList[1].description == "light rain" }
+            assertTrue { weatherList[1].weatherId == "950" }
+            assertTrue { weatherList[1].title == "Light Rain" }
+            assertTrue { weatherList[1].iconId == "08d" }
+            assertTrue { mainData.pressure == "1020" }
+            assertTrue { mainData.humidity == "35" }
+            assertTrue { mainData.temperature == "268.90" }
+            assertTrue { rain!!.oneHour == "1" }
+            assertTrue { rain!!.threeHour == "3" }
+            assertTrue { sys.sunrise == "1646800774" }
+            assertTrue { sys.sunset == "1646849989" }
+        }
+    }
+
+    @Test
+    fun `Delete all`() = runTest {
+        dbHelper.insert(BRNO2.data)
+        dbHelper.insert(BRNO3.data)
+
+        assertEquals(
+            dbHelper.getAll().first(),
+            with(BRNO3.data) {
+                PersistedWeather(
+                    weatherList,
+                    locationName,
+                    mainData,
+                    wind,
+                    rain,
+                    sys
+                )
+            })
+
         dbHelper.nuke()
 
         assertTrue(

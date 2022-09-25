@@ -48,13 +48,19 @@ class WeatherRepository(
     }
 
     private suspend fun doRefreshWeather() {
-        val weatherResult = weatherApi.getJsonFromApi()
+        val weatherResult = try {
+            weatherApi.getJsonFromApi()
+        } catch (e: Exception) {
+            throw WeatherAPIException("Weather API has thrown an Exception: ${e.message}", e.cause)
+        }
         log.d { "Weather network result: $weatherResult" }
-        settings.putLong(DB_TIMESTAMP_KEY, clock.now().toEpochMilliseconds())
 
-        if (weatherResult.locationName.isNotBlank()) {
+        if (!weatherResult.isEmptyOrIncomplete()) {
             dbHelper.insert(weatherResult)
+            settings.putLong(DB_TIMESTAMP_KEY, clock.now().toEpochMilliseconds())
             log.d { "WeatherData result put to DB." }
+        } else {
+            throw WeatherDataConsistencyException("Weather data obtained is empty or incomplete.-----\n$weatherResult\n-----")
         }
     }
 
@@ -78,5 +84,8 @@ class WeatherRepository(
     private fun getLastDownloadTime(): Duration {
         return settings.getLong(DB_TIMESTAMP_KEY, 0).milliseconds
     }
+
+    class WeatherAPIException(message: String, cause: Throwable?) : Exception(message, cause)
+    class WeatherDataConsistencyException(message: String) : Exception(message)
 
 }

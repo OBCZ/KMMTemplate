@@ -9,6 +9,7 @@ import com.baarton.runweather.TestConfig
 import com.baarton.runweather.db.PersistedWeather
 import com.baarton.runweather.mock.BRNO1
 import com.baarton.runweather.mock.BRNO2
+import com.baarton.runweather.mock.CORRUPT
 import com.baarton.runweather.mock.ClockMock
 import com.baarton.runweather.mock.WeatherApiMock
 import com.baarton.runweather.models.WeatherViewModel
@@ -29,10 +30,10 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
-
 
 class WeatherViewModelTest {
 
@@ -73,67 +74,69 @@ class WeatherViewModelTest {
                 WeatherData.Sys("1646806774", "1646842989")
             )
         )
+
+        private val weatherCorruptStateBrno = WeatherViewState(
+            weather = PersistedWeather(
+                listOf(Weather("", "Clear", "clear sky", "01d")),
+                "Brno_Corrupt",
+                WeatherData.MainData("265.90", "", "45"),
+                WeatherData.Wind("", "345"),
+                null,
+                WeatherData.Sys("1646803774", "")
+            )
+        )
     }
 
     @BeforeTest
     fun setup() {
+        Dispatchers.setMain(Dispatchers.Unconfined)
         setDataAge(Clock.System.now() - 2.hours)
         clock.mockClock(Clock.System.now())
-        Dispatchers.setMain(Dispatchers.Unconfined)
     }
 
     @AfterTest
     fun tearDown() {
         dataTimestamp = null
         clock.mockClock(null)
-        Dispatchers.resetMain()
         apiMock.reset()
         testDbConnection.close()
+        Dispatchers.resetMain()
     }
 
     @Test
     fun `Get weather without cache`() = runBlocking {
-        apiMock.prepareResult(BRNO1.get())
+        apiMock.prepareResults(BRNO1.data)
 
         viewModel.weatherState.test {
             assertEquals(
-                weatherSuccessStateBrno1.copy(
-                    lastUpdated = 0.seconds
-                ),
-                awaitItemAfter(
-                    WeatherViewState(isLoading = true)
-                )
+                weatherSuccessStateBrno1.copy(lastUpdated = 0.seconds),
+                awaitItemAfter(WeatherViewState(isLoading = true))
             )
         }
     }
 
     @Test
     fun `Get weather with cache and update from network call`() = runBlocking {
-        apiMock.prepareResult(BRNO2.get())
-        dbHelper.insert(BRNO1.get())
+        apiMock.prepareResults(BRNO2.data)
+        dbHelper.insert(BRNO1.data)
         setDataAge(Clock.System.now() - 1.seconds)
 
         assertEquals(0, apiMock.calledCount)
 
         viewModel.weatherState.test(2000) {
             assertEquals(
-                weatherSuccessStateBrno1.copy(
-                    lastUpdated = (clock.getMockedClock()!!.toEpochMilliseconds() - dataTimestamp!!.toEpochMilliseconds()).milliseconds
-                ),
+                weatherSuccessStateBrno1.copy(lastUpdated = calculateMockedTimestamp()),
                 awaitItemAfter(WeatherViewState(isLoading = true))
             )
             assertEquals(0, apiMock.calledCount)
-            expectNoEvents()
 
             setDataAge(Clock.System.now() - 2.hours)
 
             assertEquals(
-                weatherSuccessStateBrno2.copy(
-                    lastUpdated = 0.seconds
-                ),
+                weatherSuccessStateBrno2.copy(lastUpdated = 0.seconds),
                 awaitItemAfterLast(
                     weatherSuccessStateBrno1.copy(
-                        lastUpdated = (clock.getMockedClock()!!.toEpochMilliseconds() - dataTimestamp!!.toEpochMilliseconds()).milliseconds,
+                        lastUpdated = calculateMockedTimestamp(),
                         isLoading = true
                     )
                 )
@@ -144,25 +147,19 @@ class WeatherViewModelTest {
 
     @Test
     fun `Get weather via poll - updated from network call`() = runBlocking {
-        apiMock.prepareResult(listOf(BRNO1.get(), BRNO2.get()))
+        apiMock.prepareResults(BRNO1.data, BRNO2.data)
 
         viewModel.weatherState.test(2000) {
             assertEquals(
-                weatherSuccessStateBrno1.copy(
-                    lastUpdated = 0.seconds
-                ),
-                awaitItemAfter(
-                    WeatherViewState(isLoading = true)
-                )
+                weatherSuccessStateBrno1.copy(lastUpdated = 0.seconds),
+                awaitItemAfter(WeatherViewState(isLoading = true))
             )
             assertEquals(1, apiMock.calledCount)
 
             setDataAge(Clock.System.now() - 2.hours)
 
             assertEquals(
-                weatherSuccessStateBrno2.copy(
-                    lastUpdated = 0.seconds
-                ),
+                weatherSuccessStateBrno2.copy(lastUpdated = 0.seconds),
                 awaitItemAfter(
                     weatherSuccessStateBrno1.copy(
                         lastUpdated = 0.seconds,
@@ -176,16 +173,12 @@ class WeatherViewModelTest {
 
     @Test
     fun `Get weather via poll - not updated from network call`() = runBlocking {
-        apiMock.prepareResult(listOf(BRNO1.get(), BRNO2.get()))
+        apiMock.prepareResults(BRNO1.data, BRNO2.data)
 
         viewModel.weatherState.test(2000) {
             assertEquals(
-                weatherSuccessStateBrno1.copy(
-                    lastUpdated = 0.seconds
-                ),
-                awaitItemAfter(
-                    WeatherViewState(isLoading = true)
-                )
+                weatherSuccessStateBrno1.copy(lastUpdated = 0.seconds),
+                awaitItemAfter(WeatherViewState(isLoading = true))
             )
             assertEquals(1, apiMock.calledCount)
             expectNoEvents()
@@ -193,35 +186,31 @@ class WeatherViewModelTest {
     }
 
     @Test
-    fun `Display API error on first run`() = runBlocking {
-        apiMock.throwOnCall(RuntimeException("Test error"))
+    fun `Display Data Error on initial run with no connection`() = runBlocking {
+        apiMock.prepareResults(RuntimeException("Test error"))
 
         viewModel.weatherState.test {
             assertEquals(
-                WeatherViewState(error = "Unable to download weather list."),
+                WeatherViewState(error = WeatherViewState.ErrorType.DATA_PROVIDER),
                 awaitItemAfter(WeatherViewState(isLoading = true))
             )
         }
     }
 
     @Test
-    fun `Ignore API error with cache`() = runBlocking {
-        dbHelper.insert(BRNO1.get())
-        apiMock.throwOnCall(RuntimeException("Test error"))
+    fun `Ignore API Error with cache`() = runBlocking {
+        dbHelper.insert(BRNO1.data)
+        apiMock.prepareResults(RuntimeException("Test error"), BRNO2.data)
 
         viewModel.weatherState.test(2000) {
             assertEquals(
-                weatherSuccessStateBrno1.copy(lastUpdated = 2.hours),
+                weatherSuccessStateBrno1.copy(lastUpdated = calculateMockedTimestamp()),
                 awaitItemAfter(WeatherViewState(isLoading = true))
             )
-            expectNoEvents()
-
-            apiMock.prepareResult(BRNO2.get())
+            assertEquals(0, apiMock.calledCount)
 
             assertEquals(
-                weatherSuccessStateBrno2.copy(
-                    lastUpdated = 0.seconds
-                ),
+                weatherSuccessStateBrno2.copy(lastUpdated = 0.seconds),
                 awaitItemAfter(
                     weatherSuccessStateBrno1.copy(
                         lastUpdated = 2.hours,
@@ -229,51 +218,119 @@ class WeatherViewModelTest {
                     )
                 )
             )
+            assertEquals(1, apiMock.calledCount)
         }
     }
 
     @Test
-    fun `Ignore API error on refresh with cache`() = runBlocking {
-        apiMock.prepareResult(BRNO1.get())
+    fun `Ignore API Error on refresh with cache`() = runBlocking {
+        apiMock.prepareResults(BRNO1.data, RuntimeException("Test error"))
 
         viewModel.weatherState.test(2000) {
             assertEquals(
-                weatherSuccessStateBrno1.copy(
-                    lastUpdated = 0.seconds
-                ),
+                weatherSuccessStateBrno1.copy(lastUpdated = 0.seconds),
                 awaitItemAfter(WeatherViewState(isLoading = true))
             )
-            expectNoEvents()
 
             setDataAge(Clock.System.now() - 2.hours)
-            apiMock.throwOnCall(RuntimeException("Test error"))
 
             assertEquals(
-                weatherSuccessStateBrno1.copy(
-                    lastUpdated = 0.seconds
-                ),
+                weatherSuccessStateBrno1.copy(lastUpdated = 0.seconds),
                 awaitItemAfterLast(weatherSuccessStateBrno1.copy(isLoading = true))
             )
         }
     }
 
     @Test
-    fun `Show API error on refresh without cache`() = runBlocking {
-        setDataAge(Clock.System.now() - 2.hours)
-        apiMock.throwOnCall(RuntimeException("Test error"))
+    fun `Show API Error on refresh without cache`() = runBlocking {
+        apiMock.prepareResults(RuntimeException("Test error"))
 
         viewModel.weatherState.test {
-            assertEquals(WeatherViewState(isLoading = true), awaitItem())
             assertEquals(
-                WeatherViewState(error = "Unable to download weather list."),
+                WeatherViewState(error = WeatherViewState.ErrorType.DATA_PROVIDER),
                 awaitItemAfter(WeatherViewState(isLoading = true))
             )
+        }
+    }
+
+    @Test
+    fun `Show Data Error on corrupt data`() = runBlocking {
+        apiMock.prepareResults(CORRUPT.data)
+
+        viewModel.weatherState.test(2000) {
+            assertEquals(
+                WeatherViewState(error = WeatherViewState.ErrorType.DATA_CONSISTENCY),
+                awaitItemAfter(WeatherViewState(isLoading = true))
+            )
+        }
+    }
+
+    //FIXME
+    @Test
+    fun `Show correct data and refresh from API with corrupt data`() = runBlocking {
+        apiMock.prepareResults(BRNO2.data, CORRUPT.data)
+
+        assertEquals(0, apiMock.calledCount)
+
+        viewModel.weatherState.test(2000) {
+            assertEquals(
+                weatherSuccessStateBrno2.copy(lastUpdated = 0.seconds),
+                awaitItemAfter(WeatherViewState(isLoading = true))
+            )
+
+            assertEquals(1, apiMock.calledCount)
+
+            setDataAge(Clock.System.now() - 2.hours)
+
+            assertEquals(
+                weatherCorruptStateBrno.copy(
+                    lastUpdated = 0.seconds,
+                    error = WeatherViewState.ErrorType.DATA_CONSISTENCY
+                ),
+                awaitItemAfterLast(weatherSuccessStateBrno2.copy(isLoading = true))
+            )
+
+            assertEquals(2, apiMock.calledCount)
+        }
+    }
+
+    //FIXME
+    @Test
+    fun `Show correct data and refresh from API with error`() = runBlocking {
+        apiMock.prepareResults(BRNO2.data, RuntimeException("Test error"))
+
+        assertEquals(0, apiMock.calledCount)
+
+        viewModel.weatherState.test(120000) { //TODO timeout
+            assertEquals(
+                weatherSuccessStateBrno2.copy(lastUpdated = 0.seconds),
+                awaitItemAfter(WeatherViewState(isLoading = true))
+            )
+
+            assertEquals(1, apiMock.calledCount)
+
+            setDataAge(Clock.System.now() - 2.hours)
+
+            assertEquals(
+                weatherSuccessStateBrno2.copy(
+                    lastUpdated = 0.seconds,
+                    error = WeatherViewState.ErrorType.DATA_PROVIDER
+                ),
+                awaitItemAfterLast(weatherSuccessStateBrno2.copy(isLoading = true))
+            )
+
+            assertEquals(2, apiMock.calledCount)
         }
     }
 
     private fun setDataAge(instant: Instant) {
         dataTimestamp = instant
         settings.putLong(WeatherRepository.DB_TIMESTAMP_KEY, instant.toEpochMilliseconds())
+    }
+
+    private fun calculateMockedTimestamp(): Duration {
+        return (clock.getMockedClock()!!
+            .toEpochMilliseconds() - dataTimestamp!!.toEpochMilliseconds()).milliseconds
     }
 
     private suspend fun FlowTurbine<WeatherViewState>.awaitItemAfter(vararg items: WeatherViewState): WeatherViewState {
@@ -293,5 +350,4 @@ class WeatherViewModelTest {
         }
         return awaitItem()
     }
-
 }

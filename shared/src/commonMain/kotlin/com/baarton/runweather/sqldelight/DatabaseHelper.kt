@@ -18,16 +18,22 @@ class DatabaseHelper(
     private val log: Logger,
     private val backgroundDispatcher: CoroutineDispatcher
 ) {
+
+    companion object {
+        private const val ITEM_DECODING_DELIMITER = "␝" //Group Separator
+        private const val DATA_DECODING_DELIMITER = "␟" //Unit Separator
+    }
+
     private val dbRef: RunWeatherDb =
         RunWeatherDb(
-            //TODO review/extract adapters and their default values
             sqlDriver, PersistedWeatherAdapter = PersistedWeather.Adapter(
+
                 weatherListAdapter = object : ColumnAdapter<List<Weather>, String> {
 
                     override fun encode(value: List<Weather>): String {
-                        return value.joinToString(separator = ",") {
-                            it.weatherId.plus("|").plus(it.title).plus("|")
-                                .plus(it.description).plus("|").plus(it.iconId)
+                        return value.joinToString(separator = ITEM_DECODING_DELIMITER) {
+                            it.weatherId.plus(DATA_DECODING_DELIMITER).plus(it.title).plus(DATA_DECODING_DELIMITER)
+                                .plus(it.description).plus(DATA_DECODING_DELIMITER).plus(it.iconId)
                         }
                     }
 
@@ -36,9 +42,16 @@ class DatabaseHelper(
                             emptyList()
                         } else {
                             val result = mutableListOf<Weather>()
-                            databaseValue.split(",").forEach {
-                                val elementSplit = it.split("|")
-                                result.add(Weather(elementSplit[0], elementSplit[1], elementSplit[2], elementSplit[3]))
+                            databaseValue.split(ITEM_DECODING_DELIMITER).forEach {
+                                val elementSplit = it.split(DATA_DECODING_DELIMITER)
+                                result.add(
+                                    Weather(
+                                        elementSplit[0],
+                                        elementSplit[1],
+                                        elementSplit[2],
+                                        elementSplit[3]
+                                    )
+                                )
                             }
                             result
                         }
@@ -48,7 +61,7 @@ class DatabaseHelper(
                 mainDataAdapter = object : ColumnAdapter<WeatherData.MainData, String> {
 
                     override fun encode(value: WeatherData.MainData): String {
-                        return value.temperature.plus("|").plus(value.pressure).plus("|")
+                        return value.temperature.plus(DATA_DECODING_DELIMITER).plus(value.pressure).plus(DATA_DECODING_DELIMITER)
                             .plus(value.humidity)
                     }
 
@@ -56,23 +69,22 @@ class DatabaseHelper(
                         return if (databaseValue.isEmpty()) {
                             WeatherData.MainData("", "", "")
                         } else {
-                            val split = databaseValue.split("|")
+                            val split = databaseValue.split(DATA_DECODING_DELIMITER)
                             WeatherData.MainData(split[0], split[1], split[2])
                         }
                     }
                 },
-                //TODO what of rain is null? what does this do?
                 rainAdapter = object : ColumnAdapter<WeatherData.Rain, String> {
 
                     override fun encode(value: WeatherData.Rain): String {
-                        return value.oneHour.plus("|").plus(value.threeHour)
+                        return value.oneHour.plus(DATA_DECODING_DELIMITER).plus(value.threeHour)
                     }
 
                     override fun decode(databaseValue: String): WeatherData.Rain {
                         return if (databaseValue.isEmpty()) {
                             WeatherData.Rain("", "")
                         } else {
-                            val split = databaseValue.split("|")
+                            val split = databaseValue.split(DATA_DECODING_DELIMITER)
                             WeatherData.Rain(split[0], split[1])
                         }
                     }
@@ -80,14 +92,14 @@ class DatabaseHelper(
                 sysAdapter = object : ColumnAdapter<WeatherData.Sys, String> {
 
                     override fun encode(value: WeatherData.Sys): String {
-                        return value.sunrise.plus("|").plus(value.sunset)
+                        return value.sunrise.plus(DATA_DECODING_DELIMITER).plus(value.sunset)
                     }
 
                     override fun decode(databaseValue: String): WeatherData.Sys {
                         return if (databaseValue.isEmpty()) {
                             WeatherData.Sys("", "")
                         } else {
-                            val split = databaseValue.split("|")
+                            val split = databaseValue.split(DATA_DECODING_DELIMITER)
                             WeatherData.Sys(split[0], split[1])
                         }
                     }
@@ -95,20 +107,19 @@ class DatabaseHelper(
                 windAdapter = object : ColumnAdapter<WeatherData.Wind, String> {
 
                     override fun encode(value: WeatherData.Wind): String {
-                        return value.speed.plus("|").plus(value.deg)
+                        return value.speed.plus(DATA_DECODING_DELIMITER).plus(value.deg)
                     }
 
                     override fun decode(databaseValue: String): WeatherData.Wind {
                         return if (databaseValue.isEmpty()) {
                             WeatherData.Wind("", "")
                         } else {
-                            val split = databaseValue.split("|")
+                            val split = databaseValue.split(DATA_DECODING_DELIMITER)
                             WeatherData.Wind(split[0], split[1])
                         }
                     }
                 }
             )
-
         )
 
     fun getAll(): Flow<PersistedWeather?> =

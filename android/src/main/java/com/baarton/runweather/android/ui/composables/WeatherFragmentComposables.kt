@@ -1,6 +1,5 @@
 package com.baarton.runweather.android.ui.composables
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -57,7 +56,6 @@ fun WeatherFragmentScreen(
         viewModel.weatherState.flowWithLifecycle(lifecycleOwner.lifecycle)
     }
 
-    @SuppressLint("StateFlowValueCalledInComposition") // False positive lint check when used inside collectAsState()
     val weatherState by lifecycleAwareWeatherFlow.collectAsState(viewModel.weatherState.value)
 
     WeatherFragmentScreenContent(
@@ -94,10 +92,10 @@ private fun WeatherFragmentScreenContent(
             }
             val error = weatherState.error
             if (error != null) {
-                LaunchedEffect(error) {
-                    onError(error)
-                }
-                ErrorScreen(error)
+                // LaunchedEffect(error) {
+                //     onError(stringResource(id = error.messageRes.resourceId))
+                // }
+                ErrorScreen(stringResource(id = error.messageRes.resourceId))
             }
         }
     }
@@ -128,6 +126,7 @@ private fun ErrorScreen(error: String) {
         horizontalAlignment = CenterHorizontally,
     ) {
         Text(text = error)
+        //TODO dont forget explicit button refresh
     }
 }
 
