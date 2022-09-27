@@ -8,12 +8,9 @@ import com.baarton.runweather.models.SettingsViewModel.Companion.WEATHER_DATA_TH
 import com.baarton.runweather.models.weather.CurrentWeather
 import com.baarton.runweather.sqldelight.DatabaseHelper
 import com.russhwolf.settings.Settings
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-
 
 class WeatherRepository(
     private val dbHelper: DatabaseHelper,
@@ -34,20 +31,26 @@ class WeatherRepository(
         ensureNeverFrozen()
     }
 
-    fun getWeather(): Flow<CurrentWeather?> {
+    fun getWeather(): CurrentWeather? {
         log.d("Get WeatherData from DB.")
-        return dbHelper.getAll().map {
-            it?.let { CurrentWeather(it, getLastDownloadTime()) }
+        return dbHelper.getAll().let {
+            if (it.isEmpty()) {
+                null
+            } else { //TODO consistency check on it.first() plus test(s)
+                CurrentWeather(it.first(), getLastDownloadTime())
+            }
         }
     }
 
-    suspend fun refreshWeather() {
-        if (isWeatherListStale()) {
+    suspend fun refreshWeather(): CurrentWeather? {
+        return if (isWeatherListStale()) {
             doRefreshWeather()
+        } else {
+            getWeather()
         }
     }
 
-    private suspend fun doRefreshWeather() {
+    private suspend fun doRefreshWeather(): CurrentWeather {
         val weatherResult = try {
             weatherApi.getJsonFromApi()
         } catch (e: Exception) {
@@ -57,8 +60,10 @@ class WeatherRepository(
 
         if (!weatherResult.isEmptyOrIncomplete()) {
             dbHelper.insert(weatherResult)
-            settings.putLong(DB_TIMESTAMP_KEY, clock.now().toEpochMilliseconds())
+            val timeStamp = clock.now().toEpochMilliseconds()
+            settings.putLong(DB_TIMESTAMP_KEY, timeStamp)
             log.d { "WeatherData result put to DB." }
+            return CurrentWeather(weatherResult, timeStamp.milliseconds)
         } else {
             throw WeatherDataConsistencyException("Weather data obtained is empty or incomplete.-----\n$weatherResult\n-----")
         }

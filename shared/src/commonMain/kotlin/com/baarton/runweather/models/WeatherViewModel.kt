@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -53,7 +52,7 @@ class WeatherViewModel(
     }
 
     private fun observeWeather() {
-        val refreshFlow = channelFlow<Throwable?> {
+        val refreshFlow = channelFlow {
             while (!isClosed) {
                 log.i("Get WeatherData for poll send.")
                 mutableWeatherState.update {
@@ -63,10 +62,10 @@ class WeatherViewModel(
                 }
                 try {
                     log.i("Try to refresh WeatherData from flow.")
-                    weatherRepository.refreshWeather()
-                    send(null)
+                    val item = weatherRepository.refreshWeather()
+                    send(PollingResult(data = item))
                 } catch (exception: Exception) {
-                    send(exception)
+                    send(PollingResult(error = exception))
                 }
                 log.i("Delaying next poll.")
                 delay(config.weatherDataRequestInterval)
@@ -76,19 +75,15 @@ class WeatherViewModel(
 
         viewModelScope.launch {
             log.d { "WeatherData refresh coroutine launch." }
-            combine(
-                refreshFlow,
-                weatherRepository.getWeather()
-            ) { throwable, weather -> throwable to weather }
-                .collect { (error, weather) ->
+            refreshFlow.collect { pollingResult ->
                     log.d("Weather collected.")
                     mutableWeatherState.update { previousState ->
-                        if (shouldUpdateState(previousState, weather, error)) {
+                        if (shouldUpdateState(previousState, pollingResult)) {
                             WeatherViewState(
                                 isLoading = false,
-                                lastUpdated = weather?.let { timeStampDuration(it.timestamp) },
-                                weather = weather?.persistedWeather,
-                                error = getError(previousState, weather, error).takeIf { isCorrupt(weather) } //FIXME need to think about this condition
+                                lastUpdated = pollingResult.data?.let { timeStampDuration(it.timestamp) },
+                                weather = pollingResult.data?.persistedWeather,
+                                error = classifyError(previousState, pollingResult.error).takeIf { isCorrupt(pollingResult.data) } //FIXME need to think about this condition, even with new approach?
                             ).also {
                                 log.d { "Updating weather state with $it." }
                             }
@@ -102,17 +97,17 @@ class WeatherViewModel(
         }
     }
 
-    private fun shouldUpdateState(previousState: WeatherViewState, weather: CurrentWeather?, error: Throwable?): Boolean {
-        return previousState.weather != weather?.persistedWeather ||
-            previousState.lastUpdated != weather?.timestamp?.let { timeStampDuration(it) } ||
-            previousState.error != error
+    private fun shouldUpdateState(previousState: WeatherViewState, result: PollingResult): Boolean {
+        return previousState.weather != result.data?.persistedWeather ||
+            previousState.lastUpdated != result.data?.timestamp?.let { timeStampDuration(it) } ||
+            previousState.error != result.error
     }
 
     private fun timeStampDuration(dataTimestamp: Duration): Duration {
         return clock.now().toEpochMilliseconds().milliseconds - dataTimestamp
     }
 
-    private fun getError(previousState: WeatherViewState, weather: CurrentWeather?, error: Throwable?): WeatherViewState.ErrorType? {
+    private fun classifyError(previousState: WeatherViewState, error: Throwable?): WeatherViewState.ErrorType? {
         return when(error) {
             is WeatherRepository.WeatherDataConsistencyException -> WeatherViewState.ErrorType.DATA_CONSISTENCY
             is WeatherRepository.WeatherAPIException -> WeatherViewState.ErrorType.DATA_PROVIDER
@@ -167,6 +162,8 @@ fun lastUpdatedResId(timestampAge: Duration?): Pair<StringResource, Long?> {
         else -> SharedRes.strings.fragment_weather_last_updated_min_time to timestampAge.inWholeMinutes
     }
 }
+
+data class PollingResult(val data: CurrentWeather? = null, val error: Throwable? = null)
 
 data class WeatherViewState(
     val weather: PersistedWeather? = null,

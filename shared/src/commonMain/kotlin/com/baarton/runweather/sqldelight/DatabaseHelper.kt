@@ -7,11 +7,7 @@ import com.baarton.runweather.models.weather.Weather
 import com.baarton.runweather.models.weather.WeatherData
 import com.squareup.sqldelight.ColumnAdapter
 import com.squareup.sqldelight.db.SqlDriver
-import com.squareup.sqldelight.runtime.coroutines.asFlow
-import com.squareup.sqldelight.runtime.coroutines.mapToOneOrNull
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
 
 class DatabaseHelper(
     sqlDriver: SqlDriver,
@@ -74,6 +70,7 @@ class DatabaseHelper(
                         }
                     }
                 },
+
                 rainAdapter = object : ColumnAdapter<WeatherData.Rain, String> {
 
                     override fun encode(value: WeatherData.Rain): String {
@@ -89,6 +86,7 @@ class DatabaseHelper(
                         }
                     }
                 },
+
                 sysAdapter = object : ColumnAdapter<WeatherData.Sys, String> {
 
                     override fun encode(value: WeatherData.Sys): String {
@@ -104,6 +102,7 @@ class DatabaseHelper(
                         }
                     }
                 },
+
                 windAdapter = object : ColumnAdapter<WeatherData.Wind, String> {
 
                     override fun encode(value: WeatherData.Wind): String {
@@ -122,12 +121,10 @@ class DatabaseHelper(
             )
         )
 
-    fun getAll(): Flow<PersistedWeather?> =
+    fun getAll(): List<PersistedWeather> =
         dbRef.tableQueries
             .getAll()
-            .asFlow()
-            .mapToOneOrNull()
-            .flowOn(backgroundDispatcher)
+            .executeAsList()
 
     suspend fun insert(weatherData: WeatherData) {
         log.d { "Inserting weather for ${weatherData.locationName} into database" }
