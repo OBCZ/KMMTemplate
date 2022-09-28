@@ -33,6 +33,9 @@ import org.koin.dsl.module
 // extracting/moving stuff/files further
 // review tests
 // get iOS working
+// fork to RunWeather GH
+// create simple CI/CD
+// define simple formatting rules with ktlint?
 
 //TODO runners data enhancements
 // no categories' texts, only pictograms (cap, torso, legs etc.)

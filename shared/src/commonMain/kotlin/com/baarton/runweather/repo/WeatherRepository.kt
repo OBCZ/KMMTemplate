@@ -12,6 +12,7 @@ import kotlinx.datetime.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
+
 class WeatherRepository(
     private val dbHelper: DatabaseHelper,
     private val settings: Settings,
@@ -31,22 +32,28 @@ class WeatherRepository(
         ensureNeverFrozen()
     }
 
-    fun getWeather(): CurrentWeather? {
-        log.d("Get WeatherData from DB.")
-        return dbHelper.getAll().let {
-            if (it.isEmpty()) {
-                null
-            } else { //TODO consistency check on it.first() plus test(s)
-                CurrentWeather(it.first(), getLastDownloadTime())
-            }
-        }
-    }
-
     suspend fun refreshWeather(): CurrentWeather? {
         return if (isWeatherListStale()) {
             doRefreshWeather()
         } else {
             getWeather()
+        }
+    }
+
+    private fun getWeather(): CurrentWeather? {
+        log.d("Get WeatherData from DB.")
+        return dbHelper.getAll().let {
+            if (it.isEmpty()) {
+                null
+            } else {
+                with(CurrentWeather(it.first(), getLastDownloadTime())) {
+                    if (this.isEmptyOrIncomplete()) {
+                        throw WeatherDataConsistencyException("Weather data retrieved from the DB is empty or incomplete.-----\n${this.persistedWeather}\n-----")
+                    } else {
+                        this
+                    }
+                }
+            }
         }
     }
 
@@ -71,12 +78,16 @@ class WeatherRepository(
 
     private fun isWeatherListStale(): Boolean {
         val lastDownload = getLastDownloadTime()
-        val threshold = Duration.parseIsoString(settings.getString(WEATHER_DATA_THRESHOLD_TAG, config.weatherDataMinimumThreshold.toIsoString()))
+        val threshold = Duration.parseIsoString(
+            settings.getString(WEATHER_DATA_THRESHOLD_TAG, config.weatherDataMinimumThreshold.toIsoString())
+        )
         val now = clock.now().toEpochMilliseconds().milliseconds
-        log.d { "Resolving staleness of data.\n" +
-            "Saved data timestamp: $lastDownload\n" +
-            "-------Timestamp now: $now\n" +
-            "-----------Threshold: $threshold" }
+        log.d {
+            "Resolving staleness of data.\n" +
+                "Saved data timestamp: $lastDownload\n" +
+                "-------Timestamp now: $now\n" +
+                "-----------Threshold: $threshold"
+        }
         return (lastDownload + threshold < now).also {
             if (!it) {
                 log.i { "Weather not fetched from network. Recently updated" }

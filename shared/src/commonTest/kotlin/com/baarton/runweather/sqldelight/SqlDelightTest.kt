@@ -10,7 +10,6 @@ import com.baarton.runweather.mock.BRNO3
 import com.baarton.runweather.mock.BRNO4
 import com.baarton.runweather.testDbConnection
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -104,7 +103,7 @@ class SqlDelightTest {
         dbHelper.nuke()
 
         assertTrue(
-            dbHelper.getAll().first() == null,
+            dbHelper.getAll().isEmpty(),
             "Delete All did not work"
         )
     }

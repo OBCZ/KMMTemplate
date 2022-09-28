@@ -37,19 +37,18 @@ import kotlin.time.Duration.Companion.seconds
 
 class WeatherViewModelTest {
 
-    private var kermit = Logger(StaticConfig())
+    private var logger = Logger(StaticConfig())
     private var testDbConnection = testDbConnection()
-    private var dbHelper = DatabaseHelper(testDbConnection, kermit, Dispatchers.Default)
-    private val settings = MockSettings()
-    private val config = TestConfig
-    private val apiMock = WeatherApiMock()
-    private val clock = ClockMock()
+    private var dbHelper = DatabaseHelper(testDbConnection, logger, Dispatchers.Default)
     private var dataTimestamp: Instant? = null
-    private val repository: WeatherRepository =
-        WeatherRepository(dbHelper, settings, config, apiMock, kermit, clock)
-    private val testConfig: Config = TestConfig
 
-    private val viewModel by lazy { WeatherViewModel(testConfig, repository, clock, kermit) }
+    private val settingsMock = MockSettings()
+    private val apiMock = WeatherApiMock()
+    private val clockMock = ClockMock()
+    private val testConfig: Config = TestConfig
+    private val repository: WeatherRepository = WeatherRepository(dbHelper, settingsMock, testConfig, apiMock, logger, clockMock)
+
+    private val viewModel by lazy { WeatherViewModel(testConfig, repository, clockMock, logger) }
 
     companion object {
 
@@ -81,13 +80,13 @@ class WeatherViewModelTest {
     fun setup() {
         Dispatchers.setMain(Dispatchers.Unconfined)
         setDataAge(Clock.System.now() - 2.hours)
-        clock.mockClock(Clock.System.now())
+        clockMock.mockClock(Clock.System.now())
     }
 
     @AfterTest
     fun tearDown() {
         dataTimestamp = null
-        clock.mockClock(null)
+        clockMock.mockClock(null)
         apiMock.reset()
 
         runBlocking {
@@ -111,7 +110,7 @@ class WeatherViewModelTest {
     }
 
     @Test
-    fun `Get weather with cache and update from network call`() = runBlocking {
+    fun `Get weather from DB and update from API`() = runBlocking {
         apiMock.prepareResults(BRNO2.data)
         dbHelper.insert(BRNO1.data)
         setDataAge(Clock.System.now() - 1.seconds)
@@ -142,7 +141,7 @@ class WeatherViewModelTest {
     }
 
     @Test
-    fun `Get weather via poll - updated from network call`() = runBlocking {
+    fun `Get weather from API and refresh from API`() = runBlocking {
         apiMock.prepareResults(BRNO1.data, BRNO2.data)
 
         viewModel.weatherState.test(2000) {
@@ -169,7 +168,7 @@ class WeatherViewModelTest {
     }
 
     @Test
-    fun `Get weather via poll - not updated from network call`() = runBlocking {
+    fun `Get weather from API and don't refresh from API`() = runBlocking {
         apiMock.prepareResults(BRNO1.data, BRNO2.data)
 
         viewModel.weatherState.test {
@@ -184,7 +183,7 @@ class WeatherViewModelTest {
     }
 
     @Test
-    fun `Display Data Error on initial run with no connection`() = runBlocking {
+    fun `Show Data Error on initial run with no connection`() = runBlocking {
         apiMock.prepareResults(RuntimeException("Test error"))
 
         viewModel.weatherState.test {
@@ -212,7 +211,7 @@ class WeatherViewModelTest {
     }
 
     @Test
-    fun `Show API Error with outdated cache and then refresh`() = runBlocking {
+    fun `Show API Error with outdated DB and then refresh from API`() = runBlocking {
         dbHelper.insert(BRNO1.data)
         apiMock.prepareResults(RuntimeException("Test error"), BRNO2.data)
 
@@ -254,7 +253,53 @@ class WeatherViewModelTest {
     }
 
     @Test
-    fun `Show Data Error on corrupt data`() = runBlocking {
+    fun `Show Data Error on corrupt data from DB`() = runBlocking {
+        dbHelper.insert(CORRUPT.data)
+        setDataAge(Clock.System.now() - 1.seconds)
+
+        viewModel.weatherState.test {
+            assertEquals(
+                WeatherViewState(error = WeatherViewState.ErrorType.DATA_CONSISTENCY),
+                awaitItemAfter(WeatherViewState(isLoading = true))
+            )
+            cancel()
+        }
+    }
+
+    @Test
+    fun `Show Data Error on corrupt data from DB and then refresh API`() = runBlocking {
+        dbHelper.insert(CORRUPT.data)
+        apiMock.prepareResults(BRNO2.data)
+        setDataAge(Clock.System.now() - 1.seconds)
+
+        assertEquals(0, apiMock.calledCount)
+
+        viewModel.weatherState.test(2000) {
+            assertEquals(
+                WeatherViewState(error = WeatherViewState.ErrorType.DATA_CONSISTENCY),
+                awaitItemAfter(WeatherViewState(isLoading = true))
+            )
+
+            assertEquals(0, apiMock.calledCount)
+
+            setDataAge(Clock.System.now() - 2.hours)
+
+            assertEquals(
+                weatherSuccessStateBrno2.copy(lastUpdated = 0.seconds),
+                awaitItemAfter(
+                    WeatherViewState(
+                        error = WeatherViewState.ErrorType.DATA_CONSISTENCY,
+                        isLoading = true
+                    )
+                )
+            )
+            assertEquals(1, apiMock.calledCount)
+            cancel()
+        }
+    }
+
+    @Test
+    fun `Show Data Error on corrupt data from API`() = runBlocking {
         apiMock.prepareResults(CORRUPT.data)
 
         viewModel.weatherState.test {
@@ -320,11 +365,11 @@ class WeatherViewModelTest {
 
     private fun setDataAge(instant: Instant) {
         dataTimestamp = instant
-        settings.putLong(WeatherRepository.DB_TIMESTAMP_KEY, instant.toEpochMilliseconds())
+        settingsMock.putLong(WeatherRepository.DB_TIMESTAMP_KEY, instant.toEpochMilliseconds())
     }
 
     private fun calculateMockedTimestamp(): Duration {
-        return (clock.getMockedClock()!!
+        return (clockMock.getMockedClock()!!
             .toEpochMilliseconds() - dataTimestamp!!.toEpochMilliseconds()).milliseconds
     }
 

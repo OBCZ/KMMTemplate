@@ -76,24 +76,26 @@ class WeatherViewModel(
         viewModelScope.launch {
             log.d { "WeatherData refresh coroutine launch." }
             refreshFlow.collect { pollingResult ->
-                    log.d("Weather collected.")
-                    mutableWeatherState.update { previousState ->
-                        if (shouldUpdateState(previousState, pollingResult)) {
-                            WeatherViewState(
-                                isLoading = false,
-                                lastUpdated = pollingResult.data?.let { timeStampDuration(it.timestamp) },
-                                weather = pollingResult.data?.persistedWeather,
-                                error = classifyError(previousState, pollingResult.error).takeIf { isCorrupt(pollingResult.data) } //FIXME need to think about this condition, even with new approach?
-                            ).also {
-                                log.d { "Updating weather state with $it." }
+                log.d("Weather collected.")
+                mutableWeatherState.update { previousState ->
+                    if (shouldUpdateState(previousState, pollingResult)) {
+                        WeatherViewState(
+                            isLoading = false,
+                            lastUpdated = pollingResult.data?.let { timeStampDuration(it.timestamp) },
+                            weather = pollingResult.data?.persistedWeather,
+                            error = pollingResult.error?.let {
+                                classifyError(previousState, pollingResult.error)
                             }
-                        } else {
-                            previousState.also {
-                                log.d { "Weather state not updated." }
-                            }
+                        ).also {
+                            log.d { "Updating weather state with $it." }
+                        }
+                    } else {
+                        previousState.also {
+                            log.d { "Weather state not updated." }
                         }
                     }
                 }
+            }
         }
     }
 
@@ -107,16 +109,12 @@ class WeatherViewModel(
         return clock.now().toEpochMilliseconds().milliseconds - dataTimestamp
     }
 
-    private fun classifyError(previousState: WeatherViewState, error: Throwable?): WeatherViewState.ErrorType? {
+    private fun classifyError(previousState: WeatherViewState, error: Throwable): WeatherViewState.ErrorType? {
         return when(error) {
             is WeatherRepository.WeatherDataConsistencyException -> WeatherViewState.ErrorType.DATA_CONSISTENCY
             is WeatherRepository.WeatherAPIException -> WeatherViewState.ErrorType.DATA_PROVIDER
             else -> previousState.error
         }
-    }
-
-    private fun isCorrupt(weather: CurrentWeather?): Boolean {
-        return weather == null || weather.isEmptyOrIncomplete()
     }
 
     //TODO review when implementing the one-time button

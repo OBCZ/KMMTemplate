@@ -1,6 +1,5 @@
 package com.baarton.runweather.repo
 
-import app.cash.turbine.test
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.StaticConfig
 import com.baarton.runweather.AndroidJUnit4
@@ -33,21 +32,16 @@ import kotlin.time.Duration.Companion.seconds
 @RunWith(AndroidJUnit4::class)
 class WeatherRepositoryTest {
 
-    private var kermit = Logger(StaticConfig())
+    private var logger = Logger(StaticConfig())
     private var testDbConnection = testDbConnection()
-    private var dbHelper = DatabaseHelper(
-        testDbConnection,
-        kermit,
-        Dispatchers.Default
-    )
-    private val settings = MockSettings()
-    private val config = TestConfig
-    private val apiMock = WeatherApiMock()
+    private var dbHelper = DatabaseHelper(testDbConnection, logger, Dispatchers.Default)
 
+    private val settingsMock = MockSettings()
+    private val testConfig = TestConfig
+    private val apiMock = WeatherApiMock()
     private val clock = Clock.System
 
-    private val repository: WeatherRepository =
-        WeatherRepository(dbHelper, settings, config, apiMock, kermit, clock)
+    private val repository: WeatherRepository = WeatherRepository(dbHelper, settingsMock, testConfig, apiMock, logger, clock)
 
     @AfterTest
     fun tearDown() = runTest {
@@ -56,11 +50,9 @@ class WeatherRepositoryTest {
     }
 
     @Test
-    fun `Get weather without cache`() = runBlocking {
+    fun `Web call with no data`() = runBlocking {
         apiMock.prepareResults(BRNO1.data)
-        repository.refreshWeather()
-        repository.getWeather().test {
-            val item = awaitItem()
+        repository.refreshWeather().let {
             assertEquals(
                 PersistedWeather(
                     listOf(Weather("800", "Clear", "clear sky", "01d")),
@@ -69,17 +61,17 @@ class WeatherRepositoryTest {
                     WeatherData.Wind("4.6", "345"),
                     null,
                     WeatherData.Sys("1646803774", "1646844989")
-                ), item?.persistedWeather
+                ), it?.persistedWeather
             )
             assertEquals(
-                settings.getLong(DB_TIMESTAMP_KEY, 0).milliseconds, item?.timestamp
+                settingsMock.getLong(DB_TIMESTAMP_KEY, 0).milliseconds, it?.timestamp
             )
         }
     }
 
     @Test
     fun `No web call if data is not stale`() = runTest {
-        settings.putLong(DB_TIMESTAMP_KEY, clock.now().toEpochMilliseconds())
+        settingsMock.putLong(DB_TIMESTAMP_KEY, clock.now().toEpochMilliseconds())
         apiMock.prepareResults(BRNO1.data)
 
         repository.refreshWeather()
@@ -88,7 +80,7 @@ class WeatherRepositoryTest {
 
     @Test
     fun `No web call if data is not stale and web call after delay`() = runTest {
-        settings.putLong(DB_TIMESTAMP_KEY, clock.now().toEpochMilliseconds())
+        settingsMock.putLong(DB_TIMESTAMP_KEY, clock.now().toEpochMilliseconds())
         apiMock.prepareResults(BRNO1.data)
 
         repository.refreshWeather()
@@ -104,8 +96,8 @@ class WeatherRepositoryTest {
 
     @Test
     fun `No web call if data is not stale and web call after delay - edited setting 1`() = runTest {
-        settings.putLong(DB_TIMESTAMP_KEY, clock.now().toEpochMilliseconds())
-        settings.putString(
+        settingsMock.putLong(DB_TIMESTAMP_KEY, clock.now().toEpochMilliseconds())
+        settingsMock.putString(
             SettingsViewModel.WEATHER_DATA_THRESHOLD_TAG,
             5.seconds.toIsoString()
         )
@@ -128,8 +120,8 @@ class WeatherRepositoryTest {
 
     @Test
     fun `No web call if data is not stale and web call after delay - edited setting 2`() = runTest {
-        settings.putLong(DB_TIMESTAMP_KEY, clock.now().toEpochMilliseconds())
-        settings.putString(
+        settingsMock.putLong(DB_TIMESTAMP_KEY, clock.now().toEpochMilliseconds())
+        settingsMock.putString(
             SettingsViewModel.WEATHER_DATA_THRESHOLD_TAG,
             5.seconds.toIsoString()
         )
@@ -169,10 +161,7 @@ class WeatherRepositoryTest {
 
     @Test
     fun `Rethrow on API error when stale`() = runTest {
-        settings.putLong(
-            DB_TIMESTAMP_KEY,
-            (Clock.System.now() - 2.hours).toEpochMilliseconds()
-        )
+        settingsMock.putLong(DB_TIMESTAMP_KEY, (Clock.System.now() - 2.hours).toEpochMilliseconds())
         apiMock.prepareResults(RuntimeException("Test error"))
 
         val throwable = assertFails {
