@@ -1,24 +1,22 @@
 package com.baarton.runweather.android.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Shapes
+import androidx.compose.material.Typography
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.baarton.runweather.android.ui.AndroidColor.dark
 import com.baarton.runweather.android.ui.AndroidColor.light
-import com.baarton.runweather.ui.ThemedColor.BACKGROUND
-import com.baarton.runweather.ui.ThemedColor.ERROR
-import com.baarton.runweather.ui.ThemedColor.ON_BACKGROUND
-import com.baarton.runweather.ui.ThemedColor.ON_ERROR
-import com.baarton.runweather.ui.ThemedColor.ON_PRIMARY
-import com.baarton.runweather.ui.ThemedColor.ON_SECONDARY
-import com.baarton.runweather.ui.ThemedColor.ON_SURFACE
-import com.baarton.runweather.ui.ThemedColor.PRIMARY
-import com.baarton.runweather.ui.ThemedColor.PRIMARY_VARIANT
-import com.baarton.runweather.ui.ThemedColor.SECONDARY
-import com.baarton.runweather.ui.ThemedColor.SECONDARY_VARIANT
-import com.baarton.runweather.ui.ThemedColor.SURFACE
+import com.baarton.runweather.ui.Dimens
+import com.baarton.runweather.ui.ThemedColor.*
 
 
 private val LightColorPalette = lightColors(
@@ -51,6 +49,33 @@ private val DarkColorPalette = darkColors(
     onBackground = ON_BACKGROUND.dark(),
 )
 
+//TODO can this be platform-independently defined if in Material Design also for iOS somehow?
+private val Typography = Typography(
+    body1 = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp
+    )
+    /* Other default text styles to override
+    button = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.W500,
+        fontSize = 14.sp
+    ),
+    caption = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 12.sp
+    )
+    */
+)
+
+private val Shapes = Shapes(
+    small = RoundedCornerShape(Dimens.ANDROID_SHAPE_ROUND_SMALL.dp),
+    medium = RoundedCornerShape(Dimens.ANDROID_SHAPE_ROUND_MEDIUM.dp),
+    large = RoundedCornerShape(Dimens.ANDROID_SHAPE_ROUND_LARGE.dp)
+)
+
 @Composable
 fun RunWeatherTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
 
@@ -62,8 +87,8 @@ fun RunWeatherTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Compos
 
     MaterialTheme(
         colors = colors,
-        typography = Typography, //TODO can be platform-independently defined if in Material Design
-        shapes = Shapes, //TODO can be platform-independently defined with PT/DP claim
+        typography = Typography,
+        shapes = Shapes,
         content = content
     )
 }
