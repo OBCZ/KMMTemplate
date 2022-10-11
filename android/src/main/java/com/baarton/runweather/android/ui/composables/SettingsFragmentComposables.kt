@@ -25,7 +25,6 @@ import org.koin.core.parameter.parametersOf
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
-
 //TODO explore https://github.com/uragiristereo/Mejiboard/tree/main/app-alpha/src/main/java/com/github/uragiristereo/mejiboard/presentation/settings
 @Composable
 fun SettingsFragmentScreen(

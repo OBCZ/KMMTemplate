@@ -1,20 +1,19 @@
 package com.baarton.runweather.android.ui.composables
 
-import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.baarton.runweather.android.R
+import com.baarton.runweather.android.ui.AndroidVector.build
 import com.baarton.runweather.res.SharedRes
+import com.baarton.runweather.ui.Vector
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
@@ -23,14 +22,14 @@ import kotlinx.coroutines.launch
 
 enum class TabItem(
     val index: Int,
-    @DrawableRes val iconResId: Int,
+    val vector: Vector,
     @StringRes val titleResId: Int,
     val screenToLoad: @Composable () -> Unit
 ) {
-    WEATHER(0, R.drawable.ic_sunny_24_secondary, SharedRes.strings.main_tab_today.resourceId, {
+    WEATHER(0, Vector.SUN, SharedRes.strings.main_tab_today.resourceId, {
         WeatherFragmentScreen()
     }),
-    SETTINGS(1, R.drawable.ic_settings_24_secondary, SharedRes.strings.main_tab_settings.resourceId, {
+    SETTINGS(1, Vector.SETTINGS, SharedRes.strings.main_tab_settings.resourceId, {
         SettingsFragmentScreen()
     })
 }
@@ -59,14 +58,18 @@ fun IconWithTextTabLayout(
     selectedIndex: Int,
     onPageSelected: ((tabItem: TabItem) -> Unit)
 ) {
-    TabRow(selectedTabIndex = selectedIndex) {
+
+    TabRow(selectedTabIndex = selectedIndex, backgroundColor = MaterialTheme.colors.primary) {
         TabItem.values().forEachIndexed { index, tabItem ->
             Tab(selected = index == selectedIndex, onClick = {
                 onPageSelected(tabItem)
             }, text = {
                 Text(text = stringResource(id = tabItem.titleResId))
             }, icon = {
-                Icon(ImageVector.vectorResource(id = tabItem.iconResId), "TODO")
+                Icon(
+                    tabItem.vector.build(),
+                    contentDescription = "TODO",
+                )
             })
         }
     }

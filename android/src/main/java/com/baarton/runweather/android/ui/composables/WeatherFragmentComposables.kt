@@ -14,34 +14,29 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.flowWithLifecycle
-import co.touchlab.kermit.Logger
-import com.baarton.runweather.android.R
+import com.baarton.runweather.android.ui.AndroidVector.build
 import com.baarton.runweather.db.PersistedWeather
-import com.baarton.runweather.models.weather.Weather
-import com.baarton.runweather.models.weather.WeatherData
 import com.baarton.runweather.models.WeatherViewModel
 import com.baarton.runweather.models.WeatherViewState
 import com.baarton.runweather.models.lastUpdatedResId
+import com.baarton.runweather.models.weather.Weather
+import com.baarton.runweather.models.weather.WeatherData
 import com.baarton.runweather.res.SharedRes
+import com.baarton.runweather.ui.Vector
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import org.koin.androidx.compose.inject
 import org.koin.androidx.compose.viewModel
-import org.koin.core.parameter.parametersOf
 import kotlin.time.Duration
 
 @Composable
@@ -49,7 +44,6 @@ fun WeatherFragmentScreen(
 ) {
     //TODO we can inject like that into composables
     val viewModel: WeatherViewModel by viewModel()
-    val log: Logger by inject { parametersOf("WeatherFragment") }
 
     val lifecycleOwner = LocalLifecycleOwner.current
     val lifecycleAwareWeatherFlow = remember(viewModel.weatherState, lifecycleOwner) {
@@ -61,8 +55,6 @@ fun WeatherFragmentScreen(
     WeatherFragmentScreenContent(
         weatherState = weatherState,
         onRefresh = { viewModel.refreshWeather() },
-        onSuccess = { data -> log.v { "View updating with data:\n$data" } },
-        onError = { exception -> log.e { "Displaying error: $exception" } },
     )
 }
 
@@ -70,8 +62,6 @@ fun WeatherFragmentScreen(
 private fun WeatherFragmentScreenContent(
     weatherState: WeatherViewState,
     onRefresh: () -> Unit = {},
-    onSuccess: (PersistedWeather) -> Unit = {},
-    onError: (String) -> Unit = {},
 ) {
     Surface(
         color = MaterialTheme.colors.background,
@@ -85,16 +75,12 @@ private fun WeatherFragmentScreenContent(
             if (weather == null) { //TODO review this check
                 ErrorScreen("Weather null")
             } else {
-                LaunchedEffect(weather) {
-                    onSuccess(weather)
-                }
-                WeatherScreen(weather, weatherState)
+
+                WeatherScreen(weather, weatherState.lastUpdated)
             }
             val error = weatherState.error
             if (error != null) {
-                // LaunchedEffect(error) {
-                //     onError(stringResource(id = error.messageRes.resourceId))
-                // }
+
                 ErrorScreen(stringResource(id = error.messageRes.resourceId))
             }
         }
@@ -111,7 +97,7 @@ private fun EmptyScreen() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = CenterHorizontally,
     ) {
-        Text(stringResource(R.string.empty_weather))
+        Text("Empty")
     }
 }
 
@@ -132,10 +118,7 @@ private fun ErrorScreen(error: String) {
 
 //TODO how much can I extract with iOS to common from the UI building blocks (expect/actual abstraction)?
 @Composable
-private fun WeatherScreen(
-    successData: PersistedWeather,
-    state: WeatherViewState
-) {
+private fun WeatherScreen(weatherData: PersistedWeather, lastUpdated: Duration?) {
     //TODO img background
     Column {
         //TODO network, location row 1
@@ -153,7 +136,7 @@ private fun WeatherScreen(
                     .align(CenterVertically)
                     .padding(8.dp)
                     .weight(1f),
-                imageVector = ImageVector.vectorResource(id = R.drawable.ic_location_on_24_primary),
+                imageVector = Vector.LOCATION_OFF.build(),
                 contentDescription = "TODO"
             )
             Image(
@@ -161,7 +144,7 @@ private fun WeatherScreen(
                     .align(CenterVertically)
                     .padding(8.dp)
                     .weight(1f),
-                imageVector = ImageVector.vectorResource(id = R.drawable.ic_network_on_24_primary),
+                imageVector = Vector.LOCATION_ON.build(),
                 contentDescription = "TODO"
             )
             Text(
@@ -169,7 +152,7 @@ private fun WeatherScreen(
                     .align(CenterVertically)
                     .padding(8.dp)
                     .weight(8f),
-                text = lastUpdatedText(state.lastUpdated)
+                text = lastUpdatedText(lastUpdated)
             )
             //TODO example for string resources
 
@@ -250,14 +233,14 @@ private fun WeatherScreen(
                     .fillMaxHeight()
                     .weight(6f)
             ) { // 3
-                Text(successData.locationName)
+                Text(weatherData.locationName)
                 Row {
                     //TODO img from service
                     Image(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_about_24_primary),
+                        imageVector = Vector.ABOUT.build(),
                         contentDescription = "TODO"
                     )
-                    Text(text = successData.weatherList[0].description)
+                    Text(text = weatherData.weatherList[0].description)
                     // Img, Text
                 }
             }
@@ -266,7 +249,7 @@ private fun WeatherScreen(
                     .fillMaxHeight()
                     .weight(4f)
             ) { // 2
-                Text(text = successData.mainData.temperature)
+                Text(text = weatherData.mainData.temperature)
                 // Text
             }
         }
@@ -314,7 +297,7 @@ fun MainScreenContentPreview_Success() {
                     humidity = "38"
                 ),
                 wind = WeatherData.Wind(speed = "4.27", deg = "277"),
-                rain = null,
+                rain = WeatherData.Rain(oneHour = "0.58", threeHour = "1.36"),
                 sys = WeatherData.Sys(
                     sunrise = "1657681500",
                     sunset = "1657739161"
