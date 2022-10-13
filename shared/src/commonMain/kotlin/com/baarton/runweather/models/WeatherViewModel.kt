@@ -167,7 +167,9 @@ data class WeatherViewState(
     val weather: PersistedWeather? = null,
     val lastUpdated: Duration? = null,
     val error: ErrorType? = null,
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val locationAvailable: Boolean = true, //TODO need provider logic
+    val networkAvailable: Boolean = true //TODO need provider logic
 ) {
 
     enum class ErrorType(val messageRes: StringResource) {

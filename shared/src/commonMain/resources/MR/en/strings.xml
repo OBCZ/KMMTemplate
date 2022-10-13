@@ -4,6 +4,9 @@
     <string name="app_ok">OK</string>
     <string name="app_n_a">N/A</string>
 
+    <string name="app_on">ON</string>
+    <string name="app_off">OFF</string>
+
     <string name="wind_direction_north">N</string>
     <string name="wind_direction_northeast">NE</string>
     <string name="wind_direction_east">E</string>
@@ -35,6 +38,9 @@
     <string name="fragment_weather_results_data_error">Weather data is empty, incomplete or corrupt. Try refresh the data by clicking the button.</string>
     <string name="fragment_weather_results_refresh_button">Refresh</string>
     <string name="fragment_weather_results_nothing">NO RESULTS</string>
+
+    <string name="fragment_weather_location_content_description">Location setting %1$s</string>
+    <string name="fragment_weather_network_content_description">Network connection %1$s</string>
 
     <string name="fragment_weather_last_updated_text">Last update: %1$s</string>
     <string name="fragment_weather_last_updated_now">Just now</string>

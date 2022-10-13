@@ -4,6 +4,9 @@
     <string name="app_ok">OK</string>
     <string name="app_n_a">N/A</string>
 
+    <string name="app_on">ZAP</string>
+    <string name="app_off">VYP</string>
+
     <string name="wind_direction_north">S</string>
     <string name="wind_direction_northeast">SV</string>
     <string name="wind_direction_east">V</string>
@@ -35,6 +38,9 @@
     <string name="fragment_weather_results_data_error">Obdržená data jsou prázdná, nekompletní, nebo poškozená. Opakujte načtení dat kliknutím na tlačítko.</string>
     <string name="fragment_weather_results_refresh_button">Načíst znovu</string>
     <string name="fragment_weather_results_nothing">PRÁZDNÉ</string>
+
+    <string name="fragment_weather_location_content_description">Nastavení Polohy %1$s</string>
+    <string name="fragment_weather_network_content_description">Připojení k internetu %1$s</string>
 
     <string name="fragment_weather_last_updated_text">Poslední aktualizace: %1$s</string>
     <string name="fragment_weather_last_updated_now">Právě nyní</string>

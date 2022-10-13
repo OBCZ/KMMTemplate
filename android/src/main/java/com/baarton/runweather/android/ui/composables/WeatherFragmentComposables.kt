@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.flowWithLifecycle
@@ -38,6 +39,7 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import org.koin.androidx.compose.viewModel
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 @Composable
 fun WeatherFragmentScreen(
@@ -71,17 +73,15 @@ private fun WeatherFragmentScreenContent(
             state = rememberSwipeRefreshState(isRefreshing = weatherState.isLoading),
             onRefresh = onRefresh
         ) {
-            val weather = weatherState.weather
-            if (weather == null) { //TODO review this check
-                ErrorScreen("Weather null")
-            } else {
-
-                WeatherScreen(weather, weatherState.lastUpdated)
-            }
-            val error = weatherState.error
-            if (error != null) {
-
-                ErrorScreen(stringResource(id = error.messageRes.resourceId))
+            with(weatherState) {
+                val error = this.error
+                val weather = this.weather
+                when {
+                    error == null && weather == null -> ErrorScreen("Weather empty")
+                    error == null && weather != null -> WeatherScreen(this.copy(weather = weather))
+                    error != null && weather == null -> ErrorScreen(stringResource(id = error.messageRes.resourceId))
+                    else -> ErrorScreen("Unknown error")
+                }
             }
         }
     }
@@ -118,45 +118,19 @@ private fun ErrorScreen(error: String) {
 
 //TODO how much can I extract with iOS to common from the UI building blocks (expect/actual abstraction)?
 @Composable
-private fun WeatherScreen(weatherData: PersistedWeather, lastUpdated: Duration?) {
+private fun WeatherScreen(weatherState: WeatherViewState) {
+    val weather = weatherState.weather!! // we should not get NPE here
+
     //TODO img background
     Column {
-        //TODO network, location row 1
-        Row(
+        StateRow(
             Modifier
                 .align(CenterHorizontally)
                 .padding(4.dp)
                 .weight(1f)
-                .fillMaxWidth()
-        ) {
-            // TODO Img 1, Img 1, Text 8
-            //
-            Image(
-                modifier = Modifier
-                    .align(CenterVertically)
-                    .padding(8.dp)
-                    .weight(1f),
-                imageVector = Vector.LOCATION_OFF.build(),
-                contentDescription = "TODO"
-            )
-            Image(
-                modifier = Modifier
-                    .align(CenterVertically)
-                    .padding(8.dp)
-                    .weight(1f),
-                imageVector = Vector.LOCATION_ON.build(),
-                contentDescription = "TODO"
-            )
-            Text(
-                modifier = Modifier
-                    .align(CenterVertically)
-                    .padding(8.dp)
-                    .weight(8f),
-                text = lastUpdatedText(lastUpdated)
-            )
-            //TODO example for string resources
-
-        }
+                .fillMaxWidth(),
+            weatherState
+        )
 
         //TODO data row 5
         Row(
@@ -233,14 +207,14 @@ private fun WeatherScreen(weatherData: PersistedWeather, lastUpdated: Duration?)
                     .fillMaxHeight()
                     .weight(6f)
             ) { // 3
-                Text(weatherData.locationName)
+                Text(weather.locationName)
                 Row {
                     //TODO img from service
                     Image(
                         imageVector = Vector.ABOUT.build(),
                         contentDescription = "TODO"
                     )
-                    Text(text = weatherData.weatherList[0].description)
+                    Text(text = weather.weatherList[0].description)
                     // Img, Text
                 }
             }
@@ -249,7 +223,7 @@ private fun WeatherScreen(weatherData: PersistedWeather, lastUpdated: Duration?)
                     .fillMaxHeight()
                     .weight(4f)
             ) { // 2
-                Text(text = weatherData.mainData.temperature)
+                Text(text = weather.mainData.temperature)
                 // Text
             }
         }
@@ -257,7 +231,61 @@ private fun WeatherScreen(weatherData: PersistedWeather, lastUpdated: Duration?)
     }
 }
 
-//TODO can we extract more?
+@Composable
+fun StateRow(modifier: Modifier, weatherState: WeatherViewState) {
+    Row(modifier = modifier) {
+        Image(
+            modifier = Modifier
+                .align(CenterVertically)
+                .padding(8.dp)
+                .weight(1f),
+            imageVector = if (weatherState.locationAvailable) {
+                Vector.LOCATION_ON
+            } else {
+                Vector.LOCATION_OFF
+            }.build(),
+            contentDescription = stringResource(
+                id = SharedRes.strings.fragment_weather_location_content_description.resourceId,
+                formatArgs = arrayOf(onOffText(weatherState.locationAvailable))
+            )
+        )
+        Image(
+            modifier = Modifier
+                .align(CenterVertically)
+                .padding(8.dp)
+                .weight(1f),
+            imageVector = if (weatherState.networkAvailable) {
+                Vector.NETWORK_ON
+            } else {
+                Vector.NETWORK_OFF
+            }.build(),
+            contentDescription = stringResource(
+                id = SharedRes.strings.fragment_weather_network_content_description.resourceId,
+                formatArgs = arrayOf(onOffText(weatherState.networkAvailable))
+            )
+        )
+        Text(
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .align(CenterVertically)
+                .padding(8.dp)
+                .weight(8f),
+            text = lastUpdatedText(weatherState.lastUpdated)
+        )
+    }
+}
+
+@Composable
+fun onOffText(available: Boolean): String {
+    return stringResource(
+        if (available) {
+            SharedRes.strings.app_on
+        } else {
+            SharedRes.strings.app_off
+        }.resourceId
+    )
+}
+
 @Composable
 private fun lastUpdatedText(lastUpdated: Duration?): String {
     val pair = lastUpdatedResId(lastUpdated)
@@ -302,7 +330,8 @@ fun MainScreenContentPreview_Success() {
                     sunrise = "1657681500",
                     sunset = "1657739161"
                 )
-            )
+            ),
+            lastUpdated = 5.minutes
         )
     )
 }
