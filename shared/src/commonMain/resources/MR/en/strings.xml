@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <resources>
 
     <string name="app_settings">Settings</string>
@@ -16,15 +17,16 @@
     <string name="wind_direction_west">W</string>
     <string name="wind_direction_northwest">NW</string>
 
-    <string name="unit_celsius">°</string>
-    <string name="unit_kelvin">K</string>
-    <string name="unit_fahrenheit">°</string>
-    <string name="unit_millimeter">mm</string>
-    <string name="unit_inch">in</string>
-    <string name="unit_hectopascal">hPa</string>
-    <string name="unit_millibar">mbar</string>
-    <string name="unit_miles_per_hour">mi/h</string>
-    <string name="unit_meters_per_second">m/s</string>
+    <string name="unit_celsius">%1$s°</string>
+    <string name="unit_kelvin">%1$s K</string>
+    <string name="unit_fahrenheit">%1$s°</string>
+    <string name="unit_millimeter">%1$s mm</string>
+    <string name="unit_inch">%1$s in</string>
+    <string name="unit_humidity">%1$s %%</string>
+    <string name="unit_hectopascal">%1$s\nhPa</string>
+    <string name="unit_millibar">%1$s\nmbar</string>
+    <string name="unit_miles_per_hour">%1$s\nmi/h</string>
+    <string name="unit_meters_per_second">%1$s\nm/s</string>
 
     <string name="main_tab_today">WEATHER</string>
     <string name="main_tab_settings">SETTINGS</string>

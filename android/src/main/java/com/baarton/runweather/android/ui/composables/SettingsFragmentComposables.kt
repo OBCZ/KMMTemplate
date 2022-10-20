@@ -15,13 +15,10 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.flowWithLifecycle
-import co.touchlab.kermit.Logger
-import com.baarton.runweather.models.DataUnit
-import com.baarton.runweather.models.SettingsViewModel
-import com.baarton.runweather.models.SettingsViewState
-import org.koin.androidx.compose.inject
-import org.koin.androidx.compose.viewModel
-import org.koin.core.parameter.parametersOf
+import com.baarton.runweather.model.MeasureUnit
+import com.baarton.runweather.model.viewmodel.SettingsViewModel
+import com.baarton.runweather.model.viewmodel.SettingsViewState
+import org.koin.androidx.compose.koinViewModel
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
@@ -30,8 +27,7 @@ import kotlin.time.Duration.Companion.minutes
 fun SettingsFragmentScreen(
 ) {
     //TODO we can inject like that into composables
-    val viewModel: SettingsViewModel by viewModel()
-    val log: Logger by inject { parametersOf("SettingsFragment") }
+    val viewModel = koinViewModel<SettingsViewModel>()
 
     val lifecycleOwner = LocalLifecycleOwner.current
     val lifecycleAwareWeatherFlow = remember(viewModel.settingsState, lifecycleOwner) {
@@ -102,7 +98,7 @@ fun UnitSetting(text: String, onUnitSettingClick: () -> Unit) {
 fun SettingsScreenContentPreview() {
     SettingsFragmentScreenContent(
         settingsState = SettingsViewState(
-            DataUnit.METRIC, 2.minutes
+            MeasureUnit.METRIC, 2.minutes
         ),
         onUnitSettingChanged = {  },
         onRefreshSettingChanged = {  },

@@ -1,4 +1,4 @@
-package com.baarton.runweather.models
+package com.baarton.runweather.model.viewmodel
 
 import com.baarton.runweather.FlowAdapter
 import kotlinx.coroutines.MainScope

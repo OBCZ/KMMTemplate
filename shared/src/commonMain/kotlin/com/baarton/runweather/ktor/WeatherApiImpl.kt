@@ -1,7 +1,7 @@
 package com.baarton.runweather.ktor
 
 import co.touchlab.stately.ensureNeverFrozen
-import com.baarton.runweather.models.weather.WeatherData
+import com.baarton.runweather.model.weather.WeatherData
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngine
@@ -17,6 +17,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import co.touchlab.kermit.Logger as KermitLogger
 import io.ktor.client.plugins.logging.Logger as KtorLogger
+
 
 class WeatherApiImpl(private val log: KermitLogger, engine: HttpClientEngine) : WeatherApi {
 

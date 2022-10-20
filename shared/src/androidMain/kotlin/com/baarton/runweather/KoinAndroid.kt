@@ -1,8 +1,8 @@
 package com.baarton.runweather
 
 import com.baarton.runweather.db.RunWeatherDb
-import com.russhwolf.settings.AndroidSettings
-import com.russhwolf.settings.Settings
+import com.russhwolf.settings.SharedPreferencesSettings
+import com.russhwolf.settings.ObservableSettings
 import com.squareup.sqldelight.android.AndroidSqliteDriver
 import com.squareup.sqldelight.db.SqlDriver
 import io.ktor.client.engine.okhttp.OkHttp
@@ -18,8 +18,8 @@ actual val platformModule: Module = module {
         )
     }
 
-    single<Settings> {
-        AndroidSettings(get())
+    single<ObservableSettings> {
+        SharedPreferencesSettings(get())
     }
 
     single {

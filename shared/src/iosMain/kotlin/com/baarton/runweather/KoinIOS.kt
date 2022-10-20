@@ -14,6 +14,7 @@ import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
 import platform.Foundation.NSUserDefaults
 
+//TODO https://insert-koin.io/docs/quickstart/kmm
 fun initKoinIos(
     userDefaults: NSUserDefaults,
     appInfo: AppInfo,

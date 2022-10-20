@@ -1,11 +1,15 @@
-package com.baarton.runweather.models
+package com.baarton.runweather.model.viewmodel
 
 import co.touchlab.kermit.Logger
 import com.baarton.runweather.Config
 import com.baarton.runweather.db.PersistedWeather
-import com.baarton.runweather.models.weather.CurrentWeather
+import com.baarton.runweather.model.MeasureUnit
+import com.baarton.runweather.model.viewmodel.SettingsViewModel.Companion.DATA_UNIT_TAG
+import com.baarton.runweather.model.weather.CurrentWeather
 import com.baarton.runweather.repo.WeatherRepository
 import com.baarton.runweather.res.SharedRes
+import com.russhwolf.settings.ObservableSettings
+import com.russhwolf.settings.SettingsListener
 import dev.icerock.moko.resources.StringResource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -23,8 +27,8 @@ import kotlinx.datetime.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-
 class WeatherViewModel(
+    private val settings: ObservableSettings, //TODO tests (manual, auto)
     private val config: Config,
     private val weatherRepository: WeatherRepository,
     private val clock: Clock,
@@ -34,9 +38,17 @@ class WeatherViewModel(
 
     private var isClosed = false
     private val pollingDispatcher: CoroutineDispatcher = Dispatchers.Default
+    private val settingsListener: SettingsListener = settings.addStringListener(DATA_UNIT_TAG, MeasureUnit.default().name) {
+        onUnitSettingChanged(it)
+    }
 
     private val mutableWeatherState: MutableStateFlow<WeatherViewState> =
-        MutableStateFlow(WeatherViewState(isLoading = true))
+        MutableStateFlow(
+            WeatherViewState(
+                isLoading = true,
+                unitSetting = MeasureUnit.safeValueOf(settings.getString(DATA_UNIT_TAG, MeasureUnit.default().name))
+            )
+        )
 
     val weatherState: StateFlow<WeatherViewState> = mutableWeatherState
 
@@ -44,10 +56,17 @@ class WeatherViewModel(
         observeWeather()
     }
 
+    private fun onUnitSettingChanged(unitKey: String) {
+        mutableWeatherState.update {
+            it.copy(unitSetting = MeasureUnit.safeValueOf(unitKey))
+        }
+    }
+
     override fun onCleared() {
         log.i("Close polling.")
         isClosed = true
         pollingDispatcher.cancel()
+        settingsListener.deactivate()
         log.v("Clearing WeatherViewModel")
     }
 
@@ -110,7 +129,7 @@ class WeatherViewModel(
     }
 
     private fun classifyError(previousState: WeatherViewState, error: Throwable): WeatherViewState.ErrorType? {
-        return when(error) {
+        return when (error) {
             is WeatherRepository.WeatherDataConsistencyException -> WeatherViewState.ErrorType.DATA_CONSISTENCY
             is WeatherRepository.WeatherAPIException -> WeatherViewState.ErrorType.DATA_PROVIDER
             else -> previousState.error
@@ -148,7 +167,6 @@ class WeatherViewModel(
             }
         }
     }
-
 }
 
 //TODO probably needs to be moved somewhere - UIUtils in common module?
@@ -168,8 +186,9 @@ data class WeatherViewState(
     val lastUpdated: Duration? = null,
     val error: ErrorType? = null,
     val isLoading: Boolean = false,
-    val locationAvailable: Boolean = true, //TODO need provider logic
-    val networkAvailable: Boolean = true //TODO need provider logic
+    val unitSetting: MeasureUnit = MeasureUnit.default(),
+    val locationAvailable: Boolean = true, //TODO need provider listener logic
+    val networkAvailable: Boolean = true //TODO need provider listener logic
 ) {
 
     enum class ErrorType(val messageRes: StringResource) {

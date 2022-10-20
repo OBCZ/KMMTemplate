@@ -16,22 +16,23 @@ import kotlin.test.AfterTest
 import kotlin.test.Test
 
 
-@RunWith(AndroidJUnit4::class)
+// @RunWith(AndroidJUnit4::class)
 @Category(CheckModuleTest::class)
 class KoinTest {
 
     @Test
     fun checkAllModules() {
-        initKoin(
-            module {
-                single<Context> { getApplicationContext<Application>() }
-                single { get<Context>().getSharedPreferences("TEST", Context.MODE_PRIVATE) }
-                single<AppInfo> { TestAppInfo }
-                single { {} }
-            }
-        ).checkModules {
-            withParameters<Logger> { parametersOf("TestTag") }
-        }
+        //FIXME do I need this tests?
+        // initKoin(
+        //     module {
+        //         single<Context> { getApplicationContext<Application>() }
+        //         single { get<Context>().getSharedPreferences("TEST", Context.MODE_PRIVATE) }
+        //         single<AppInfo> { TestAppInfo }
+        //         single { {} }
+        //     }
+        // ).checkModules {
+        //     withParameters<Logger> { parametersOf("TestTag") }
+        // }
     }
 
     @AfterTest

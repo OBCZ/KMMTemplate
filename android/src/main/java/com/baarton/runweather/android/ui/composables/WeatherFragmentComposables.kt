@@ -25,27 +25,38 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.flowWithLifecycle
 import com.baarton.runweather.android.ui.AndroidVector.build
 import com.baarton.runweather.db.PersistedWeather
-import com.baarton.runweather.models.WeatherViewModel
-import com.baarton.runweather.models.WeatherViewState
-import com.baarton.runweather.models.lastUpdatedResId
-import com.baarton.runweather.models.weather.Weather
-import com.baarton.runweather.models.weather.WeatherData
+import com.baarton.runweather.model.DataUnit
+import com.baarton.runweather.model.MeasureUnit
+import com.baarton.runweather.model.RainfallUnit
+import com.baarton.runweather.model.WindDirection
+import com.baarton.runweather.model.viewmodel.WeatherViewModel
+import com.baarton.runweather.model.viewmodel.WeatherViewState
+import com.baarton.runweather.model.viewmodel.lastUpdatedResId
+import com.baarton.runweather.model.weather.Weather
+import com.baarton.runweather.model.weather.WeatherData
 import com.baarton.runweather.res.SharedRes
 import com.baarton.runweather.ui.Vector
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import org.koin.androidx.compose.viewModel
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toJavaLocalDateTime
+import kotlinx.datetime.toLocalDateTime
+import org.koin.androidx.compose.koinViewModel
+import java.time.format.DateTimeFormatter
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
+//TODO tests with composables?
 @Composable
 fun WeatherFragmentScreen(
 ) {
     //TODO we can inject like that into composables
-    val viewModel: WeatherViewModel by viewModel()
+    val viewModel = koinViewModel<WeatherViewModel>()
 
     val lifecycleOwner = LocalLifecycleOwner.current
     val lifecycleAwareWeatherFlow = remember(viewModel.weatherState, lifecycleOwner) {
@@ -88,20 +99,8 @@ private fun WeatherFragmentScreenContent(
 }
 
 //TODO review
-@Composable
-private fun EmptyScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = CenterHorizontally,
-    ) {
-        Text("Empty")
-    }
-}
-
-//TODO review
+// dont forget explicit button refresh
+// make it better overall
 @Composable
 private fun ErrorScreen(error: String) {
     Column(
@@ -112,7 +111,6 @@ private fun ErrorScreen(error: String) {
         horizontalAlignment = CenterHorizontally,
     ) {
         Text(text = error)
-        //TODO dont forget explicit button refresh
     }
 }
 
@@ -120,54 +118,33 @@ private fun ErrorScreen(error: String) {
 @Composable
 private fun WeatherScreen(weatherState: WeatherViewState) {
     val weather = weatherState.weather!! // we should not get NPE here
+    val locationAvailable = weatherState.locationAvailable
+    val networkAvailable = weatherState.networkAvailable
+    val lastUpdated = weatherState.lastUpdated
+    val unitSetting = weatherState.unitSetting
 
     //TODO img background
     Column {
         StateRow(
-            Modifier
+            modifier = Modifier
                 .align(CenterHorizontally)
                 .padding(4.dp)
                 .weight(1f)
                 .fillMaxWidth(),
-            weatherState
+            locationAvailable = locationAvailable,
+            networkAvailable = networkAvailable,
+            lastUpdated = lastUpdated,
         )
 
-        //TODO data row 5
-        Row(
+        DataRow(
             modifier = Modifier
+                .align(CenterHorizontally)
+                .padding(4.dp)
                 .weight(5f)
-                .fillMaxWidth()
-
-        ) {
-            Column() {
-                //TODO data rows
-                // always info Img, num slow Text, num fast Text
-                Row() {
-                    // header row
-
-                }
-                Row() {
-                    // torso row
-                }
-                Row() {
-                    // legs row
-                }
-                //...
-
-            }
-            Column() {
-                //TODO 7 rows
-                // Img, Text
-                Row() {
-                    // humidity row
-                }
-                Row() {
-                    // rainfall row
-                }
-                //...
-            }
-
-        }
+                .fillMaxWidth(),
+            weather = weather,
+            unitSetting = unitSetting
+        )
 
         //TODO warning row 2
         Row(
@@ -223,7 +200,7 @@ private fun WeatherScreen(weatherState: WeatherViewState) {
                     .fillMaxHeight()
                     .weight(4f)
             ) { // 2
-                Text(text = weather.mainData.temperature)
+                Text(text = dataText(weather.mainData.temperature, unitSetting.tempUnit))
                 // Text
             }
         }
@@ -232,21 +209,21 @@ private fun WeatherScreen(weatherState: WeatherViewState) {
 }
 
 @Composable
-fun StateRow(modifier: Modifier, weatherState: WeatherViewState) {
+private fun StateRow(modifier: Modifier, locationAvailable: Boolean, networkAvailable: Boolean, lastUpdated: Duration?) {
     Row(modifier = modifier) {
         Image(
             modifier = Modifier
                 .align(CenterVertically)
                 .padding(8.dp)
                 .weight(1f),
-            imageVector = if (weatherState.locationAvailable) {
+            imageVector = if (locationAvailable) {
                 Vector.LOCATION_ON
             } else {
                 Vector.LOCATION_OFF
             }.build(),
             contentDescription = stringResource(
                 id = SharedRes.strings.fragment_weather_location_content_description.resourceId,
-                formatArgs = arrayOf(onOffText(weatherState.locationAvailable))
+                formatArgs = arrayOf(onOffText(locationAvailable))
             )
         )
         Image(
@@ -254,14 +231,14 @@ fun StateRow(modifier: Modifier, weatherState: WeatherViewState) {
                 .align(CenterVertically)
                 .padding(8.dp)
                 .weight(1f),
-            imageVector = if (weatherState.networkAvailable) {
+            imageVector = if (networkAvailable) {
                 Vector.NETWORK_ON
             } else {
                 Vector.NETWORK_OFF
             }.build(),
             contentDescription = stringResource(
                 id = SharedRes.strings.fragment_weather_network_content_description.resourceId,
-                formatArgs = arrayOf(onOffText(weatherState.networkAvailable))
+                formatArgs = arrayOf(onOffText(networkAvailable))
             )
         )
         Text(
@@ -270,13 +247,13 @@ fun StateRow(modifier: Modifier, weatherState: WeatherViewState) {
                 .align(CenterVertically)
                 .padding(8.dp)
                 .weight(8f),
-            text = lastUpdatedText(weatherState.lastUpdated)
+            text = lastUpdatedText(lastUpdated)
         )
     }
 }
 
 @Composable
-fun onOffText(available: Boolean): String {
+private fun onOffText(available: Boolean): String {
     return stringResource(
         if (available) {
             SharedRes.strings.app_on
@@ -303,13 +280,131 @@ private fun lastUpdatedText(lastUpdated: Duration?): String {
     )
 }
 
+@Composable
+private fun DataRow(modifier: Modifier, weather: PersistedWeather, unitSetting: MeasureUnit) {
+    Column(modifier = modifier) {
+        Row(
+            modifier = Modifier
+                .align(CenterHorizontally)
+                .padding(2.dp)
+                .weight(1f)
+                .fillMaxWidth()
+        ) {
+            val columnModifier = Modifier
+                .align(CenterVertically)
+                .weight(1f)
+                .fillMaxWidth()
+
+            with(weather) {
+                WeatherDataColumn(columnModifier, Vector.RAIN, dataText(mainData.humidity, unitSetting.humidityUnit))
+                WeatherDataColumn(columnModifier, Vector.DROPS, rainfallText(unitSetting.rainfallUnit, rain?.oneHour, rain?.threeHour))
+                WeatherDataColumn(columnModifier, Vector.PRESSURE, dataText(mainData.pressure, unitSetting.pressureUnit))
+                WeatherDataColumn(columnModifier, Vector.DIRECTION, windDirectionText(wind.deg))
+                WeatherDataColumn(columnModifier, Vector.WIND, dataText(wind.speed, unitSetting.windSpeedUnit))
+                WeatherDataColumn(columnModifier, Vector.SUNRISE, timeText(sys.sunrise))
+                WeatherDataColumn(columnModifier, Vector.SUNSET, timeText(sys.sunset))
+            }
+        }
+
+        Row(
+            modifier = Modifier
+                .align(CenterHorizontally)
+                .padding(4.dp)
+                .weight(3f)
+                .fillMaxWidth()
+        ) {
+
+        }
+
+        Column() {
+            //TODO data rows
+            // always info Img, num slow Text, num fast Text
+            Row() {
+                // header row
+
+            }
+            Row() {
+                // torso row
+            }
+            Row() {
+                // legs row
+            }
+            //...
+
+        }
+        Column() {
+            //TODO 7 rows
+            // Img, Text
+            Row() {
+                // humidity row
+            }
+            Row() {
+                // rainfall row
+            }
+            //...
+        }
+
+    }
+}
+
+@Composable
+private fun WeatherDataColumn(modifier: Modifier, vector: Vector, dataText: String) {
+    Column(
+        modifier = modifier
+    ) {
+        Image(
+            modifier = Modifier
+                .align(CenterHorizontally)
+                .weight(1f)
+                .fillMaxWidth(0.5f),
+            imageVector = vector.build(),
+            contentDescription = vector.name
+        )
+        Text(
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .align(CenterHorizontally)
+                .fillMaxWidth()
+                .weight(1f),
+            text = dataText,
+            fontSize = 10.sp //TODO extract to typography
+
+        )
+    }
+}
+
+@Composable
+private fun rainfallText(rainfallUnit: RainfallUnit, oneHour: String?, threeHour: String?): String {
+    val oneHourText = dataText(oneHour, rainfallUnit)
+    val threeHourText = dataText(threeHour, rainfallUnit)
+    return "${oneHourText}\n${threeHourText}"
+}
+
+@Composable
+private fun windDirectionText(deg: String): String {
+    return deg.toFloatOrNull()?.let {
+        stringResource(id = WindDirection.signRes(it).resourceId)
+    } ?: stringResource(id = SharedRes.strings.app_n_a.resourceId)
+}
+
+@Composable
+private fun dataText(dataValue: String?, dataUnit: DataUnit): String {
+    return (dataValue ?: "0").toFloatOrNull()?.let {
+        stringResource(id = dataUnit.stringRes.resourceId, formatArgs = arrayOf(dataUnit.prepareValue(it)))
+    } ?: stringResource(id = SharedRes.strings.app_n_a.resourceId)
+}
+
+private fun timeText(timeStampSeconds: String): String {
+    return Instant.fromEpochSeconds(timeStampSeconds.toLong())
+        .toLocalDateTime(TimeZone.currentSystemDefault()).toJavaLocalDateTime().format(DateTimeFormatter.ofPattern("HH:MM"))
+}
+
 @Preview
 @Composable
 fun MainScreenContentPreview_Success() {
     WeatherFragmentScreenContent(
         weatherState = WeatherViewState(
-            weather =
-            PersistedWeather(
+            weather = PersistedWeather(
                 weatherList = listOf(
                     Weather(
                         weatherId = "803",
@@ -325,7 +420,7 @@ fun MainScreenContentPreview_Success() {
                     humidity = "38"
                 ),
                 wind = WeatherData.Wind(speed = "4.27", deg = "277"),
-                rain = WeatherData.Rain(oneHour = "0.58", threeHour = "1.36"),
+                rain = WeatherData.Rain(oneHour = "0.58", threeHour = null),
                 sys = WeatherData.Sys(
                     sunrise = "1657681500",
                     sunset = "1657739161"

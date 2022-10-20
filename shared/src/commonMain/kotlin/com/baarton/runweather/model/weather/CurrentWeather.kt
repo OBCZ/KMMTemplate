@@ -1,4 +1,4 @@
-package com.baarton.runweather.models.weather
+package com.baarton.runweather.model.weather
 
 import com.baarton.runweather.db.PersistedWeather
 import kotlin.time.Duration

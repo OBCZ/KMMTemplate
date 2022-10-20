@@ -2,19 +2,17 @@ package com.baarton.runweather.repo
 
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.StaticConfig
-import com.baarton.runweather.AndroidJUnit4
-import com.baarton.runweather.RunWith
 import com.baarton.runweather.TestConfig
 import com.baarton.runweather.db.PersistedWeather
 import com.baarton.runweather.mock.BRNO1
 import com.baarton.runweather.mock.WeatherApiMock
-import com.baarton.runweather.models.SettingsViewModel
-import com.baarton.runweather.models.weather.Weather
-import com.baarton.runweather.models.weather.WeatherData
+import com.baarton.runweather.model.viewmodel.SettingsViewModel
+import com.baarton.runweather.model.weather.Weather
+import com.baarton.runweather.model.weather.WeatherData
 import com.baarton.runweather.repo.WeatherRepository.Companion.DB_TIMESTAMP_KEY
 import com.baarton.runweather.sqldelight.DatabaseHelper
 import com.baarton.runweather.testDbConnection
-import com.russhwolf.settings.MockSettings
+import com.russhwolf.settings.MapSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -29,14 +27,13 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 
-@RunWith(AndroidJUnit4::class)
 class WeatherRepositoryTest {
 
     private var logger = Logger(StaticConfig())
     private var testDbConnection = testDbConnection()
     private var dbHelper = DatabaseHelper(testDbConnection, logger, Dispatchers.Default)
 
-    private val settingsMock = MockSettings()
+    private val settingsMock = MapSettings()
     private val testConfig = TestConfig
     private val apiMock = WeatherApiMock()
     private val clock = Clock.System

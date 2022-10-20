@@ -1,8 +1,9 @@
 package com.baarton.runweather.sqldelight
 
+import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Logger
-import com.baarton.runweather.AndroidJUnit4
-import com.baarton.runweather.RunWith
+import co.touchlab.kermit.LoggerConfig
+import co.touchlab.kermit.Severity
 import com.baarton.runweather.db.PersistedWeather
 import com.baarton.runweather.mock.BRNO1
 import com.baarton.runweather.mock.BRNO2
@@ -18,16 +19,23 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 
-@RunWith(AndroidJUnit4::class)
 class SqlDelightTest {
 
     private lateinit var dbHelper: DatabaseHelper
+
+    private val emptyLogger = Logger(
+        config = object : LoggerConfig {
+            override val logWriterList: List<LogWriter> = emptyList()
+            override val minSeverity: Severity = Severity.Assert
+        },
+        tag = ""
+    )
 
     @BeforeTest
     fun setup() = runTest {
         dbHelper = DatabaseHelper(
             testDbConnection(),
-            Logger,
+            emptyLogger,
             Dispatchers.Default
         )
         dbHelper.nuke()

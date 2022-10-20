@@ -3,11 +3,12 @@ package com.baarton.runweather.sqldelight
 import co.touchlab.kermit.Logger
 import com.baarton.runweather.db.PersistedWeather
 import com.baarton.runweather.db.RunWeatherDb
-import com.baarton.runweather.models.weather.Weather
-import com.baarton.runweather.models.weather.WeatherData
+import com.baarton.runweather.model.weather.Weather
+import com.baarton.runweather.model.weather.WeatherData
 import com.squareup.sqldelight.ColumnAdapter
 import com.squareup.sqldelight.db.SqlDriver
 import kotlinx.coroutines.CoroutineDispatcher
+
 
 class DatabaseHelper(
     sqlDriver: SqlDriver,

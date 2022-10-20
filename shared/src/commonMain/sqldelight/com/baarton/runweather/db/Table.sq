@@ -1,8 +1,8 @@
-import com.baarton.runweather.models.weather.Weather;
-import com.baarton.runweather.models.weather.WeatherData.MainData;
-import com.baarton.runweather.models.weather.WeatherData.Rain;
-import com.baarton.runweather.models.weather.WeatherData.Sys;
-import com.baarton.runweather.models.weather.WeatherData.Wind;
+import com.baarton.runweather.model.weather.Weather;
+import com.baarton.runweather.model.weather.WeatherData.MainData;
+import com.baarton.runweather.model.weather.WeatherData.Rain;
+import com.baarton.runweather.model.weather.WeatherData.Sys;
+import com.baarton.runweather.model.weather.WeatherData.Wind;
 import kotlin.collections.List;
 
 

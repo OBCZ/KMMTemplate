@@ -1,4 +1,4 @@
-package com.baarton.runweather.models
+package com.baarton.runweather.model.viewmodel
 
 import kotlinx.coroutines.CoroutineScope
 import androidx.lifecycle.ViewModel as AndroidXViewModel

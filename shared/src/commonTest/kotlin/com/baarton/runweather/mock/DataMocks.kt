@@ -1,7 +1,7 @@
 package com.baarton.runweather.mock
 
-import com.baarton.runweather.models.weather.Weather
-import com.baarton.runweather.models.weather.WeatherData
+import com.baarton.runweather.model.weather.Weather
+import com.baarton.runweather.model.weather.WeatherData
 
 sealed class MockResponses {
     abstract val data: WeatherData

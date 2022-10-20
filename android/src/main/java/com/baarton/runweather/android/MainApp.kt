@@ -7,8 +7,8 @@ import android.util.Log
 import com.baarton.runweather.AppInfo
 import com.baarton.runweather.Config
 import com.baarton.runweather.initKoin
-import com.baarton.runweather.models.SettingsViewModel
-import com.baarton.runweather.models.WeatherViewModel
+import com.baarton.runweather.model.viewmodel.SettingsViewModel
+import com.baarton.runweather.model.viewmodel.WeatherViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
@@ -26,7 +26,7 @@ class MainApp : Application() {
                 // single<PlatformNetworkManager> { AndroidNetworkManager(get()) }
                 // single<PlatformLocationManager> { AndroidLocationManager(get()) }
 
-                viewModel { WeatherViewModel(get(), get(), get(), get { parametersOf("WeatherViewModel") }) }
+                viewModel { WeatherViewModel(get(), get(), get(), get(), get { parametersOf("WeatherViewModel") }) }
                 viewModel { SettingsViewModel(get(), get(), get { parametersOf("SettingsViewModel") }) }
                 single<SharedPreferences> {
                     get<Context>().getSharedPreferences(get<Config>().preferences, Context.MODE_PRIVATE)

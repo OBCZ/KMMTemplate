@@ -6,6 +6,7 @@
     <!--FIXME-->
     <!-- make sure Android package name stays the same com.baarton.runweather-->
     <!-- make sure it is signed by the correct signature-->
+    <!-- make sure portrait only-->
 
     <uses-permission android:name="android.permission.INTERNET" />
 

@@ -19,16 +19,13 @@ import org.koin.core.scope.Scope
 import org.koin.dsl.module
 
 
-//TODO first make Android run
-//TODO don't use gson for serialization
-//TODO then start extracting business logic to common
 //TODO then start duplicating/mimicking UI stuff, platform specific stuff
 //TODO then review all files and its origin/contents
 //TODO verify architecture somehow (KoinComponent extending instead of constructor arguments ? will it be good for unit testing ? - if not, should I do some integration tests Robolectric with KoinTest?)
 //TODO review dependencies, cleanup gradle files
 
 //TODO after migration:
-// review logging messages, exceptions, nullability, edge cases
+// review logging everywhere (tests logging, messages, exceptions, nullability, edge cases)
 // review all files (formatting, comments, naming variables/files, etc)
 // extracting/moving stuff/files further
 // review tests
@@ -36,6 +33,7 @@ import org.koin.dsl.module
 // fork to RunWeather GH
 // create simple CI/CD
 // define simple formatting rules with ktlint?
+// go through Medium bookmark tips and fine-tune the code
 
 //TODO runners data enhancements
 // no categories' texts, only pictograms (cap, torso, legs etc.)

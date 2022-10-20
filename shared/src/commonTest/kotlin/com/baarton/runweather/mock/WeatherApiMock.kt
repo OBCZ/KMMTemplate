@@ -1,7 +1,7 @@
 package com.baarton.runweather.mock
 
 import com.baarton.runweather.ktor.WeatherApi
-import com.baarton.runweather.models.weather.WeatherData
+import com.baarton.runweather.model.weather.WeatherData
 
 
 class WeatherApiMock : WeatherApi {

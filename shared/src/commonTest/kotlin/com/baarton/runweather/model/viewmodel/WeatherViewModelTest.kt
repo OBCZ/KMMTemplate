@@ -1,4 +1,4 @@
-package com.baarton.runweather.model
+package com.baarton.runweather.model.viewmodel
 
 import app.cash.turbine.FlowTurbine
 import app.cash.turbine.test
@@ -12,14 +12,12 @@ import com.baarton.runweather.mock.BRNO2
 import com.baarton.runweather.mock.CORRUPT
 import com.baarton.runweather.mock.ClockMock
 import com.baarton.runweather.mock.WeatherApiMock
-import com.baarton.runweather.models.WeatherViewModel
-import com.baarton.runweather.models.WeatherViewState
-import com.baarton.runweather.models.weather.Weather
-import com.baarton.runweather.models.weather.WeatherData
+import com.baarton.runweather.model.weather.Weather
+import com.baarton.runweather.model.weather.WeatherData
 import com.baarton.runweather.repo.WeatherRepository
 import com.baarton.runweather.sqldelight.DatabaseHelper
 import com.baarton.runweather.testDbConnection
-import com.russhwolf.settings.MockSettings
+import com.russhwolf.settings.MapSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.resetMain
@@ -35,6 +33,7 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
+
 class WeatherViewModelTest {
 
     private var logger = Logger(StaticConfig())
@@ -42,13 +41,13 @@ class WeatherViewModelTest {
     private var dbHelper = DatabaseHelper(testDbConnection, logger, Dispatchers.Default)
     private var dataTimestamp: Instant? = null
 
-    private val settingsMock = MockSettings()
+    private val settingsMock = MapSettings()
     private val apiMock = WeatherApiMock()
     private val clockMock = ClockMock()
     private val testConfig: Config = TestConfig
     private val repository: WeatherRepository = WeatherRepository(dbHelper, settingsMock, testConfig, apiMock, logger, clockMock)
 
-    private val viewModel by lazy { WeatherViewModel(testConfig, repository, clockMock, logger) }
+    private val viewModel by lazy { WeatherViewModel(settingsMock, testConfig, repository, clockMock, logger) }
 
     companion object {
 

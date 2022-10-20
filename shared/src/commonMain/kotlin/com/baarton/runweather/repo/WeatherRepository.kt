@@ -4,10 +4,10 @@ import co.touchlab.kermit.Logger
 import co.touchlab.stately.ensureNeverFrozen
 import com.baarton.runweather.Config
 import com.baarton.runweather.ktor.WeatherApi
-import com.baarton.runweather.models.SettingsViewModel.Companion.WEATHER_DATA_THRESHOLD_TAG
-import com.baarton.runweather.models.weather.CurrentWeather
+import com.baarton.runweather.model.viewmodel.SettingsViewModel.Companion.WEATHER_DATA_THRESHOLD_TAG
+import com.baarton.runweather.model.weather.CurrentWeather
 import com.baarton.runweather.sqldelight.DatabaseHelper
-import com.russhwolf.settings.Settings
+import com.russhwolf.settings.ObservableSettings
 import kotlinx.datetime.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -15,7 +15,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 class WeatherRepository(
     private val dbHelper: DatabaseHelper,
-    private val settings: Settings,
+    private val settings: ObservableSettings,
     private val config: Config,
     private val weatherApi: WeatherApi,
     log: Logger,
