@@ -1,10 +1,10 @@
 package com.baarton.runweather.model.viewmodel
 
-import app.cash.turbine.FlowTurbine
 import app.cash.turbine.test
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.StaticConfig
 import com.baarton.runweather.Config
+import com.baarton.runweather.StateFlowTest
 import com.baarton.runweather.TestConfig
 import com.baarton.runweather.db.PersistedWeather
 import com.baarton.runweather.mock.BRNO1
@@ -12,6 +12,7 @@ import com.baarton.runweather.mock.BRNO2
 import com.baarton.runweather.mock.CORRUPT
 import com.baarton.runweather.mock.ClockMock
 import com.baarton.runweather.mock.WeatherApiMock
+import com.baarton.runweather.model.MeasureUnit
 import com.baarton.runweather.model.weather.Weather
 import com.baarton.runweather.model.weather.WeatherData
 import com.baarton.runweather.repo.WeatherRepository
@@ -20,8 +21,6 @@ import com.baarton.runweather.testDbConnection
 import com.russhwolf.settings.MapSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlin.test.AfterTest
@@ -34,7 +33,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 
-class WeatherViewModelTest {
+class WeatherViewModelTest : StateFlowTest() {
 
     private var logger = Logger(StaticConfig())
     private var testDbConnection = testDbConnection()
@@ -76,14 +75,14 @@ class WeatherViewModelTest {
     }
 
     @BeforeTest
-    fun setup() {
-        Dispatchers.setMain(Dispatchers.Unconfined)
+    override fun setup() {
+        super.setup()
         setDataAge(Clock.System.now() - 2.hours)
         clockMock.mockClock(Clock.System.now())
     }
 
     @AfterTest
-    fun tearDown() {
+    override fun tearDown() {
         dataTimestamp = null
         clockMock.mockClock(null)
         apiMock.reset()
@@ -91,8 +90,8 @@ class WeatherViewModelTest {
         runBlocking {
             dbHelper.nuke()
             testDbConnection.close()
-            Dispatchers.resetMain()
         }
+        super.tearDown()
     }
 
     @Test
@@ -362,6 +361,76 @@ class WeatherViewModelTest {
         }
     }
 
+    @Test
+    fun `Show correct data with desired unit change - default init`() = runBlocking {
+        apiMock.prepareResults(BRNO1.data)
+
+        viewModel.weatherState.test(2000) {
+            assertEquals(
+                weatherSuccessStateBrno1.copy(lastUpdated = 0.seconds),
+                awaitItemAfter(WeatherViewState(isLoading = true))
+            )
+            assertEquals(1, apiMock.calledCount)
+
+            settingsMock.putString(SettingsViewModel.DATA_UNIT_TAG, MeasureUnit.IMPERIAL.name)
+
+            assertEquals(
+                weatherSuccessStateBrno1.copy(lastUpdated = 0.seconds, unitSetting = MeasureUnit.IMPERIAL),
+                awaitItemAfter(
+                    weatherSuccessStateBrno1.copy(
+                        lastUpdated = 0.seconds,
+                        isLoading = true
+                    )
+                )
+            )
+            assertEquals(1, apiMock.calledCount)
+            cancel()
+        }
+    }
+
+    @Test
+    fun `Show correct data with desired unit change - Imperial init`() = runBlocking {
+        apiMock.prepareResults(BRNO1.data, BRNO2.data)
+        settingsMock.putString(SettingsViewModel.DATA_UNIT_TAG, MeasureUnit.IMPERIAL.name)
+
+        viewModel.weatherState.test(2000) {
+            assertEquals(
+                weatherSuccessStateBrno1.copy(lastUpdated = 0.seconds, unitSetting = MeasureUnit.IMPERIAL),
+                awaitItemAfter(WeatherViewState(isLoading = true, unitSetting = MeasureUnit.IMPERIAL))
+            )
+            assertEquals(1, apiMock.calledCount)
+
+            settingsMock.putString(SettingsViewModel.DATA_UNIT_TAG, MeasureUnit.METRIC.name)
+
+            assertEquals(
+                weatherSuccessStateBrno1.copy(lastUpdated = 0.seconds, unitSetting = MeasureUnit.METRIC),
+                awaitItemAfter(
+                    weatherSuccessStateBrno1.copy(
+                        lastUpdated = 0.seconds,
+                        unitSetting = MeasureUnit.IMPERIAL,
+                        isLoading = true
+                    )
+                )
+            )
+
+            setDataAge(Clock.System.now() - 2.hours)
+
+            assertEquals(
+                weatherSuccessStateBrno2.copy(lastUpdated = 0.seconds, unitSetting = MeasureUnit.METRIC),
+                awaitItemAfter(
+                    weatherSuccessStateBrno1.copy(
+                        lastUpdated = 0.seconds,
+                        unitSetting = MeasureUnit.METRIC,
+                        isLoading = true
+                    )
+                )
+            )
+
+            assertEquals(2, apiMock.calledCount)
+            cancel()
+        }
+    }
+
     private fun setDataAge(instant: Instant) {
         dataTimestamp = instant
         settingsMock.putLong(WeatherRepository.DB_TIMESTAMP_KEY, instant.toEpochMilliseconds())
@@ -372,21 +441,4 @@ class WeatherViewModelTest {
             .toEpochMilliseconds() - dataTimestamp!!.toEpochMilliseconds()).milliseconds
     }
 
-    private suspend fun FlowTurbine<WeatherViewState>.awaitItemAfter(vararg items: WeatherViewState): WeatherViewState {
-        var nextItem = awaitItem()
-        for (item in items) {
-            if (item == nextItem) {
-                nextItem = awaitItem()
-            }
-        }
-        return nextItem
-    }
-
-    private suspend fun FlowTurbine<WeatherViewState>.awaitItemAfterLast(item: WeatherViewState): WeatherViewState {
-        val nextItem = awaitItem()
-        if (item == nextItem) {
-            awaitItemAfterLast(nextItem)
-        }
-        return awaitItem()
-    }
 }

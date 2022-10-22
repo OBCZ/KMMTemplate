@@ -26,7 +26,6 @@ import kotlin.time.Duration.Companion.minutes
 @Composable
 fun SettingsFragmentScreen(
 ) {
-    //TODO we can inject like that into composables
     val viewModel = koinViewModel<SettingsViewModel>()
 
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -83,7 +82,6 @@ fun RefreshSetting(
     )
 }
 
-//TODO so far we are nto using the changes anywhere
 @Composable
 fun UnitSetting(text: String, onUnitSettingClick: () -> Unit) {
     Text(text = "Unit Settings")

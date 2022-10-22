@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlin.time.Duration
 
-//TODO tests
+
 class SettingsViewModel(
     private val settings: ObservableSettings,
     private val config: Config,

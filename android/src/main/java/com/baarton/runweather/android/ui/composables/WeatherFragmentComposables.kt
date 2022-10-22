@@ -51,11 +51,10 @@ import java.time.format.DateTimeFormatter
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
-//TODO tests with composables?
+
 @Composable
 fun WeatherFragmentScreen(
 ) {
-    //TODO we can inject like that into composables
     val viewModel = koinViewModel<WeatherViewModel>()
 
     val lifecycleOwner = LocalLifecycleOwner.current

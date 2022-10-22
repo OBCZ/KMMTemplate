@@ -1,0 +1,97 @@
+package com.baarton.runweather.model.viewmodel
+
+import app.cash.turbine.test
+import co.touchlab.kermit.Logger
+import co.touchlab.kermit.StaticConfig
+import com.baarton.runweather.Config
+import com.baarton.runweather.StateFlowTest
+import com.baarton.runweather.TestConfig
+import com.baarton.runweather.model.MeasureUnit
+import com.russhwolf.settings.MapSettings
+import kotlinx.coroutines.runBlocking
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.seconds
+
+
+class SettingsViewModelTest : StateFlowTest() {
+
+    private var logger = Logger(StaticConfig())
+    private val settingsMock = MapSettings()
+    private val testConfig: Config = TestConfig
+
+    private val viewModel by lazy { SettingsViewModel(settingsMock, testConfig, logger) }
+
+    companion object {
+
+        private val defaultInitSettingsState = SettingsViewState(
+            unitSetting = MeasureUnit.METRIC,
+            refreshSetting = 2.seconds
+        )
+    }
+
+    @Test
+    fun `Settings default init test`() = runBlocking {
+        viewModel.settingsState.test {
+            assertEquals(
+                defaultInitSettingsState,
+                awaitItem()
+            )
+        }
+    }
+
+    @Test
+    fun `Settings modified config init test`() = runBlocking {
+        settingsMock.putString(SettingsViewModel.DATA_UNIT_TAG, MeasureUnit.IMPERIAL.name)
+        settingsMock.putString(SettingsViewModel.WEATHER_DATA_THRESHOLD_TAG, 3.seconds.toIsoString())
+
+        viewModel.settingsState.test {
+            assertEquals(
+                SettingsViewState(
+                    unitSetting = MeasureUnit.IMPERIAL,
+                    refreshSetting = 3.seconds
+                ),
+                awaitItem()
+            )
+        }
+    }
+
+    @Test
+    fun `Settings set Data Unit test`() = runBlocking {
+        viewModel.settingsState.test {
+            viewModel.setDataUnit()
+
+            assertEquals(
+                defaultInitSettingsState.copy(unitSetting = MeasureUnit.IMPERIAL),
+                awaitItemAfter(defaultInitSettingsState)
+            )
+
+            viewModel.setDataUnit()
+
+            assertEquals(
+                defaultInitSettingsState,
+                awaitItemAfter(defaultInitSettingsState.copy(unitSetting = MeasureUnit.IMPERIAL))
+            )
+        }
+    }
+
+    @Test
+    fun `Settings set Refresh interval test`() = runBlocking {
+        viewModel.settingsState.test {
+            viewModel.setRefreshInterval(10.seconds)
+
+            assertEquals(
+                defaultInitSettingsState.copy(refreshSetting = 10.seconds),
+                awaitItemAfter(defaultInitSettingsState)
+            )
+
+            viewModel.setRefreshInterval(5.seconds)
+
+            assertEquals(
+                defaultInitSettingsState.copy(refreshSetting = 5.seconds),
+                awaitItemAfter(defaultInitSettingsState.copy(refreshSetting = 10.seconds))
+            )
+        }
+    }
+
+}

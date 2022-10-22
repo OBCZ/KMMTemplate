@@ -28,7 +28,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 class WeatherViewModel(
-    private val settings: ObservableSettings, //TODO tests (manual, auto)
+    settings: ObservableSettings,
     private val config: Config,
     private val weatherRepository: WeatherRepository,
     private val clock: Clock,
@@ -98,7 +98,7 @@ class WeatherViewModel(
                 log.d("Weather collected.")
                 mutableWeatherState.update { previousState ->
                     if (shouldUpdateState(previousState, pollingResult)) {
-                        WeatherViewState(
+                        previousState.copy(
                             isLoading = false,
                             lastUpdated = pollingResult.data?.let { timeStampDuration(it.timestamp) },
                             weather = pollingResult.data?.persistedWeather,
@@ -158,7 +158,7 @@ class WeatherViewModel(
         log.e(throwable) { "Error downloading weather list" }
         mutableWeatherState.update {
             if (it.weather == null) {
-                WeatherViewState(error = WeatherViewState.ErrorType.DATA_CONSISTENCY)
+                it.copy(error = WeatherViewState.ErrorType.DATA_CONSISTENCY)
             } else {
                 // Just let it fail silently if we have a cache
                 it.copy(isLoading = false)
