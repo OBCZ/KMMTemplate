@@ -11,13 +11,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.baarton.runweather.android.ui.AndroidColor.dark
 import com.baarton.runweather.android.ui.AndroidColor.light
 import com.baarton.runweather.ui.Dimens
-import com.baarton.runweather.ui.ThemedColor.*
-
+import com.baarton.runweather.ui.ThemedColor.BACKGROUND
+import com.baarton.runweather.ui.ThemedColor.ERROR
+import com.baarton.runweather.ui.ThemedColor.ON_BACKGROUND
+import com.baarton.runweather.ui.ThemedColor.ON_ERROR
+import com.baarton.runweather.ui.ThemedColor.ON_PRIMARY
+import com.baarton.runweather.ui.ThemedColor.ON_SECONDARY
+import com.baarton.runweather.ui.ThemedColor.ON_SURFACE
+import com.baarton.runweather.ui.ThemedColor.PRIMARY
+import com.baarton.runweather.ui.ThemedColor.PRIMARY_VARIANT
+import com.baarton.runweather.ui.ThemedColor.SECONDARY
+import com.baarton.runweather.ui.ThemedColor.SECONDARY_VARIANT
+import com.baarton.runweather.ui.ThemedColor.SURFACE
 
 private val LightColorPalette = lightColors(
     primary = PRIMARY.light(),
@@ -54,7 +65,14 @@ private val Typography = Typography(
     body1 = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
-        fontSize = 16.sp
+        fontSize = 16.sp,
+        textAlign = TextAlign.Center
+    ),
+    body2 = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 10.sp,
+        textAlign = TextAlign.Center
     )
     /* Other default text styles to override
     button = TextStyle(

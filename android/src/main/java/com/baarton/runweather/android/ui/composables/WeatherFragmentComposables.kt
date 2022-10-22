@@ -2,6 +2,7 @@ package com.baarton.runweather.android.ui.composables
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -17,15 +18,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.flowWithLifecycle
 import com.baarton.runweather.android.ui.AndroidVector.build
 import com.baarton.runweather.db.PersistedWeather
@@ -241,12 +241,13 @@ private fun StateRow(modifier: Modifier, locationAvailable: Boolean, networkAvai
             )
         )
         Text(
-            textAlign = TextAlign.Center,
             modifier = Modifier
                 .align(CenterVertically)
                 .padding(8.dp)
                 .weight(8f),
-            text = lastUpdatedText(lastUpdated)
+            text = lastUpdatedText(lastUpdated),
+            style = MaterialTheme.typography.body1,
+            color = MaterialTheme.colors.onBackground
         )
     }
 }
@@ -331,17 +332,6 @@ private fun DataRow(modifier: Modifier, weather: PersistedWeather, unitSetting: 
             //...
 
         }
-        Column() {
-            //TODO 7 rows
-            // Img, Text
-            Row() {
-                // humidity row
-            }
-            Row() {
-                // rainfall row
-            }
-            //...
-        }
 
     }
 }
@@ -349,26 +339,28 @@ private fun DataRow(modifier: Modifier, weather: PersistedWeather, unitSetting: 
 @Composable
 private fun WeatherDataColumn(modifier: Modifier, vector: Vector, dataText: String) {
     Column(
-        modifier = modifier
+        modifier = modifier,
+        horizontalAlignment = CenterHorizontally
     ) {
         Image(
             modifier = Modifier
-                .align(CenterHorizontally)
                 .weight(1f)
                 .fillMaxWidth(0.5f),
             imageVector = vector.build(),
             contentDescription = vector.name
         )
-        Text(
-            textAlign = TextAlign.Center,
+        Box(
             modifier = Modifier
-                .align(CenterHorizontally)
-                .fillMaxWidth()
+                .fillMaxSize()
                 .weight(1f),
-            text = dataText,
-            fontSize = 10.sp //TODO extract to typography
-
-        )
+            contentAlignment = Center
+        ) {
+            Text(
+                text = dataText,
+                style = MaterialTheme.typography.body2,
+                color = MaterialTheme.colors.onBackground
+            )
+        }
     }
 }
 
