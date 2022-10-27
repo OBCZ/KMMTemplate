@@ -413,8 +413,8 @@ private fun dataText(dataValue: String?, dataUnit: DataUnit): String {
     } ?: stringResource(id = SharedRes.strings.app_n_a.resourceId)
 }
 
-private fun timeText(timeStampSeconds: String): String {
-    return Instant.fromEpochSeconds(timeStampSeconds.toLong())
+private fun timeText(instant: Instant): String {
+    return instant
         .toLocalDateTime(TimeZone.currentSystemDefault()).toJavaLocalDateTime().format(DateTimeFormatter.ofPattern("HH:MM"))
 }
 
@@ -548,8 +548,8 @@ fun MainScreenContentPreview_Success() {
                 wind = WeatherData.Wind(speed = "15.27", deg = "277"),
                 rain = WeatherData.Rain(oneHour = "0.58", threeHour = null),
                 sys = WeatherData.Sys(
-                    sunrise = "1657681500",
-                    sunset = "1657739161"
+                    sunrise = Instant.fromEpochSeconds(1657681500),
+                    sunset = Instant.fromEpochSeconds(1657739161),
                 )
             ),
             lastUpdated = 5.minutes

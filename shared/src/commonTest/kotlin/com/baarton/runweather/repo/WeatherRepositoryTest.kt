@@ -19,6 +19,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -58,7 +59,7 @@ class WeatherRepositoryTest {
                     WeatherData.MainData("265.90", "1021", "45"),
                     WeatherData.Wind("4.6", "345"),
                     null,
-                    WeatherData.Sys("1646803774", "1646844989")
+                    WeatherData.Sys(Instant.fromEpochSeconds(1646803774), Instant.fromEpochSeconds(1646844989))
                 ), it?.persistedWeather
             )
             assertEquals(

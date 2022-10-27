@@ -23,7 +23,7 @@ data class CurrentWeather(
 
     fun isEmptyOrIncomplete(): Boolean {
         return with(persistedWeather) {
-            weatherList.isEmpty() || locationName.isBlank() || mainData.isBlank() || wind.isBlank() || sys.isBlank()
+            weatherList.isEmpty() || locationName.isBlank() || mainData.isBlank() || wind.isBlank() || sys.isInvalid()
         }
     }
 

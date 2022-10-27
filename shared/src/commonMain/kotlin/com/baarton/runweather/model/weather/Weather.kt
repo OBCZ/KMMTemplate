@@ -1,5 +1,6 @@
 package com.baarton.runweather.model.weather
 
+import com.baarton.runweather.ktor.WeatherIdSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

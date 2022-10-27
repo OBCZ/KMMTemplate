@@ -3,6 +3,7 @@ package com.baarton.runweather.mock
 import com.baarton.runweather.model.weather.Weather
 import com.baarton.runweather.model.weather.WeatherData
 import com.baarton.runweather.model.weather.WeatherId.*
+import kotlinx.datetime.Instant
 
 sealed class MockResponses {
     abstract val data: WeatherData
@@ -16,7 +17,7 @@ object CORRUPT : MockResponses() {
             WeatherData.MainData("265.90", "", "45"),
             WeatherData.Wind("", "345"),
             null,
-            WeatherData.Sys("1646803774", "")
+            WeatherData.Sys(Instant.fromEpochSeconds(1646803774), Instant.fromEpochSeconds(0))
         )
     }
 }
@@ -29,7 +30,7 @@ object BRNO1 : MockResponses() {
             WeatherData.MainData("265.90", "1021", "45"),
             WeatherData.Wind("4.6", "345"),
             null,
-            WeatherData.Sys("1646803774", "1646844989")
+            WeatherData.Sys(Instant.fromEpochSeconds(1646803774), Instant.fromEpochSeconds(1646844989))
         )
     }
 }
@@ -42,7 +43,7 @@ object BRNO2 : MockResponses() {
             WeatherData.MainData("260.90", "1025", "55"),
             WeatherData.Wind("4.7", "355"),
             null,
-            WeatherData.Sys("1646806774", "1646842989")
+            WeatherData.Sys(Instant.fromEpochSeconds(1646806774), Instant.fromEpochSeconds(1646842989))
         )
     }
 }
@@ -55,7 +56,7 @@ object BRNO3 : MockResponses() {
             WeatherData.MainData("268.90", "1020", "35"),
             WeatherData.Wind("4.5", "305"),
             null,
-            WeatherData.Sys("1646800774", "1646849989")
+            WeatherData.Sys(Instant.fromEpochSeconds(1646800774), Instant.fromEpochSeconds(1646849989))
         )
     }
 }
@@ -71,7 +72,7 @@ object BRNO4 : MockResponses() {
             WeatherData.MainData("268.90", "1020", "35"),
             WeatherData.Wind("4.5", "305"),
             WeatherData.Rain("1", "3"),
-            WeatherData.Sys("1646800774", "1646849989")
+            WeatherData.Sys(Instant.fromEpochSeconds(1646800774), Instant.fromEpochSeconds(1646849989))
         )
     }
 }

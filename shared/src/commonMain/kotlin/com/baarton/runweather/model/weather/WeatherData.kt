@@ -1,5 +1,9 @@
 package com.baarton.runweather.model.weather
 
+import com.baarton.runweather.ktor.SecondsInstantSerializer
+import kotlinx.datetime.Instant
+import kotlinx.datetime.isDistantFuture
+import kotlinx.datetime.isDistantPast
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -32,7 +36,7 @@ data class WeatherData(
 ) {
 
     fun isEmptyOrIncomplete(): Boolean {
-        return weatherList.isEmpty() || locationName.isBlank() || mainData.isBlank() || wind.isBlank() || sys.isBlank()
+        return weatherList.isEmpty() || locationName.isBlank() || mainData.isBlank() || wind.isBlank() || sys.isInvalid()
     }
 
     @Serializable
@@ -101,19 +105,21 @@ data class WeatherData(
     data class Sys(
 
         /*
-         * Unix timestamp in <seconds> format.
+         * Instant serialized from Unix timestamp in <seconds> format.
          */
         @SerialName("sunrise")
-        val sunrise: String,
+        @Serializable(with = SecondsInstantSerializer::class)
+        val sunrise: Instant,
 
         /*
-         * Unix timestamp in <seconds> format.
+         * Instant serialized from Unix timestamp in <seconds> format.
          */
         @SerialName("sunset")
-        val sunset: String
+        @Serializable(with = SecondsInstantSerializer::class)
+        val sunset: Instant
     ) {
-        fun isBlank(): Boolean {
-            return sunrise.isBlank() || sunset.isBlank()
+        fun isInvalid(): Boolean {
+            return sunrise.isDistantPast || sunset.isDistantPast || sunrise.isDistantFuture || sunset.isDistantFuture
         }
     }
 }

@@ -168,8 +168,8 @@ sealed class RunnersInfo {
         private val RES_SUNGLASSES_UNKNOWN = SharedRes.strings.app_n_a
 
         override fun hint(weatherData: PersistedWeather): TextHint {
-            val now = Clock.System.now().epochSeconds
-            val isDaylight = weatherData.sys.sunrise.toLong() < now && now < weatherData.sys.sunset.toLong()
+            val now = Clock.System.now()
+            val isDaylight = weatherData.sys.sunrise < now && now < weatherData.sys.sunset
 
             val weatherId = weatherData.weatherList.firstOrNull()?.weatherId ?: WeatherId.UNKNOWN
 

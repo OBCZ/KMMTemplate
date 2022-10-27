@@ -58,7 +58,7 @@ class WeatherViewModelTest : StateFlowTest() {
                 WeatherData.MainData("265.90", "1021", "45"),
                 WeatherData.Wind("4.6", "345"),
                 null,
-                WeatherData.Sys("1646803774", "1646844989")
+                WeatherData.Sys(Instant.fromEpochSeconds(1646803774), Instant.fromEpochSeconds(1646844989))
             )
         )
 
@@ -69,7 +69,7 @@ class WeatherViewModelTest : StateFlowTest() {
                 WeatherData.MainData("260.90", "1025", "55"),
                 WeatherData.Wind("4.7", "355"),
                 null,
-                WeatherData.Sys("1646806774", "1646842989")
+                WeatherData.Sys(Instant.fromEpochSeconds(1646806774), Instant.fromEpochSeconds(1646842989))
             )
         )
 

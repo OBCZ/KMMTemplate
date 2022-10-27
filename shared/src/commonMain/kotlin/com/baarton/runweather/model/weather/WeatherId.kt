@@ -1,13 +1,5 @@
 package com.baarton.runweather.model.weather
 
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializer
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 
 /*
  * See https://openweathermap.org/weather-conditions.
@@ -154,19 +146,5 @@ enum class WeatherId(val id: String) {
                 UNKNOWN
             }
         }
-    }
-}
-
-@OptIn(ExperimentalSerializationApi::class)
-@Serializer(forClass = WeatherId::class)
-object WeatherIdSerializer : KSerializer<WeatherId> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("WeatherId", PrimitiveKind.STRING)
-
-    override fun serialize(encoder: Encoder, value: WeatherId) {
-        encoder.encodeString("$value")
-    }
-
-    override fun deserialize(decoder: Decoder): WeatherId {
-        return WeatherId.safeValueOf(decoder.decodeString())
     }
 }

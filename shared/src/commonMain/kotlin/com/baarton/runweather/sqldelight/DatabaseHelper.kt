@@ -9,7 +9,8 @@ import com.baarton.runweather.model.weather.WeatherId
 import com.squareup.sqldelight.ColumnAdapter
 import com.squareup.sqldelight.db.SqlDriver
 import kotlinx.coroutines.CoroutineDispatcher
-
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 
 class DatabaseHelper(
     sqlDriver: SqlDriver,
@@ -92,15 +93,15 @@ class DatabaseHelper(
                 sysAdapter = object : ColumnAdapter<WeatherData.Sys, String> {
 
                     override fun encode(value: WeatherData.Sys): String {
-                        return value.sunrise.plus(DATA_DECODING_DELIMITER).plus(value.sunset)
+                        return value.sunrise.toString().plus(DATA_DECODING_DELIMITER).plus(value.sunset.toString())
                     }
 
                     override fun decode(databaseValue: String): WeatherData.Sys {
                         return if (databaseValue.isEmpty()) {
-                            WeatherData.Sys("", "")
+                            WeatherData.Sys(Clock.System.now(), Clock.System.now())
                         } else {
                             val split = databaseValue.split(DATA_DECODING_DELIMITER)
-                            WeatherData.Sys(split[0], split[1])
+                            WeatherData.Sys(Instant.parse(split[0]), Instant.parse(split[1]))
                         }
                     }
                 },

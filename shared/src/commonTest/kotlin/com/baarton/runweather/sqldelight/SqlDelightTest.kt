@@ -18,7 +18,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import com.baarton.runweather.model.weather.WeatherId.*
-
+import kotlinx.datetime.Instant
 
 class SqlDelightTest {
 
@@ -59,8 +59,8 @@ class SqlDelightTest {
             assertTrue { mainData.humidity == "45" }
             assertTrue { mainData.temperature == "265.90" }
             assertTrue { rain == null }
-            assertTrue { sys.sunrise == "1646803774" }
-            assertTrue { sys.sunset == "1646844989" }
+            assertTrue { sys.sunrise == Instant.fromEpochSeconds(1646803774) }
+            assertTrue { sys.sunset == Instant.fromEpochSeconds(1646844989) }
         }
     }
 
@@ -86,8 +86,8 @@ class SqlDelightTest {
             assertTrue { mainData.temperature == "268.90" }
             assertTrue { rain!!.oneHour == "1" }
             assertTrue { rain!!.threeHour == "3" }
-            assertTrue { sys.sunrise == "1646800774" }
-            assertTrue { sys.sunset == "1646849989" }
+            assertTrue { sys.sunrise == Instant.fromEpochSeconds(1646800774) }
+            assertTrue { sys.sunset == Instant.fromEpochSeconds(1646849989) }
         }
     }
 

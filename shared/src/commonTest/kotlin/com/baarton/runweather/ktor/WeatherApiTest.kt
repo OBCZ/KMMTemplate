@@ -15,6 +15,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.Instant
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -97,7 +98,7 @@ class WeatherApiTest {
                 WeatherData.MainData("300.93", "1009", "48"),
                 WeatherData.Wind("4.06", "302"),
                 null,
-                WeatherData.Sys("1660881327", "1660932734")
+                WeatherData.Sys(Instant.fromEpochSeconds(1660881327), Instant.fromEpochSeconds(1660932734))
             ),
             result
         )
