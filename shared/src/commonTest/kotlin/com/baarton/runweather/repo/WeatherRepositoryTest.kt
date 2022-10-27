@@ -9,6 +9,7 @@ import com.baarton.runweather.mock.WeatherApiMock
 import com.baarton.runweather.model.viewmodel.SettingsViewModel
 import com.baarton.runweather.model.weather.Weather
 import com.baarton.runweather.model.weather.WeatherData
+import com.baarton.runweather.model.weather.WeatherId
 import com.baarton.runweather.repo.WeatherRepository.Companion.DB_TIMESTAMP_KEY
 import com.baarton.runweather.sqldelight.DatabaseHelper
 import com.baarton.runweather.testDbConnection
@@ -52,7 +53,7 @@ class WeatherRepositoryTest {
         repository.refreshWeather().let {
             assertEquals(
                 PersistedWeather(
-                    listOf(Weather("800", "Clear", "clear sky", "01d")),
+                    listOf(Weather(WeatherId.CLEAR_SKY, "Clear", "clear sky", "01d")),
                     "Brno1",
                     WeatherData.MainData("265.90", "1021", "45"),
                     WeatherData.Wind("4.6", "345"),

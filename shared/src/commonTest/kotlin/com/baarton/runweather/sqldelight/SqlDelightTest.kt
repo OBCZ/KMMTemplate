@@ -17,6 +17,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import com.baarton.runweather.model.weather.WeatherId.*
 
 
 class SqlDelightTest {
@@ -51,7 +52,7 @@ class SqlDelightTest {
             assertTrue { locationName == "Brno1" }
             assertTrue { weatherList.size == 1 }
             assertTrue { weatherList[0].description == "clear sky" }
-            assertTrue { weatherList[0].weatherId == "800" }
+            assertTrue { weatherList[0].weatherId == CLEAR_SKY }
             assertTrue { weatherList[0].title == "Clear" }
             assertTrue { weatherList[0].iconId == "01d" }
             assertTrue { mainData.pressure == "1021" }
@@ -73,11 +74,11 @@ class SqlDelightTest {
             assertTrue { locationName == "Brno Rain" }
             assertTrue { weatherList.size == 2 }
             assertTrue { weatherList[0].description == "heavy rain" }
-            assertTrue { weatherList[0].weatherId == "900" }
+            assertTrue { weatherList[0].weatherId == HEAVY_INTENSITY_RAIN }
             assertTrue { weatherList[0].title == "Rain" }
             assertTrue { weatherList[0].iconId == "05d" }
             assertTrue { weatherList[1].description == "light rain" }
-            assertTrue { weatherList[1].weatherId == "950" }
+            assertTrue { weatherList[1].weatherId == LIGHT_RAIN }
             assertTrue { weatherList[1].title == "Light Rain" }
             assertTrue { weatherList[1].iconId == "08d" }
             assertTrue { mainData.pressure == "1020" }

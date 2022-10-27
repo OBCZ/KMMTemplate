@@ -6,6 +6,10 @@ import dev.icerock.moko.resources.StringResource
 import kotlin.math.roundToInt
 
 
+//TODO all convert functions as extensions
+//TODO consider refactoring Units class to sth like [1.0f.celsius] calls
+//TODO might want to parse it to these Types when I got it from API
+
 enum class MeasureUnit(
     val tempUnit: TempUnit,
     val humidityUnit: HumidityUnit,
@@ -198,4 +202,14 @@ interface DataUnit {
 
     val stringRes: StringResource
     fun prepareValue(value: Float): String
+}
+
+@OptIn(ExperimentalStdlibApi::class)
+fun kelvinRange(lower: Float, upper: Float, tempUnit: TempUnit = TempUnit.CELSIUS): OpenEndRange<Float> {
+    return tempUnit.toKelvin(lower).rangeUntil(tempUnit.toKelvin(upper))
+}
+
+@OptIn(ExperimentalStdlibApi::class)
+fun metersPerSecondRange(lower: Float, upper: Float, speedUnit: WindSpeedUnit = WindSpeedUnit.METERS_PER_SECOND): OpenEndRange<Float> {
+    return speedUnit.toMetersPerSecond(lower).rangeUntil(speedUnit.toMetersPerSecond(upper))
 }

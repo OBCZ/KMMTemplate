@@ -6,6 +6,7 @@ import co.touchlab.kermit.LoggerConfig
 import co.touchlab.kermit.Severity
 import com.baarton.runweather.model.weather.Weather
 import com.baarton.runweather.model.weather.WeatherData
+import com.baarton.runweather.model.weather.WeatherId
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.plugins.ClientRequestException
@@ -91,7 +92,7 @@ class WeatherApiTest {
         val result = weatherApi.getJsonFromApi()
         assertEquals(
             WeatherData(
-                listOf(Weather("804", "Clouds", "zataženo", "04d")),
+                listOf(Weather(WeatherId.OVERCAST_CLOUDS, "Clouds", "zataženo", "04d")),
                 "Kouřim",
                 WeatherData.MainData("300.93", "1009", "48"),
                 WeatherData.Wind("4.06", "302"),

@@ -71,8 +71,13 @@
 
     <string name="weather_runners_info_data_head_cover_category">Head Cover</string>
     <string name="weather_runners_info_data_head_cover_none">None</string>
-    <string name="weather_runners_info_data_head_cover_ears">Ear cover</string>
+    <string name="weather_runners_info_data_head_cover_sun">Sun shield</string>
+    <string name="weather_runners_info_data_head_cover_ears">Head band</string>
     <string name="weather_runners_info_data_head_cover_cap">Cap</string>
+
+    <string name="weather_runners_info_data_sunglasses_category">Sunglasses</string>
+    <string name="weather_runners_info_data_sunglasses_no">No</string>
+    <string name="weather_runners_info_data_sunglasses_yes">Yes</string>
 
     <string name="weather_runners_info_data_neck_cover_category">Neck Cover</string>
     <string name="weather_runners_info_data_neck_cover_none">None</string>

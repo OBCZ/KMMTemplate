@@ -1,6 +1,7 @@
 package com.baarton.runweather.android.ui.composables
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
@@ -33,15 +36,22 @@ import com.baarton.runweather.model.DataUnit
 import com.baarton.runweather.model.MeasureUnit
 import com.baarton.runweather.model.RainfallUnit
 import com.baarton.runweather.model.WindDirection
+import com.baarton.runweather.model.viewmodel.RunnersHint
+import com.baarton.runweather.model.viewmodel.RunnersInfo
+import com.baarton.runweather.model.viewmodel.TemperatureHint
+import com.baarton.runweather.model.viewmodel.WarningHint
+import com.baarton.runweather.model.viewmodel.WeatherHint
 import com.baarton.runweather.model.viewmodel.WeatherViewModel
 import com.baarton.runweather.model.viewmodel.WeatherViewState
 import com.baarton.runweather.model.viewmodel.lastUpdatedResId
 import com.baarton.runweather.model.weather.Weather
 import com.baarton.runweather.model.weather.WeatherData
+import com.baarton.runweather.model.weather.WeatherId
 import com.baarton.runweather.res.SharedRes
 import com.baarton.runweather.ui.Vector
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import dev.icerock.moko.resources.StringResource
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDateTime
@@ -122,54 +132,38 @@ private fun WeatherScreen(weatherState: WeatherViewState) {
     val lastUpdated = weatherState.lastUpdated
     val unitSetting = weatherState.unitSetting
 
-    //TODO img background
-    Column {
+
+    Column(
+        Modifier.background(color = MaterialTheme.colors.background) //TODO img background
+    ) {
         StateRow(
             modifier = Modifier
                 .align(CenterHorizontally)
-                .padding(4.dp)
+                .padding(2.dp)
                 .weight(1f)
                 .fillMaxWidth(),
             locationAvailable = locationAvailable,
             networkAvailable = networkAvailable,
-            lastUpdated = lastUpdated,
+            lastUpdated = lastUpdated
         )
 
         DataRow(
             modifier = Modifier
                 .align(CenterHorizontally)
-                .padding(4.dp)
-                .weight(5f)
+                .padding(2.dp)
+                .weight(6f)
                 .fillMaxWidth(),
             weather = weather,
             unitSetting = unitSetting
         )
 
-        //TODO warning row 2
-        Row(
+        WarningRow(
             modifier = Modifier
                 .weight(2f)
-                .fillMaxWidth()
-        ) {
-            //TODO temp warning
-            Column() {
-                Row() {
-                    // Img, Img
-                }
-                Row() {
-                    // Text
-                }
-            }
-            //TODO wind warning
-            Column() {
-                Row() {
-                    // Img, Img
-                }
-                Row() {
-                    // Text
-                }
-            }
-        }
+                .align(CenterHorizontally)
+                .fillMaxSize(),
+            weather = weather,
+        )
 
         //TODO main data row 2
         Row(
@@ -296,8 +290,8 @@ private fun DataRow(modifier: Modifier, weather: PersistedWeather, unitSetting: 
                 .fillMaxWidth()
 
             with(weather) {
-                WeatherDataColumn(columnModifier, Vector.RAIN, dataText(mainData.humidity, unitSetting.humidityUnit))
-                WeatherDataColumn(columnModifier, Vector.DROPS, rainfallText(unitSetting.rainfallUnit, rain?.oneHour, rain?.threeHour))
+                WeatherDataColumn(columnModifier, Vector.HUMIDITY, dataText(mainData.humidity, unitSetting.humidityUnit))
+                WeatherDataColumn(columnModifier, Vector.RAIN, rainfallText(unitSetting.rainfallUnit, rain?.oneHour, rain?.threeHour))
                 WeatherDataColumn(columnModifier, Vector.PRESSURE, dataText(mainData.pressure, unitSetting.pressureUnit))
                 WeatherDataColumn(columnModifier, Vector.DIRECTION, windDirectionText(wind.deg))
                 WeatherDataColumn(columnModifier, Vector.WIND, dataText(wind.speed, unitSetting.windSpeedUnit))
@@ -306,30 +300,64 @@ private fun DataRow(modifier: Modifier, weather: PersistedWeather, unitSetting: 
             }
         }
 
-        Row(
+        Column(
             modifier = Modifier
                 .align(CenterHorizontally)
                 .padding(4.dp)
-                .weight(3f)
-                .fillMaxWidth()
+                .weight(4f)
+                .fillMaxSize()
+
         ) {
 
-        }
+            val rowModifier = Modifier
+                .align(CenterHorizontally)
+                .weight(1f)
+                .fillMaxSize()
 
-        Column() {
-            //TODO data rows
-            // always info Img, num slow Text, num fast Text
-            Row() {
-                // header row
+            //TODO header row?
 
-            }
-            Row() {
-                // torso row
-            }
-            Row() {
-                // legs row
-            }
-            //...
+            InfoRow(
+                rowModifier,
+                weather,
+                SharedRes.strings.weather_runners_info_data_head_cover_category,
+                RunnersInfo.HeadCover
+            )
+            InfoRow(
+                rowModifier,
+                weather,
+                SharedRes.strings.weather_runners_info_data_sunglasses_category,
+                RunnersInfo.Sunglasses
+            )
+            InfoRow(
+                rowModifier,
+                weather,
+                SharedRes.strings.weather_runners_info_data_neck_cover_category,
+                RunnersInfo.NeckCover
+            )
+            InfoRow(
+                rowModifier,
+                weather,
+                SharedRes.strings.weather_runners_info_data_top_layers_category,
+                RunnersInfo.LayersTop
+            )
+            InfoRow(
+                rowModifier,
+                weather,
+                SharedRes.strings.weather_runners_info_data_gloves_category,
+                RunnersInfo.Gloves
+            )
+            InfoRow(
+                rowModifier,
+                weather,
+                SharedRes.strings.weather_runners_info_data_bottom_layers_category,
+                RunnersInfo.LayersBottom
+            )
+            InfoRow(
+                rowModifier,
+                weather,
+                SharedRes.strings.weather_runners_info_data_socks_category,
+                RunnersInfo.Socks
+            )
 
         }
 
@@ -345,7 +373,7 @@ private fun WeatherDataColumn(modifier: Modifier, vector: Vector, dataText: Stri
         Image(
             modifier = Modifier
                 .weight(1f)
-                .fillMaxWidth(0.5f),
+                .fillMaxWidth(0.66f),
             imageVector = vector.build(),
             contentDescription = vector.name
         )
@@ -390,6 +418,113 @@ private fun timeText(timeStampSeconds: String): String {
         .toLocalDateTime(TimeZone.currentSystemDefault()).toJavaLocalDateTime().format(DateTimeFormatter.ofPattern("HH:MM"))
 }
 
+@Composable
+private fun InfoRow(modifier: Modifier, weatherData: PersistedWeather, categoryTextRes: StringResource, hint: RunnersHint) {
+    val slowColumnHint = when (hint) {
+        is TemperatureHint -> hint.slow(weatherData.mainData.temperature.toFloat())
+        is WeatherHint -> hint.hint(weatherData)
+    }
+
+    val fastColumnHint = when (hint) {
+        is TemperatureHint -> hint.fast(weatherData.mainData.temperature.toFloat())
+        is WeatherHint -> hint.hint(weatherData)
+    }
+
+    Row(
+        modifier
+            .wrapContentHeight()
+            .background(color = MaterialTheme.colors.primary, shape = MaterialTheme.shapes.medium)
+            .padding(6.dp),
+    ) {
+        Text(
+            modifier = Modifier
+                .padding(vertical = 1.dp, horizontal = 2.dp)
+                .weight(0.33f),
+            text = stringResource(id = categoryTextRes.resourceId),
+            color = MaterialTheme.colors.onPrimary,
+            style = MaterialTheme.typography.body2
+        )
+        Text(
+            modifier = Modifier
+                .padding(vertical = 1.dp, horizontal = 2.dp)
+                .weight(0.33f),
+            text = stringResource(id = slowColumnHint.textRes.resourceId),
+            color = MaterialTheme.colors.onPrimary,
+            style = MaterialTheme.typography.body2
+        )
+        Text(
+            modifier = Modifier
+                .padding(vertical = 1.dp, horizontal = 2.dp)
+                .weight(0.33f),
+            text = stringResource(id = fastColumnHint.textRes.resourceId),
+            color = MaterialTheme.colors.onPrimary,
+            style = MaterialTheme.typography.body2
+        )
+    }
+}
+
+@Composable
+fun WarningRow(modifier: Modifier, weather: PersistedWeather) {
+    val temperatureWarning = RunnersInfo.TemperatureWarning.warning(weather)
+    val windWarning = RunnersInfo.WindWarning.warning(weather)
+
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = CenterVertically
+    ) {
+        val warningItemModifier = Modifier
+            .weight(1f)
+
+        temperatureWarning?.let { WarningItem(warningItemModifier, it, Vector.THERMOSTAT) }
+        windWarning?.let { WarningItem(warningItemModifier, it, Vector.WIND) }
+    }
+}
+
+@Composable
+fun WarningItem(modifier: Modifier, warningHint: WarningHint, warningVector: Vector) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Center
+    ) {
+        Column(
+            modifier = Modifier
+                .background(color = MaterialTheme.colors.secondary, shape = MaterialTheme.shapes.medium)
+                .padding(horizontal = 24.dp, vertical = 8.dp)
+
+        ) {
+            Row(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .align(CenterHorizontally),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Image(
+                    modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 8.dp, end = 4.dp),
+                    imageVector = warningHint.vector.build(), contentDescription = null
+                )
+                Image(
+                    modifier = Modifier.padding(top = 8.dp, bottom = 4.dp, start = 4.dp, end = 8.dp),
+                    imageVector = warningVector.build(), contentDescription = null
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .align(CenterHorizontally),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    modifier = Modifier.padding(top = 4.dp, bottom = 8.dp, start = 8.dp, end = 8.dp),
+                    text = stringResource(id = warningHint.textRes.resourceId),
+                    color = MaterialTheme.colors.onPrimary,
+                    style = MaterialTheme.typography.body2
+                )
+            }
+        }
+    }
+}
+
 @Preview
 @Composable
 fun MainScreenContentPreview_Success() {
@@ -398,7 +533,7 @@ fun MainScreenContentPreview_Success() {
             weather = PersistedWeather(
                 weatherList = listOf(
                     Weather(
-                        weatherId = "803",
+                        weatherId = WeatherId.BROKEN_CLOUDS,
                         title = "Clouds",
                         description = "oblačno",
                         iconId = "04d"
@@ -406,11 +541,11 @@ fun MainScreenContentPreview_Success() {
                 ),
                 locationName = "Kouřim",
                 mainData = WeatherData.MainData(
-                    temperature = "300.82",
+                    temperature = "288.82",
                     pressure = "1019",
                     humidity = "38"
                 ),
-                wind = WeatherData.Wind(speed = "4.27", deg = "277"),
+                wind = WeatherData.Wind(speed = "15.27", deg = "277"),
                 rain = WeatherData.Rain(oneHour = "0.58", threeHour = null),
                 sys = WeatherData.Sys(
                     sunrise = "1657681500",

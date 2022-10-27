@@ -69,8 +69,13 @@
 
     <string name="weather_runners_info_data_head_cover_category">Ochrana hlavy</string>
     <string name="weather_runners_info_data_head_cover_none">Žádná</string>
+    <string name="weather_runners_info_data_head_cover_sun">Proti Slunci</string>
     <string name="weather_runners_info_data_head_cover_ears">Čelenka</string>
     <string name="weather_runners_info_data_head_cover_cap">Čepice</string>
+
+    <string name="weather_runners_info_data_sunglasses_category">Sluneční brýle</string>
+    <string name="weather_runners_info_data_sunglasses_no">Ne</string>
+    <string name="weather_runners_info_data_sunglasses_yes">Ano</string>
 
     <string name="weather_runners_info_data_neck_cover_category">Ochrana krku</string>
     <string name="weather_runners_info_data_neck_cover_none">Žádná</string>

@@ -35,12 +35,6 @@ import org.koin.dsl.module
 // define simple formatting rules with ktlint?
 // go through Medium bookmark tips and fine-tune the code
 
-//TODO runners data enhancements
-// no categories' texts, only pictograms (cap, torso, legs etc.)
-// new categories - sunglasses etc.
-// might consider wind if cold to influence layers
-// might consider slow, fast workout to influence layers
-
 
 fun initKoin(appModule: Module): KoinApplication {
     val koinApplication = startKoin {

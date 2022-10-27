@@ -5,6 +5,7 @@ import com.baarton.runweather.db.PersistedWeather
 import com.baarton.runweather.db.RunWeatherDb
 import com.baarton.runweather.model.weather.Weather
 import com.baarton.runweather.model.weather.WeatherData
+import com.baarton.runweather.model.weather.WeatherId
 import com.squareup.sqldelight.ColumnAdapter
 import com.squareup.sqldelight.db.SqlDriver
 import kotlinx.coroutines.CoroutineDispatcher
@@ -29,7 +30,7 @@ class DatabaseHelper(
 
                     override fun encode(value: List<Weather>): String {
                         return value.joinToString(separator = ITEM_DECODING_DELIMITER) {
-                            it.weatherId.plus(DATA_DECODING_DELIMITER).plus(it.title).plus(DATA_DECODING_DELIMITER)
+                            it.weatherId.id.plus(DATA_DECODING_DELIMITER).plus(it.title).plus(DATA_DECODING_DELIMITER)
                                 .plus(it.description).plus(DATA_DECODING_DELIMITER).plus(it.iconId)
                         }
                     }
@@ -43,7 +44,7 @@ class DatabaseHelper(
                                 val elementSplit = it.split(DATA_DECODING_DELIMITER)
                                 result.add(
                                     Weather(
-                                        elementSplit[0],
+                                        WeatherId.safeValueOf(elementSplit[0]),
                                         elementSplit[1],
                                         elementSplit[2],
                                         elementSplit[3]
