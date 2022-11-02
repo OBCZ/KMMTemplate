@@ -9,7 +9,7 @@ import com.baarton.runweather.android.ui.theme.RunWeatherTheme
 import com.baarton.runweather.injectLogger
 import org.koin.core.component.KoinComponent
 
-//TODO tests with composables?
+//TEST tests with composables?
 //TODO handle permissions somehow
 class MainActivity : FragmentActivity(), /*PermissionFragment.PermissionListener,*/ KoinComponent {
 

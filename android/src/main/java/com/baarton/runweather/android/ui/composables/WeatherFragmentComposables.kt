@@ -32,9 +32,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.flowWithLifecycle
 import com.baarton.runweather.android.ui.AndroidVector.build
 import com.baarton.runweather.db.PersistedWeather
-import com.baarton.runweather.model.DataUnit
-import com.baarton.runweather.model.MeasureUnit
-import com.baarton.runweather.model.RainfallUnit
+import com.baarton.runweather.model.Angle
+import com.baarton.runweather.model.Angle.Companion.deg
+import com.baarton.runweather.model.Height
+import com.baarton.runweather.model.Height.Companion.mm
+import com.baarton.runweather.model.Humidity.Companion.percent
+import com.baarton.runweather.model.Pressure.Companion.hpa
+import com.baarton.runweather.model.QuantityUnit
+import com.baarton.runweather.model.Temperature.Companion.celsius
+import com.baarton.runweather.model.Velocity.Companion.mps
 import com.baarton.runweather.model.WindDirection
 import com.baarton.runweather.model.viewmodel.RunnersHint
 import com.baarton.runweather.model.viewmodel.RunnersInfo
@@ -43,6 +49,7 @@ import com.baarton.runweather.model.viewmodel.WarningHint
 import com.baarton.runweather.model.viewmodel.WeatherHint
 import com.baarton.runweather.model.viewmodel.WeatherViewModel
 import com.baarton.runweather.model.viewmodel.WeatherViewState
+import com.baarton.runweather.model.viewmodel.copy
 import com.baarton.runweather.model.viewmodel.lastUpdatedResId
 import com.baarton.runweather.model.weather.Weather
 import com.baarton.runweather.model.weather.WeatherData
@@ -60,7 +67,6 @@ import org.koin.androidx.compose.koinViewModel
 import java.time.format.DateTimeFormatter
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
-
 
 @Composable
 fun WeatherFragmentScreen(
@@ -98,7 +104,7 @@ private fun WeatherFragmentScreenContent(
                 val weather = this.weather
                 when {
                     error == null && weather == null -> ErrorScreen("Weather empty")
-                    error == null && weather != null -> WeatherScreen(this.copy(weather = weather))
+                    error == null && weather != null -> WeatherScreen(copy(weather = weather))
                     error != null && weather == null -> ErrorScreen(stringResource(id = error.messageRes.resourceId))
                     else -> ErrorScreen("Unknown error")
                 }
@@ -126,12 +132,10 @@ private fun ErrorScreen(error: String) {
 //TODO how much can I extract with iOS to common from the UI building blocks (expect/actual abstraction)?
 @Composable
 private fun WeatherScreen(weatherState: WeatherViewState) {
-    val weather = weatherState.weather!! // we should not get NPE here
+    val weather = weatherState.weather!!.copy(weatherState.unitSetting) // we should not get NPE here
     val locationAvailable = weatherState.locationAvailable
     val networkAvailable = weatherState.networkAvailable
     val lastUpdated = weatherState.lastUpdated
-    val unitSetting = weatherState.unitSetting
-
 
     Column(
         Modifier.background(color = MaterialTheme.colors.background) //TODO img background
@@ -153,8 +157,7 @@ private fun WeatherScreen(weatherState: WeatherViewState) {
                 .padding(2.dp)
                 .weight(6f)
                 .fillMaxWidth(),
-            weather = weather,
-            unitSetting = unitSetting
+            weather = weather
         )
 
         WarningRow(
@@ -193,7 +196,7 @@ private fun WeatherScreen(weatherState: WeatherViewState) {
                     .fillMaxHeight()
                     .weight(4f)
             ) { // 2
-                Text(text = dataText(weather.mainData.temperature, unitSetting.tempUnit))
+                Text(text = dataText(weather.mainData.temperature))
                 // Text
             }
         }
@@ -275,7 +278,7 @@ private fun lastUpdatedText(lastUpdated: Duration?): String {
 }
 
 @Composable
-private fun DataRow(modifier: Modifier, weather: PersistedWeather, unitSetting: MeasureUnit) {
+private fun DataRow(modifier: Modifier, weather: PersistedWeather) {
     Column(modifier = modifier) {
         Row(
             modifier = Modifier
@@ -290,11 +293,11 @@ private fun DataRow(modifier: Modifier, weather: PersistedWeather, unitSetting: 
                 .fillMaxWidth()
 
             with(weather) {
-                WeatherDataColumn(columnModifier, Vector.HUMIDITY, dataText(mainData.humidity, unitSetting.humidityUnit))
-                WeatherDataColumn(columnModifier, Vector.RAIN, rainfallText(unitSetting.rainfallUnit, rain?.oneHour, rain?.threeHour))
-                WeatherDataColumn(columnModifier, Vector.PRESSURE, dataText(mainData.pressure, unitSetting.pressureUnit))
-                WeatherDataColumn(columnModifier, Vector.DIRECTION, windDirectionText(wind.deg))
-                WeatherDataColumn(columnModifier, Vector.WIND, dataText(wind.speed, unitSetting.windSpeedUnit))
+                WeatherDataColumn(columnModifier, Vector.HUMIDITY, dataText(mainData.humidity))
+                WeatherDataColumn(columnModifier, Vector.RAIN, rainfallText(rain.oneHour, rain.threeHour))
+                WeatherDataColumn(columnModifier, Vector.PRESSURE, dataText(mainData.pressure))
+                WeatherDataColumn(columnModifier, Vector.DIRECTION, windDirectionText(wind.angle))
+                WeatherDataColumn(columnModifier, Vector.WIND, dataText(wind.velocity))
                 WeatherDataColumn(columnModifier, Vector.SUNRISE, timeText(sys.sunrise))
                 WeatherDataColumn(columnModifier, Vector.SUNSET, timeText(sys.sunset))
             }
@@ -393,24 +396,20 @@ private fun WeatherDataColumn(modifier: Modifier, vector: Vector, dataText: Stri
 }
 
 @Composable
-private fun rainfallText(rainfallUnit: RainfallUnit, oneHour: String?, threeHour: String?): String {
-    val oneHourText = dataText(oneHour, rainfallUnit)
-    val threeHourText = dataText(threeHour, rainfallUnit)
+private fun rainfallText(oneHour: Height, threeHour: Height): String {
+    val oneHourText = dataText(oneHour)
+    val threeHourText = dataText(threeHour)
     return "${oneHourText}\n${threeHourText}"
 }
 
 @Composable
-private fun windDirectionText(deg: String): String {
-    return deg.toFloatOrNull()?.let {
-        stringResource(id = WindDirection.signRes(it).resourceId)
-    } ?: stringResource(id = SharedRes.strings.app_n_a.resourceId)
+private fun windDirectionText(angle: Angle): String {
+    return stringResource(id = WindDirection.signRes(angle).resourceId)
 }
 
 @Composable
-private fun dataText(dataValue: String?, dataUnit: DataUnit): String {
-    return (dataValue ?: "0").toFloatOrNull()?.let {
-        stringResource(id = dataUnit.stringRes.resourceId, formatArgs = arrayOf(dataUnit.prepareValue(it)))
-    } ?: stringResource(id = SharedRes.strings.app_n_a.resourceId)
+private fun dataText(quantityUnit: QuantityUnit): String {
+    return stringResource(id = quantityUnit.unit.stringRes.resourceId, formatArgs = arrayOf(quantityUnit.formattedValue()))
 }
 
 private fun timeText(instant: Instant): String {
@@ -421,12 +420,12 @@ private fun timeText(instant: Instant): String {
 @Composable
 private fun InfoRow(modifier: Modifier, weatherData: PersistedWeather, categoryTextRes: StringResource, hint: RunnersHint) {
     val slowColumnHint = when (hint) {
-        is TemperatureHint -> hint.slow(weatherData.mainData.temperature.toFloat())
+        is TemperatureHint -> hint.slow(weatherData.mainData.temperature)
         is WeatherHint -> hint.hint(weatherData)
     }
 
     val fastColumnHint = when (hint) {
-        is TemperatureHint -> hint.fast(weatherData.mainData.temperature.toFloat())
+        is TemperatureHint -> hint.fast(weatherData.mainData.temperature)
         is WeatherHint -> hint.hint(weatherData)
     }
 
@@ -541,12 +540,12 @@ fun MainScreenContentPreview_Success() {
                 ),
                 locationName = "Kouřim",
                 mainData = WeatherData.MainData(
-                    temperature = "288.82",
-                    pressure = "1019",
-                    humidity = "38"
+                    temperature = 15.celsius,
+                    pressure = 1019.hpa,
+                    humidity = 38.percent
                 ),
-                wind = WeatherData.Wind(speed = "15.27", deg = "277"),
-                rain = WeatherData.Rain(oneHour = "0.58", threeHour = null),
+                wind = WeatherData.Wind(velocity = 15.27.mps, angle = 277.deg),
+                rain = WeatherData.Rain(oneHour = 0.58.mm),
                 sys = WeatherData.Sys(
                     sunrise = Instant.fromEpochSeconds(1657681500),
                     sunset = Instant.fromEpochSeconds(1657739161),

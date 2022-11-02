@@ -47,7 +47,7 @@ class WeatherRepository(
                 null
             } else {
                 with(CurrentWeather(it.first(), getLastDownloadTime())) {
-                    if (this.isEmptyOrIncomplete()) {
+                    if (this.isInvalid()) {
                         throw WeatherDataConsistencyException("Weather data retrieved from the DB is empty or incomplete.-----\n${this.persistedWeather}\n-----")
                     } else {
                         this
@@ -65,7 +65,7 @@ class WeatherRepository(
         }
         log.d { "Weather network result: $weatherResult" }
 
-        if (!weatherResult.isEmptyOrIncomplete()) {
+        if (!weatherResult.isInvalid()) {
             dbHelper.insert(weatherResult)
             val timeStamp = clock.now().toEpochMilliseconds()
             settings.putLong(DB_TIMESTAMP_KEY, timeStamp)

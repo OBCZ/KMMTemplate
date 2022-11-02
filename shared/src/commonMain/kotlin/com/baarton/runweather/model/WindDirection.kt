@@ -16,8 +16,8 @@ enum class WindDirection(private val signRes: StringResource, private val degInt
     NORTHWEST(SharedRes.strings.wind_direction_northwest, listOf(292.5f..337.499f));
 
     companion object {
-        fun signRes(deg: Float): StringResource {
-            return values().first { it.degIntervals.any { interval -> interval.contains(deg) } }.signRes
+        fun signRes(angle: Angle): StringResource {
+            return values().first { it.degIntervals.any { interval -> interval.contains(angle.value) } }.signRes
         }
     }
 

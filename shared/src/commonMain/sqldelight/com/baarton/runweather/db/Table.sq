@@ -7,12 +7,11 @@ import kotlin.collections.List;
 
 
 CREATE TABLE PersistedWeather (
--- timestamp TEXT AS Long NOT NULL,
 weatherList TEXT AS List<Weather> NOT NULL,
 locationName TEXT NOT NULL,
 mainData TEXT AS MainData NOT NULL,
 wind TEXT AS Wind NOT NULL,
-rain TEXT AS Rain,
+rain TEXT AS Rain NOT NULL,
 sys TEXT AS Sys NOT NULL
 );
 
@@ -25,30 +24,3 @@ SELECT * FROM PersistedWeather;
 
 nuke:
 DELETE FROM PersistedWeather;
-
-
-
--- CREATE TABLE Breed (
--- id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
--- name TEXT NOT NULL UNIQUE,
--- favorite INTEGER AS Boolean NOT NULL DEFAULT 0
--- );
---
--- selectAll:
--- SELECT * FROM Breed;
---
--- selectById:
--- SELECT * FROM Breed WHERE id = ?;
---
--- selectByName:
--- SELECT * FROM Breed WHERE name = ?;
---
--- insertBreed:
--- INSERT OR IGNORE INTO Breed(name)
--- VALUES (?);
---
--- deleteAll:
--- DELETE FROM Breed;
---
--- updateFavorite:
--- UPDATE Breed SET favorite = ? WHERE id = ?;

@@ -4,6 +4,11 @@ import co.touchlab.kermit.LogWriter
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.LoggerConfig
 import co.touchlab.kermit.Severity
+import com.baarton.runweather.model.Angle.Companion.deg
+import com.baarton.runweather.model.Humidity.Companion.percent
+import com.baarton.runweather.model.Pressure.Companion.hpa
+import com.baarton.runweather.model.Temperature.Companion.kelvin
+import com.baarton.runweather.model.Velocity.Companion.mps
 import com.baarton.runweather.model.weather.Weather
 import com.baarton.runweather.model.weather.WeatherData
 import com.baarton.runweather.model.weather.WeatherId
@@ -95,9 +100,9 @@ class WeatherApiTest {
             WeatherData(
                 listOf(Weather(WeatherId.OVERCAST_CLOUDS, "Clouds", "zataženo", "04d")),
                 "Kouřim",
-                WeatherData.MainData("300.93", "1009", "48"),
-                WeatherData.Wind("4.06", "302"),
-                null,
+                WeatherData.MainData(300.93.kelvin, 1009.hpa, 48.percent),
+                WeatherData.Wind(4.06.mps, 302.deg),
+                WeatherData.Rain(),
                 WeatherData.Sys(Instant.fromEpochSeconds(1660881327), Instant.fromEpochSeconds(1660932734))
             ),
             result

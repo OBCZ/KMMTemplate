@@ -6,7 +6,7 @@ import co.touchlab.kermit.StaticConfig
 import com.baarton.runweather.Config
 import com.baarton.runweather.StateFlowTest
 import com.baarton.runweather.TestConfig
-import com.baarton.runweather.model.MeasureUnit
+import com.baarton.runweather.model.UnitSystem
 import com.russhwolf.settings.MapSettings
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
@@ -25,7 +25,7 @@ class SettingsViewModelTest : StateFlowTest() {
     companion object {
 
         private val defaultInitSettingsState = SettingsViewState(
-            unitSetting = MeasureUnit.METRIC,
+            unitSetting = UnitSystem.METRIC,
             refreshSetting = 2.seconds
         )
     }
@@ -42,13 +42,13 @@ class SettingsViewModelTest : StateFlowTest() {
 
     @Test
     fun `Settings modified config init test`() = runBlocking {
-        settingsMock.putString(SettingsViewModel.DATA_UNIT_TAG, MeasureUnit.IMPERIAL.name)
+        settingsMock.putString(SettingsViewModel.DATA_UNIT_TAG, UnitSystem.IMPERIAL.name)
         settingsMock.putString(SettingsViewModel.WEATHER_DATA_THRESHOLD_TAG, 3.seconds.toIsoString())
 
         viewModel.settingsState.test {
             assertEquals(
                 SettingsViewState(
-                    unitSetting = MeasureUnit.IMPERIAL,
+                    unitSetting = UnitSystem.IMPERIAL,
                     refreshSetting = 3.seconds
                 ),
                 awaitItem()
@@ -62,7 +62,7 @@ class SettingsViewModelTest : StateFlowTest() {
             viewModel.setDataUnit()
 
             assertEquals(
-                defaultInitSettingsState.copy(unitSetting = MeasureUnit.IMPERIAL),
+                defaultInitSettingsState.copy(unitSetting = UnitSystem.IMPERIAL),
                 awaitItemAfter(defaultInitSettingsState)
             )
 
@@ -70,7 +70,7 @@ class SettingsViewModelTest : StateFlowTest() {
 
             assertEquals(
                 defaultInitSettingsState,
-                awaitItemAfter(defaultInitSettingsState.copy(unitSetting = MeasureUnit.IMPERIAL))
+                awaitItemAfter(defaultInitSettingsState.copy(unitSetting = UnitSystem.IMPERIAL))
             )
         }
     }

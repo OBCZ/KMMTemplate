@@ -6,6 +6,11 @@ import com.baarton.runweather.TestConfig
 import com.baarton.runweather.db.PersistedWeather
 import com.baarton.runweather.mock.BRNO1
 import com.baarton.runweather.mock.WeatherApiMock
+import com.baarton.runweather.model.Angle.Companion.deg
+import com.baarton.runweather.model.Humidity.Companion.percent
+import com.baarton.runweather.model.Pressure.Companion.hpa
+import com.baarton.runweather.model.Temperature.Companion.kelvin
+import com.baarton.runweather.model.Velocity.Companion.mps
 import com.baarton.runweather.model.viewmodel.SettingsViewModel
 import com.baarton.runweather.model.weather.Weather
 import com.baarton.runweather.model.weather.WeatherData
@@ -56,9 +61,9 @@ class WeatherRepositoryTest {
                 PersistedWeather(
                     listOf(Weather(WeatherId.CLEAR_SKY, "Clear", "clear sky", "01d")),
                     "Brno1",
-                    WeatherData.MainData("265.90", "1021", "45"),
-                    WeatherData.Wind("4.6", "345"),
-                    null,
+                    WeatherData.MainData(265.90.kelvin, 1021.hpa, 45.percent),
+                    WeatherData.Wind(4.6.mps, 345.deg),
+                    WeatherData.Rain(),
                     WeatherData.Sys(Instant.fromEpochSeconds(1646803774), Instant.fromEpochSeconds(1646844989))
                 ), it?.persistedWeather
             )

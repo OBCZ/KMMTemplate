@@ -27,6 +27,7 @@
     <string name="unit_humidity">%1$s %%</string>
     <string name="unit_hectopascal">%1$s\nhPa</string>
     <string name="unit_millibar">%1$s\nmbar</string>
+    <string name="unit_degree">%1$s°</string>
     <string name="unit_miles_per_hour">%1$s\nmi/h</string>
     <string name="unit_meters_per_second">%1$s\nm/s</string>
 

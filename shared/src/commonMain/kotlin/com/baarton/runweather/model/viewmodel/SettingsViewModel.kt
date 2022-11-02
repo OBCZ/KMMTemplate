@@ -2,7 +2,7 @@ package com.baarton.runweather.model.viewmodel
 
 import co.touchlab.kermit.Logger
 import com.baarton.runweather.Config
-import com.baarton.runweather.model.MeasureUnit
+import com.baarton.runweather.model.UnitSystem
 import com.russhwolf.settings.ObservableSettings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,7 +26,7 @@ class SettingsViewModel(
     private val mutableSettingsState: MutableStateFlow<SettingsViewState> =
         MutableStateFlow(
             SettingsViewState(
-                MeasureUnit.safeValueOf(settings.getString(DATA_UNIT_TAG, MeasureUnit.default().name)),
+                UnitSystem.safeValueOf(settings.getString(DATA_UNIT_TAG, UnitSystem.default().name)),
                 Duration.parseIsoString(
                     settings.getString(
                         WEATHER_DATA_THRESHOLD_TAG,
@@ -46,8 +46,8 @@ class SettingsViewModel(
         mutableSettingsState.update { state ->
             state.copy(
                 unitSetting = when (mutableSettingsState.value.unitSetting) {
-                    MeasureUnit.METRIC -> MeasureUnit.IMPERIAL
-                    MeasureUnit.IMPERIAL -> MeasureUnit.METRIC
+                    UnitSystem.METRIC -> UnitSystem.IMPERIAL
+                    UnitSystem.IMPERIAL -> UnitSystem.METRIC
                 }
             ).also { newState ->
                 settings.putString(DATA_UNIT_TAG, newState.unitSetting.name)
@@ -73,6 +73,6 @@ class SettingsViewModel(
 }
 
 data class SettingsViewState(
-    val unitSetting: MeasureUnit,
+    val unitSetting: UnitSystem,
     val refreshSetting: Duration
 )

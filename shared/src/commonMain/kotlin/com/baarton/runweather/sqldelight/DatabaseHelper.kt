@@ -3,6 +3,12 @@ package com.baarton.runweather.sqldelight
 import co.touchlab.kermit.Logger
 import com.baarton.runweather.db.PersistedWeather
 import com.baarton.runweather.db.RunWeatherDb
+import com.baarton.runweather.model.Angle.Companion.deg
+import com.baarton.runweather.model.Height.Companion.mm
+import com.baarton.runweather.model.Humidity.Companion.percent
+import com.baarton.runweather.model.Pressure.Companion.hpa
+import com.baarton.runweather.model.Temperature.Companion.kelvin
+import com.baarton.runweather.model.Velocity.Companion.mps
 import com.baarton.runweather.model.weather.Weather
 import com.baarton.runweather.model.weather.WeatherData
 import com.baarton.runweather.model.weather.WeatherId
@@ -60,16 +66,19 @@ class DatabaseHelper(
                 mainDataAdapter = object : ColumnAdapter<WeatherData.MainData, String> {
 
                     override fun encode(value: WeatherData.MainData): String {
-                        return value.temperature.plus(DATA_DECODING_DELIMITER).plus(value.pressure).plus(DATA_DECODING_DELIMITER)
-                            .plus(value.humidity)
+                        return with(value) {
+                            "${temperature.kelvin.value}${DATA_DECODING_DELIMITER}" +
+                                "${pressure.hpa.value}${DATA_DECODING_DELIMITER}" +
+                                "${humidity.percent.value}"
+                        }
                     }
 
                     override fun decode(databaseValue: String): WeatherData.MainData {
                         return if (databaseValue.isEmpty()) {
-                            WeatherData.MainData("", "", "")
+                            WeatherData.MainData(293.kelvin, 1013.hpa, 0.percent)
                         } else {
                             val split = databaseValue.split(DATA_DECODING_DELIMITER)
-                            WeatherData.MainData(split[0], split[1], split[2])
+                            WeatherData.MainData(split[0].toFloat().kelvin, split[1].toFloat().hpa, split[2].toFloat().percent)
                         }
                     }
                 },
@@ -77,15 +86,18 @@ class DatabaseHelper(
                 rainAdapter = object : ColumnAdapter<WeatherData.Rain, String> {
 
                     override fun encode(value: WeatherData.Rain): String {
-                        return value.oneHour.plus(DATA_DECODING_DELIMITER).plus(value.threeHour)
+                        return with(value) {
+                            "${oneHour.mm.value}${DATA_DECODING_DELIMITER}" +
+                                "${threeHour.mm.value}"
+                        }
                     }
 
                     override fun decode(databaseValue: String): WeatherData.Rain {
                         return if (databaseValue.isEmpty()) {
-                            WeatherData.Rain("", "")
+                            WeatherData.Rain()
                         } else {
                             val split = databaseValue.split(DATA_DECODING_DELIMITER)
-                            WeatherData.Rain(split[0], split[1])
+                            WeatherData.Rain(split[0].toFloat().mm, split[1].toFloat().mm)
                         }
                     }
                 },
@@ -93,7 +105,9 @@ class DatabaseHelper(
                 sysAdapter = object : ColumnAdapter<WeatherData.Sys, String> {
 
                     override fun encode(value: WeatherData.Sys): String {
-                        return value.sunrise.toString().plus(DATA_DECODING_DELIMITER).plus(value.sunset.toString())
+                        return with(value) {
+                            "${sunrise}${DATA_DECODING_DELIMITER}${sunset}"
+                        }
                     }
 
                     override fun decode(databaseValue: String): WeatherData.Sys {
@@ -109,15 +123,18 @@ class DatabaseHelper(
                 windAdapter = object : ColumnAdapter<WeatherData.Wind, String> {
 
                     override fun encode(value: WeatherData.Wind): String {
-                        return value.speed.plus(DATA_DECODING_DELIMITER).plus(value.deg)
+                        return with(value) {
+                            "${velocity.mps.value}${DATA_DECODING_DELIMITER}" +
+                                "${angle.deg.value}"
+                        }
                     }
 
                     override fun decode(databaseValue: String): WeatherData.Wind {
                         return if (databaseValue.isEmpty()) {
-                            WeatherData.Wind("", "")
+                            WeatherData.Wind(0.mps, 0.deg)
                         } else {
                             val split = databaseValue.split(DATA_DECODING_DELIMITER)
-                            WeatherData.Wind(split[0], split[1])
+                            WeatherData.Wind(split[0].toFloat().mps, split[1].toFloat().deg)
                         }
                     }
                 }
@@ -145,5 +162,4 @@ class DatabaseHelper(
             dbRef.tableQueries.nuke()
         }
     }
-
 }

@@ -21,9 +21,9 @@ data class CurrentWeather(
         timestamp
     )
 
-    fun isEmptyOrIncomplete(): Boolean {
+    fun isInvalid(): Boolean {
         return with(persistedWeather) {
-            weatherList.isEmpty() || locationName.isBlank() || mainData.isBlank() || wind.isBlank() || sys.isInvalid()
+            weatherList.isEmpty() || locationName.isBlank() || mainData.isInvalid() || wind.isInvalid() || rain.isInvalid() || sys.isInvalid()
         }
     }
 

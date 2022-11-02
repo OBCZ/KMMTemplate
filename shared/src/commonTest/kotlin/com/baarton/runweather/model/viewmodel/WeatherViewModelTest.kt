@@ -12,7 +12,12 @@ import com.baarton.runweather.mock.BRNO2
 import com.baarton.runweather.mock.CORRUPT
 import com.baarton.runweather.mock.ClockMock
 import com.baarton.runweather.mock.WeatherApiMock
-import com.baarton.runweather.model.MeasureUnit
+import com.baarton.runweather.model.Angle.Companion.deg
+import com.baarton.runweather.model.Humidity.Companion.percent
+import com.baarton.runweather.model.Pressure.Companion.hpa
+import com.baarton.runweather.model.Temperature.Companion.kelvin
+import com.baarton.runweather.model.UnitSystem
+import com.baarton.runweather.model.Velocity.Companion.mps
 import com.baarton.runweather.model.weather.Weather
 import com.baarton.runweather.model.weather.WeatherData
 import com.baarton.runweather.model.weather.WeatherId
@@ -55,9 +60,9 @@ class WeatherViewModelTest : StateFlowTest() {
             weather = PersistedWeather(
                 listOf(Weather(WeatherId.CLEAR_SKY, "Clear", "clear sky", "01d")),
                 "Brno1",
-                WeatherData.MainData("265.90", "1021", "45"),
-                WeatherData.Wind("4.6", "345"),
-                null,
+                WeatherData.MainData(265.90.kelvin, 1021.hpa, 45.percent),
+                WeatherData.Wind(4.6.mps, 345.deg),
+                WeatherData.Rain(),
                 WeatherData.Sys(Instant.fromEpochSeconds(1646803774), Instant.fromEpochSeconds(1646844989))
             )
         )
@@ -66,9 +71,9 @@ class WeatherViewModelTest : StateFlowTest() {
             weather = PersistedWeather(
                 listOf(Weather(WeatherId.CLEAR_SKY, "Clear", "clear sky", "01d")),
                 "Brno2",
-                WeatherData.MainData("260.90", "1025", "55"),
-                WeatherData.Wind("4.7", "355"),
-                null,
+                WeatherData.MainData(260.90.kelvin, 1025.hpa, 55.percent),
+                WeatherData.Wind(4.7.mps, 355.deg),
+                WeatherData.Rain(),
                 WeatherData.Sys(Instant.fromEpochSeconds(1646806774), Instant.fromEpochSeconds(1646842989))
             )
         )
@@ -373,10 +378,10 @@ class WeatherViewModelTest : StateFlowTest() {
             )
             assertEquals(1, apiMock.calledCount)
 
-            settingsMock.putString(SettingsViewModel.DATA_UNIT_TAG, MeasureUnit.IMPERIAL.name)
+            settingsMock.putString(SettingsViewModel.DATA_UNIT_TAG, UnitSystem.IMPERIAL.name)
 
             assertEquals(
-                weatherSuccessStateBrno1.copy(lastUpdated = 0.seconds, unitSetting = MeasureUnit.IMPERIAL),
+                weatherSuccessStateBrno1.copy(lastUpdated = 0.seconds, unitSetting = UnitSystem.IMPERIAL),
                 awaitItemAfter(
                     weatherSuccessStateBrno1.copy(
                         lastUpdated = 0.seconds,
@@ -392,23 +397,23 @@ class WeatherViewModelTest : StateFlowTest() {
     @Test
     fun `Show correct data with desired unit change - Imperial init`() = runBlocking {
         apiMock.prepareResults(BRNO1.data, BRNO2.data)
-        settingsMock.putString(SettingsViewModel.DATA_UNIT_TAG, MeasureUnit.IMPERIAL.name)
+        settingsMock.putString(SettingsViewModel.DATA_UNIT_TAG, UnitSystem.IMPERIAL.name)
 
         viewModel.weatherState.test(2000) {
             assertEquals(
-                weatherSuccessStateBrno1.copy(lastUpdated = 0.seconds, unitSetting = MeasureUnit.IMPERIAL),
-                awaitItemAfter(WeatherViewState(isLoading = true, unitSetting = MeasureUnit.IMPERIAL))
+                weatherSuccessStateBrno1.copy(lastUpdated = 0.seconds, unitSetting = UnitSystem.IMPERIAL),
+                awaitItemAfter(WeatherViewState(isLoading = true, unitSetting = UnitSystem.IMPERIAL))
             )
             assertEquals(1, apiMock.calledCount)
 
-            settingsMock.putString(SettingsViewModel.DATA_UNIT_TAG, MeasureUnit.METRIC.name)
+            settingsMock.putString(SettingsViewModel.DATA_UNIT_TAG, UnitSystem.METRIC.name)
 
             assertEquals(
-                weatherSuccessStateBrno1.copy(lastUpdated = 0.seconds, unitSetting = MeasureUnit.METRIC),
+                weatherSuccessStateBrno1.copy(lastUpdated = 0.seconds, unitSetting = UnitSystem.METRIC),
                 awaitItemAfter(
                     weatherSuccessStateBrno1.copy(
                         lastUpdated = 0.seconds,
-                        unitSetting = MeasureUnit.IMPERIAL,
+                        unitSetting = UnitSystem.IMPERIAL,
                         isLoading = true
                     )
                 )
@@ -417,11 +422,11 @@ class WeatherViewModelTest : StateFlowTest() {
             setDataAge(Clock.System.now() - 2.hours)
 
             assertEquals(
-                weatherSuccessStateBrno2.copy(lastUpdated = 0.seconds, unitSetting = MeasureUnit.METRIC),
+                weatherSuccessStateBrno2.copy(lastUpdated = 0.seconds, unitSetting = UnitSystem.METRIC),
                 awaitItemAfter(
                     weatherSuccessStateBrno1.copy(
                         lastUpdated = 0.seconds,
-                        unitSetting = MeasureUnit.METRIC,
+                        unitSetting = UnitSystem.METRIC,
                         isLoading = true
                     )
                 )

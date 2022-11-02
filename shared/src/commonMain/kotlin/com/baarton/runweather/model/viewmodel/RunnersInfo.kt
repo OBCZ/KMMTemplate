@@ -4,8 +4,12 @@ package com.baarton.runweather.model.viewmodel
 
 import com.baarton.runweather.db.PersistedWeather
 import com.baarton.runweather.model.TempUnit.*
-import com.baarton.runweather.model.kelvinRange
-import com.baarton.runweather.model.metersPerSecondRange
+import com.baarton.runweather.model.Temperature
+import com.baarton.runweather.model.Temperature.Companion.celsius
+import com.baarton.runweather.model.Temperature.Companion.kelvin
+import com.baarton.runweather.model.Velocity.Companion.mps
+import com.baarton.runweather.model.temperatureRange
+import com.baarton.runweather.model.velocityRange
 import com.baarton.runweather.model.weather.WeatherId
 import com.baarton.runweather.res.SharedRes
 import com.baarton.runweather.ui.Vector
@@ -30,9 +34,9 @@ sealed class RunnersInfo {
         }
 
         override fun warning(weatherData: PersistedWeather): WarningHint? {
-            return when (weatherData.wind.speed.toFloat()) {
-                in metersPerSecondRange(14.0f, Float.POSITIVE_INFINITY) -> WindWarningHint.STRONG
-                in metersPerSecondRange(3.5f, 14.0f) -> WindWarningHint.MODERATE
+            return when (weatherData.wind.velocity) {
+                in velocityRange(14.0f.mps, Float.POSITIVE_INFINITY.mps) -> WindWarningHint.STRONG
+                in velocityRange(3.5f.mps, 14.0f.mps) -> WindWarningHint.MODERATE
                 else -> null
             }
         }
@@ -51,10 +55,10 @@ sealed class RunnersInfo {
         }
 
         override fun warning(weatherData: PersistedWeather): WarningHint? {
-            return when (weatherData.mainData.temperature.toFloat()) {
-                in kelvinRange(28.0f, Float.POSITIVE_INFINITY) -> TemperatureWarningHint.HIGH_TEMP
-                in kelvinRange(15.0f, 17.0f) -> TemperatureWarningHint.IDEAL
-                in kelvinRange(Float.NEGATIVE_INFINITY, -5.0f) -> TemperatureWarningHint.LOW_TEMP
+            return when (weatherData.mainData.temperature) {
+                in temperatureRange(28.0f.celsius, Float.POSITIVE_INFINITY.celsius) -> TemperatureWarningHint.HIGH_TEMP
+                in temperatureRange(15.0f.celsius, 17.0f.celsius) -> TemperatureWarningHint.IDEAL
+                in temperatureRange(0.kelvin, (-5.0f).celsius) -> TemperatureWarningHint.LOW_TEMP
                 else -> null
             }
         }
@@ -67,27 +71,27 @@ sealed class RunnersInfo {
         private val RES_TOP_LAYER_THREE = SharedRes.strings.weather_runners_info_data_top_layers_three
         private val RES_TOP_LAYER_FOUR = SharedRes.strings.weather_runners_info_data_top_layers_four
 
-        override fun slow(temp: Float): TextHint {
+        override fun slow(temp: Temperature): TextHint {
             return when (temp) {
-                in kelvinRange(15.0f, Float.POSITIVE_INFINITY) -> LayersTopHint.ONE
-                in kelvinRange(10.0f, 15.0f) -> LayersTopHint.TWO
-                in kelvinRange(-1.0f, 10.0f) -> LayersTopHint.THREE
-                in kelvinRange(Float.NEGATIVE_INFINITY, -1.0f) -> LayersTopHint.FOUR
+                in temperatureRange(15.0f.celsius, Float.POSITIVE_INFINITY.celsius) -> LayersTopHint.ONE
+                in temperatureRange(10.0f.celsius, 15.0f.celsius) -> LayersTopHint.TWO
+                in temperatureRange((-1.0f).celsius, 10.0f.celsius) -> LayersTopHint.THREE
+                in temperatureRange(0.kelvin, (-1.0f).celsius) -> LayersTopHint.FOUR
                 else -> throwException(temp, LayersTop::class)
             }
         }
 
-        override fun fast(temp: Float): TextHint {
+        override fun fast(temp: Temperature): TextHint {
             return when (temp) {
-                in kelvinRange(13.0f, Float.POSITIVE_INFINITY) -> LayersTopHint.ONE
-                in kelvinRange(8.0f, 13.0f) -> LayersTopHint.TWO
-                in kelvinRange(-3.0f, 8.0f) -> LayersTopHint.THREE
-                in kelvinRange(Float.NEGATIVE_INFINITY, -3.0f) -> LayersTopHint.FOUR
+                in temperatureRange(13.0f.celsius, Float.POSITIVE_INFINITY.celsius) -> LayersTopHint.ONE
+                in temperatureRange(8.0f.celsius, 13.0f.celsius) -> LayersTopHint.TWO
+                in temperatureRange((-3.0f).celsius, 8.0f.celsius) -> LayersTopHint.THREE
+                in temperatureRange(0.kelvin, (-3.0f).celsius) -> LayersTopHint.FOUR
                 else -> throwException(temp, LayersTop::class)
             }
         }
 
-        private enum class LayersTopHint(override val textRes: StringResource) : TextHint {
+        enum class LayersTopHint(override val textRes: StringResource) : TextHint {
             ONE(RES_TOP_LAYER_ONE),
             TWO(RES_TOP_LAYER_TWO),
             THREE(RES_TOP_LAYER_THREE),
@@ -101,20 +105,20 @@ sealed class RunnersInfo {
         private val RES_BOTTOM_LAYER_LONG_SLEEVE = SharedRes.strings.weather_runners_info_data_bottom_layers_long_sleeved
         private val RES_BOTTOM_LAYER_LONG_SLEEVE_DOUBLE = SharedRes.strings.weather_runners_info_data_bottom_layers_long_sleeved_double
 
-        override fun slow(temp: Float): TextHint {
+        override fun slow(temp: Temperature): TextHint {
             return when (temp) {
-                in kelvinRange(13.5f, Float.POSITIVE_INFINITY) -> LayersBottomHint.SHORTS
-                in kelvinRange(0.0f, 13.5f) -> LayersBottomHint.LONG_SLEEVED
-                in kelvinRange(Float.NEGATIVE_INFINITY, 13.5f) -> LayersBottomHint.LONG_SLEEVED_DOUBLE
+                in temperatureRange(13.5f.celsius, Float.POSITIVE_INFINITY.celsius) -> LayersBottomHint.SHORTS
+                in temperatureRange(0.0f.celsius, 13.5f.celsius) -> LayersBottomHint.LONG_SLEEVED
+                in temperatureRange(0.kelvin, 0.0f.celsius) -> LayersBottomHint.LONG_SLEEVED_DOUBLE
                 else -> throwException(temp, LayersBottom::class)
             }
         }
 
-        override fun fast(temp: Float): TextHint {
+        override fun fast(temp: Temperature): TextHint {
             return when (temp) {
-                in kelvinRange(10.5f, Float.POSITIVE_INFINITY) -> LayersBottomHint.SHORTS
-                in kelvinRange(-3.0f, 10.5f) -> LayersBottomHint.LONG_SLEEVED
-                in kelvinRange(Float.NEGATIVE_INFINITY, -3.0f) -> LayersBottomHint.LONG_SLEEVED_DOUBLE
+                in temperatureRange(10.5f.celsius, Float.POSITIVE_INFINITY.celsius) -> LayersBottomHint.SHORTS
+                in temperatureRange((-3.0f).celsius, 10.5f.celsius) -> LayersBottomHint.LONG_SLEEVED
+                in temperatureRange(0.kelvin, (-3.0f).celsius) -> LayersBottomHint.LONG_SLEEVED_DOUBLE
                 else -> throwException(temp, LayersBottom::class)
             }
         }
@@ -133,22 +137,22 @@ sealed class RunnersInfo {
         private val RES_HEAD_EARS = SharedRes.strings.weather_runners_info_data_head_cover_ears
         private val RES_HEAD_CAP = SharedRes.strings.weather_runners_info_data_head_cover_cap
 
-        override fun slow(temp: Float): TextHint {
+        override fun slow(temp: Temperature): TextHint {
             return when (temp) {
-                in kelvinRange(28.0f, Float.POSITIVE_INFINITY) -> HeadCoverHint.SUN
-                in kelvinRange(14.5f, 28.0f) -> HeadCoverHint.NONE
-                in kelvinRange(9.0f, 14.5f) -> HeadCoverHint.EARS
-                in kelvinRange(Float.NEGATIVE_INFINITY, 9.0f) -> HeadCoverHint.CAP
+                in temperatureRange(28.0f.celsius, Float.POSITIVE_INFINITY.celsius) -> HeadCoverHint.SUN
+                in temperatureRange(14.5f.celsius, 28.0f.celsius) -> HeadCoverHint.NONE
+                in temperatureRange(9.0f.celsius, 14.5f.celsius) -> HeadCoverHint.EARS
+                in temperatureRange(0.kelvin, 9.0f.celsius) -> HeadCoverHint.CAP
                 else -> throwException(temp, HeadCover::class)
             }
         }
 
-        override fun fast(temp: Float): TextHint {
+        override fun fast(temp: Temperature): TextHint {
             return when (temp) {
-                in kelvinRange(28.0f, Float.POSITIVE_INFINITY) -> HeadCoverHint.SUN
-                in kelvinRange(12.5f, 28.0f) -> HeadCoverHint.NONE
-                in kelvinRange(7.0f, 12.5f) -> HeadCoverHint.EARS
-                in kelvinRange(Float.NEGATIVE_INFINITY, 7.0f) -> HeadCoverHint.CAP
+                in temperatureRange(28.0f.celsius, Float.POSITIVE_INFINITY.celsius) -> HeadCoverHint.SUN
+                in temperatureRange(12.5f.celsius, 28.0f.celsius) -> HeadCoverHint.NONE
+                in temperatureRange(7.0f.celsius, 12.5f.celsius) -> HeadCoverHint.EARS
+                in temperatureRange(0.kelvin, 7.0f.celsius) -> HeadCoverHint.CAP
                 else -> throwException(temp, HeadCover::class)
             }
         }
@@ -195,20 +199,20 @@ sealed class RunnersInfo {
         private val RES_NECK_WEAK = SharedRes.strings.weather_runners_info_data_neck_cover_weak
         private val RES_NECK_STRONG = SharedRes.strings.weather_runners_info_data_neck_cover_strong
 
-        override fun slow(temp: Float): TextHint {
+        override fun slow(temp: Temperature): TextHint {
             return when (temp) {
-                in kelvinRange(9.0f, Float.POSITIVE_INFINITY) -> NeckCoverHint.NONE
-                in kelvinRange(5.5f, 9.0f) -> NeckCoverHint.WEAK
-                in kelvinRange(Float.NEGATIVE_INFINITY, 5.5f) -> NeckCoverHint.STRONG
+                in temperatureRange(9.0f.celsius, Float.POSITIVE_INFINITY.celsius) -> NeckCoverHint.NONE
+                in temperatureRange(5.5f.celsius, 9.0f.celsius) -> NeckCoverHint.WEAK
+                in temperatureRange(0.kelvin, 5.5f.celsius) -> NeckCoverHint.STRONG
                 else -> throwException(temp, NeckCover::class)
             }
         }
 
-        override fun fast(temp: Float): TextHint {
+        override fun fast(temp: Temperature): TextHint {
             return when (temp) {
-                in kelvinRange(7.5f, Float.POSITIVE_INFINITY) -> NeckCoverHint.NONE
-                in kelvinRange(4.0f, 7.5f) -> NeckCoverHint.WEAK
-                in kelvinRange(Float.NEGATIVE_INFINITY, 4.0f) -> NeckCoverHint.STRONG
+                in temperatureRange(7.5f.celsius, Float.POSITIVE_INFINITY.celsius) -> NeckCoverHint.NONE
+                in temperatureRange(4.0f.celsius, 7.5f.celsius) -> NeckCoverHint.WEAK
+                in temperatureRange(0.kelvin, 4.0f.celsius) -> NeckCoverHint.STRONG
                 else -> throwException(temp, NeckCover::class)
             }
         }
@@ -225,18 +229,18 @@ sealed class RunnersInfo {
         private val RES_GLOVES_NO = SharedRes.strings.weather_runners_info_data_gloves_no
         private val RES_GLOVES_YES = SharedRes.strings.weather_runners_info_data_gloves_yes
 
-        override fun slow(temp: Float): TextHint {
+        override fun slow(temp: Temperature): TextHint {
             return when (temp) {
-                in kelvinRange(4.5f, Float.POSITIVE_INFINITY) -> GlovesHint.NO
-                in kelvinRange(Float.NEGATIVE_INFINITY, 4.5f) -> GlovesHint.YES
+                in temperatureRange(4.5f.celsius, Float.POSITIVE_INFINITY.celsius) -> GlovesHint.NO
+                in temperatureRange(0.kelvin, 4.5f.celsius) -> GlovesHint.YES
                 else -> throwException(temp, Gloves::class)
             }
         }
 
-        override fun fast(temp: Float): TextHint {
+        override fun fast(temp: Temperature): TextHint {
             return when (temp) {
-                in kelvinRange(3.0f, Float.POSITIVE_INFINITY) -> GlovesHint.NO
-                in kelvinRange(Float.NEGATIVE_INFINITY, 3.0f) -> GlovesHint.YES
+                in temperatureRange(3.0f.celsius, Float.POSITIVE_INFINITY.celsius) -> GlovesHint.NO
+                in temperatureRange(0.kelvin, 3.0f.celsius) -> GlovesHint.YES
                 else -> throwException(temp, Gloves::class)
             }
         }
@@ -252,18 +256,18 @@ sealed class RunnersInfo {
         private val RES_SOCKS_NORMAL = SharedRes.strings.weather_runners_info_data_socks_normal
         private val RES_SOCKS_WARM = SharedRes.strings.weather_runners_info_data_socks_warm
 
-        override fun slow(temp: Float): TextHint {
+        override fun slow(temp: Temperature): TextHint {
             return when (temp) {
-                in kelvinRange(-1.5f, Float.POSITIVE_INFINITY) -> SocksHint.NORMAL
-                in kelvinRange(Float.NEGATIVE_INFINITY, -1.5f) -> SocksHint.WARM
+                in temperatureRange((-1.5f).celsius, Float.POSITIVE_INFINITY.celsius) -> SocksHint.NORMAL
+                in temperatureRange(0.kelvin, (-1.5f).celsius) -> SocksHint.WARM
                 else -> throwException(temp, Socks::class)
             }
         }
 
-        override fun fast(temp: Float): TextHint {
+        override fun fast(temp: Temperature): TextHint {
             return when (temp) {
-                in kelvinRange(-3.0f, Float.POSITIVE_INFINITY) -> SocksHint.NORMAL
-                in kelvinRange(Float.NEGATIVE_INFINITY, -3.0f) -> SocksHint.WARM
+                in temperatureRange((-3.0f).celsius, Float.POSITIVE_INFINITY.celsius) -> SocksHint.NORMAL
+                in temperatureRange(0.kelvin, (-3.0f).celsius) -> SocksHint.WARM
                 else -> throwException(temp, Socks::class)
             }
         }
@@ -277,10 +281,10 @@ sealed class RunnersInfo {
 
 interface TemperatureHint : RunnersHint {
 
-    fun slow(temp: Float): TextHint
-    fun fast(temp: Float): TextHint
+    fun slow(temp: Temperature): TextHint
+    fun fast(temp: Temperature): TextHint
 
-    fun throwException(temp: Float, cls: KClass<*>): TextHint {
+    fun throwException(temp: Temperature, cls: KClass<*>): TextHint {
         throw IllegalArgumentException("Illegal argument for the temperature range: $temp while attempting to resolve ${cls.simpleName}.")
     }
 }

@@ -3,7 +3,7 @@ package com.baarton.runweather.model.viewmodel
 import co.touchlab.kermit.Logger
 import com.baarton.runweather.Config
 import com.baarton.runweather.db.PersistedWeather
-import com.baarton.runweather.model.MeasureUnit
+import com.baarton.runweather.model.UnitSystem
 import com.baarton.runweather.model.viewmodel.SettingsViewModel.Companion.DATA_UNIT_TAG
 import com.baarton.runweather.model.weather.CurrentWeather
 import com.baarton.runweather.repo.WeatherRepository
@@ -38,7 +38,7 @@ class WeatherViewModel(
 
     private var isClosed = false
     private val pollingDispatcher: CoroutineDispatcher = Dispatchers.Default
-    private val settingsListener: SettingsListener = settings.addStringListener(DATA_UNIT_TAG, MeasureUnit.default().name) {
+    private val settingsListener: SettingsListener = settings.addStringListener(DATA_UNIT_TAG, UnitSystem.default().name) {
         onUnitSettingChanged(it)
     }
 
@@ -46,7 +46,7 @@ class WeatherViewModel(
         MutableStateFlow(
             WeatherViewState(
                 isLoading = true,
-                unitSetting = MeasureUnit.safeValueOf(settings.getString(DATA_UNIT_TAG, MeasureUnit.default().name))
+                unitSetting = UnitSystem.safeValueOf(settings.getString(DATA_UNIT_TAG, UnitSystem.default().name))
             )
         )
 
@@ -58,7 +58,7 @@ class WeatherViewModel(
 
     private fun onUnitSettingChanged(unitKey: String) {
         mutableWeatherState.update {
-            it.copy(unitSetting = MeasureUnit.safeValueOf(unitKey))
+            it.copy(unitSetting = UnitSystem.safeValueOf(unitKey))
         }
     }
 
@@ -169,6 +169,27 @@ class WeatherViewModel(
     }
 }
 
+fun PersistedWeather.copy(unitSetting: UnitSystem): PersistedWeather {
+    return this.copy(
+        weatherList = weatherList,
+        locationName = locationName,
+        mainData = mainData.copy(
+            temperature = unitSetting.tempSwitch(mainData.temperature),
+            pressure = unitSetting.pressureSwitch(mainData.pressure),
+            humidity = unitSetting.humiditySwitch(mainData.humidity),
+        ),
+        wind = wind.copy(
+            velocity = unitSetting.velocitySwitch(wind.velocity),
+            angle = unitSetting.angleSwitch(wind.angle),
+        ),
+        rain = rain.copy(
+            oneHour = unitSetting.heightSwitch(rain.oneHour),
+            threeHour = unitSetting.heightSwitch(rain.threeHour)
+        ),
+        sys = sys
+    )
+}
+
 //TODO probably needs to be moved somewhere - UIUtils in common module?
 fun lastUpdatedResId(timestampAge: Duration?): Pair<StringResource, Long?> {
     return when (timestampAge?.inWholeSeconds) {
@@ -186,7 +207,7 @@ data class WeatherViewState(
     val lastUpdated: Duration? = null,
     val error: ErrorType? = null,
     val isLoading: Boolean = false,
-    val unitSetting: MeasureUnit = MeasureUnit.default(),
+    val unitSetting: UnitSystem = UnitSystem.default(),
     val locationAvailable: Boolean = true, //TODO need provider listener logic
     val networkAvailable: Boolean = true //TODO need provider listener logic
 ) {

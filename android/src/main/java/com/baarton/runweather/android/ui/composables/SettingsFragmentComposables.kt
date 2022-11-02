@@ -15,7 +15,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.flowWithLifecycle
-import com.baarton.runweather.model.MeasureUnit
+import com.baarton.runweather.model.UnitSystem
 import com.baarton.runweather.model.viewmodel.SettingsViewModel
 import com.baarton.runweather.model.viewmodel.SettingsViewState
 import org.koin.androidx.compose.koinViewModel
@@ -96,7 +96,7 @@ fun UnitSetting(text: String, onUnitSettingClick: () -> Unit) {
 fun SettingsScreenContentPreview() {
     SettingsFragmentScreenContent(
         settingsState = SettingsViewState(
-            MeasureUnit.METRIC, 2.minutes
+            UnitSystem.METRIC, 2.minutes
         ),
         onUnitSettingChanged = {  },
         onRefreshSettingChanged = {  },
