@@ -24,7 +24,10 @@ import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.paint
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -136,8 +139,12 @@ private fun WeatherScreen(weatherState: WeatherViewState) {
     val networkAvailable = weatherState.networkAvailable
     val lastUpdated = weatherState.lastUpdated
 
+    //UPGRADE change images according to the weather conditions
     Column(
-        Modifier.background(color = MaterialTheme.colors.background) //TODO img background
+        Modifier.paint(
+            painter = painterResource(SharedRes.images.beautiful_sunset.drawableResId),
+            contentScale = ContentScale.Crop
+        )
     ) {
         StateRow(
             modifier = Modifier

@@ -60,7 +60,7 @@ private val DarkColorPalette = darkColors(
     onBackground = ON_BACKGROUND.dark(),
 )
 
-//TODO can this be platform-independently defined if in Material Design also for iOS somehow?
+//TODO can this be platform-independently defined if in Material Design also for iOS somehow? MoKo fonts?
 private val Typography = Typography(
     h1 = TextStyle(
         fontFamily = FontFamily.Default,

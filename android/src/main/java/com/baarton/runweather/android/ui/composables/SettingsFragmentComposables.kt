@@ -22,6 +22,10 @@ import org.koin.androidx.compose.koinViewModel
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
+//TODO attribution section for images (SVGs have their own licenses - not needed to attribute)
+// plus the following:
+// <a href="https://www.freepik.com/free-photo/beautiful-sky-sunset-sun-clouds-landscape-nature-background_4550584.htm#query=sunset&position=4&from_view=search&track=sph">Image by jcomp</a> on Freepik
+
 //TODO explore https://github.com/uragiristereo/Mejiboard/tree/main/app-alpha/src/main/java/com/github/uragiristereo/mejiboard/presentation/settings
 @Composable
 fun SettingsFragmentScreen(

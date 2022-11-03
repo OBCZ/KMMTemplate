@@ -34,6 +34,7 @@ import org.koin.dsl.module
 // create simple CI/CD
 // define simple formatting rules with ktlint?
 // go through Medium bookmark tips and fine-tune the code
+// go through and review TODOs and create Trello tickets from them
 
 
 fun initKoin(appModule: Module): KoinApplication {

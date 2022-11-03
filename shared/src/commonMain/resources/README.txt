@@ -3,7 +3,8 @@ Resources Structure
 
 MOKO-Resources
 --------------
-- For now, only Strings
+- Strings
+- PNGs, JPEGs
 
 Internal expect-actual logic
 ----------------------------
@@ -11,7 +12,6 @@ Internal expect-actual logic
     - SVGs
     - Colors
     - Dimens (Android DP and iOS PT are supposed to be equal)
-- TODO PNGs are not decided on yet
 - TODO App icon is not decided on yet
 
 
