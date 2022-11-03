@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -154,7 +153,7 @@ private fun WeatherScreen(weatherState: WeatherViewState) {
         DataRow(
             modifier = Modifier
                 .align(CenterHorizontally)
-                .padding(2.dp)
+                .padding(6.dp)
                 .weight(6f)
                 .fillMaxWidth(),
             weather = weather
@@ -168,39 +167,14 @@ private fun WeatherScreen(weatherState: WeatherViewState) {
             weather = weather,
         )
 
-        //TODO main data row 2
-        Row(
+        MainRow(
             modifier = Modifier
-                .weight(2f)
-                .fillMaxWidth()
-        ) {
-
-            Column(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .weight(6f)
-            ) { // 3
-                Text(weather.locationName)
-                Row {
-                    //TODO img from service
-                    Image(
-                        imageVector = Vector.ABOUT.build(),
-                        contentDescription = "TODO"
-                    )
-                    Text(text = weather.weatherList[0].description)
-                    // Img, Text
-                }
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .weight(4f)
-            ) { // 2
-                Text(text = dataText(weather.mainData.temperature))
-                // Text
-            }
-        }
-
+                .align(CenterHorizontally)
+                .padding(6.dp)
+                .weight(3f)
+                .fillMaxWidth(),
+            weather = weather
+        )
     }
 }
 
@@ -463,7 +437,7 @@ private fun InfoRow(modifier: Modifier, weatherData: PersistedWeather, categoryT
 }
 
 @Composable
-fun WarningRow(modifier: Modifier, weather: PersistedWeather) {
+private fun WarningRow(modifier: Modifier, weather: PersistedWeather) {
     val temperatureWarning = RunnersInfo.TemperatureWarning.warning(weather)
     val windWarning = RunnersInfo.WindWarning.warning(weather)
 
@@ -481,7 +455,7 @@ fun WarningRow(modifier: Modifier, weather: PersistedWeather) {
 }
 
 @Composable
-fun WarningItem(modifier: Modifier, warningHint: WarningHint, warningVector: Vector) {
+private fun WarningItem(modifier: Modifier, warningHint: WarningHint, warningVector: Vector) {
     Box(
         modifier = modifier,
         contentAlignment = Center
@@ -520,6 +494,57 @@ fun WarningItem(modifier: Modifier, warningHint: WarningHint, warningVector: Vec
                     style = MaterialTheme.typography.body2
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun MainRow(modifier: Modifier, weather: PersistedWeather) {
+    Row(
+        modifier = modifier
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(3f)
+                .align(CenterVertically),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = weather.locationName,
+                color = MaterialTheme.colors.onBackground,
+                style = MaterialTheme.typography.h2
+            )
+            Row(
+                modifier = Modifier
+                    .padding(2.dp)
+            ) {
+                //TODO img from service
+                Image(
+                    imageVector = Vector.ABOUT.build(),
+                    contentDescription = null
+                )
+                Text(
+                    modifier = Modifier
+                        .padding(horizontal = 2.dp),
+                    text = weather.weatherList[0].description,
+                    color = MaterialTheme.colors.onBackground,
+                    style = MaterialTheme.typography.body1
+                )
+            }
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(2f)
+                .align(CenterVertically),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = dataText(weather.mainData.temperature),
+                color = MaterialTheme.colors.onBackground,
+                style = MaterialTheme.typography.h1
+            )
         }
     }
 }

@@ -62,6 +62,18 @@ private val DarkColorPalette = darkColors(
 
 //TODO can this be platform-independently defined if in Material Design also for iOS somehow?
 private val Typography = Typography(
+    h1 = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 48.sp,
+        textAlign = TextAlign.Center
+    ),
+    h2 = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 36.sp,
+        textAlign = TextAlign.Center
+    ),
     body1 = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
