@@ -15,7 +15,6 @@ import com.baarton.runweather.util.roundDecimals
 import dev.icerock.moko.resources.StringResource
 import kotlin.math.roundToInt
 
-
 enum class UnitSystem(
     val tempSwitch: (Temperature) -> Temperature,
     val humiditySwitch: (Humidity) -> Humidity,
@@ -208,13 +207,13 @@ data class Pressure(override val value: Float, override val unit: PressureUnit) 
         private fun Pressure.toHectoPascal(): Pressure {
             return when (unit) {
                 PressureUnit.HECTOPASCAL -> this
-                PressureUnit.MILLIBAR -> this
+                PressureUnit.MILLIBAR -> this.copy(unit = PressureUnit.HECTOPASCAL)
             }
         }
 
         private fun Pressure.toMillibar(): Pressure {
             return when (unit) {
-                PressureUnit.HECTOPASCAL -> this
+                PressureUnit.HECTOPASCAL -> this.copy(unit = PressureUnit.MILLIBAR)
                 PressureUnit.MILLIBAR -> this
             }
         }

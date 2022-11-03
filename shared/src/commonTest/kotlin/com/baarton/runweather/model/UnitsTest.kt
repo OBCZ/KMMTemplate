@@ -1,238 +1,250 @@
 package com.baarton.runweather.model
 
-import com.baarton.runweather.model.VelocityUnit.METERS_PER_SECOND
-import com.baarton.runweather.model.VelocityUnit.MILES_PER_HOUR
+import com.baarton.runweather.model.Angle.Companion.deg
+import com.baarton.runweather.model.Height.Companion.inch
+import com.baarton.runweather.model.Height.Companion.mm
+import com.baarton.runweather.model.Humidity.Companion.percent
+import com.baarton.runweather.model.Pressure.Companion.hpa
+import com.baarton.runweather.model.Pressure.Companion.mbar
+import com.baarton.runweather.model.Temperature.Companion.celsius
+import com.baarton.runweather.model.Temperature.Companion.fahrenheit
+import com.baarton.runweather.model.Temperature.Companion.kelvin
+import com.baarton.runweather.model.Velocity.Companion.mph
+import com.baarton.runweather.model.Velocity.Companion.mps
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
-//TODO more tests (for the extension functions mainly)?
-//FIXME
+
 class UnitsFormattingTest {
 
-//     @Test
-//     fun tempFormattingTest() {
-//         val kelvinValue = 274.313f
-//         assertEquals("274.3", KELVIN.prepareValue(kelvinValue))
-//         assertEquals("1.2", CELSIUS.prepareValue(kelvinValue))
-//         assertEquals("34.1", FAHRENHEIT.prepareValue(kelvinValue))
-//     }
-//
-//     @Test
-//     fun humidityFormattingTest() {
-//         val rawValue = 74.5f
-//         assertEquals("74", PERCENT.prepareValue(rawValue))
-//     }
-//
-//     @Test
-//     fun pressureFormattingTest() {
-//         val hectoPascalValue = 1025.313f
-//         assertEquals("1025", HECTOPASCAL.prepareValue(hectoPascalValue))
-//         assertEquals("1025", MILLIBAR.prepareValue(hectoPascalValue))
-//     }
-//
-//     @Test
-//     fun rainfallFormattingTest() {
-//         val millimeterValue = 12.313f
-//         assertEquals("12.3", MILLIMETER.prepareValue(millimeterValue))
-//         assertEquals("0.5", INCH.prepareValue(millimeterValue))
-//     }
-//
-//     @Test
-//     fun windSpeedFormattingTest() {
-//         val meterPerSecondValue = 6.313f
-//         assertEquals("6.3", METERS_PER_SECOND.prepareValue(meterPerSecondValue))
-//         assertEquals("14.1", MILES_PER_HOUR.prepareValue(meterPerSecondValue))
-//     }
-// }
-//
-// class TempUnitTest {
-//
-//     data class TempUnitTestParam(
-//         override val inputValue: Float,
-//         val inputUnit: TempUnit,
-//         val expectedKelvin: Float,
-//         val expectedCelsius: Float,
-//         val expectedFahrenheit: Float
-//     ) : TestParam
-//
-//     private val tempTestParams by lazy {
-//         listOf(
-//             TempUnitTestParam(-30f, FAHRENHEIT, 238.706f, -34.444f, -30f),
-//             TempUnitTestParam(-10f, FAHRENHEIT, 249.817f, -23.333f, -10f),
-//             TempUnitTestParam(0f, FAHRENHEIT, 255.372f, -17.778f, 0f),
-//             TempUnitTestParam(10.0f, FAHRENHEIT, 260.928f, -12.222f, 10.0f),
-//             TempUnitTestParam(30.5f, FAHRENHEIT, 272.317f, -0.833f, 30.50f),
-//             TempUnitTestParam(50.6f, FAHRENHEIT, 283.483f, 10.333f, 50.6f),
-//             TempUnitTestParam(70.7f, FAHRENHEIT, 294.65f, 21.5f, 70.7f),
-//             TempUnitTestParam(92.3f, FAHRENHEIT, 306.65f, 33.5f, 92.30f),
-//             TempUnitTestParam(111.6f, FAHRENHEIT, 317.372f, 44.222f, 111.6f),
-//             TempUnitTestParam(0f, KELVIN, 0.0f, -273.15f, -459.67f),
-//             TempUnitTestParam(263.15f, KELVIN, 263.15f, -10.0f, 14.0f),
-//             TempUnitTestParam(273.15f, KELVIN, 273.150f, 0f, 32.0f),
-//             TempUnitTestParam(283.15f, KELVIN, 283.15f, 10f, 50.0f),
-//             TempUnitTestParam(293.15f, KELVIN, 293.15f, 20f, 68.0f),
-//             TempUnitTestParam(303.15f, KELVIN, 303.15f, 30.0f, 86.0f),
-//             TempUnitTestParam(313.15f, KELVIN, 313.150f, 40f, 104.0f),
-//             TempUnitTestParam(-20.0f, CELSIUS, 253.150f, -20.0f, -4.0f),
-//             TempUnitTestParam(-10.0f, CELSIUS, 263.150f, -10.0f, 14.0f),
-//             TempUnitTestParam(0f, CELSIUS, 273.150f, 0f, 32.0f),
-//             TempUnitTestParam(20.5f, CELSIUS, 293.650f, 20.5f, 68.9f),
-//             TempUnitTestParam(30.5f, CELSIUS, 303.650f, 30.5f, 86.9f),
-//             TempUnitTestParam(40.0f, CELSIUS, 313.150f, 40f, 104.0f),
-//             TempUnitTestParam(50f, CELSIUS, 323.150f, 50f, 122.0f),
-//         )
-//     }
-//
-//     @Test
-//     fun toKelvinTest() {
-//         tempTestParams.testConvert(
-//             expectedFun = { it.expectedKelvin },
-//             actualFun = { unitTestParam, inputValue -> unitTestParam.inputUnit.toKelvin(inputValue) }
-//         )
-//     }
-//
-//     @Test
-//     fun toCelsiusTest() {
-//         tempTestParams.testConvert(
-//             expectedFun = { it.expectedCelsius },
-//             actualFun = { unitTestParam, inputValue -> unitTestParam.inputUnit.toCelsius(inputValue) }
-//         )
-//     }
-//
-//     @Test
-//     fun toFahrenheitTest() {
-//         tempTestParams.testConvert(
-//             expectedFun = { it.expectedFahrenheit },
-//             actualFun = { unitTestParam, inputValue -> unitTestParam.inputUnit.toFahrenheit(inputValue) }
-//         )
-//     }
-// }
-//
-// class RainfallUnitTest {
-//
-//     data class RainUnitTestParam(
-//         override val inputValue: Float,
-//         val inputUnit: HeightUnit,
-//         val expectedMillimeter: Float,
-//         val expectedInch: Float
-//     ) : TestParam
-//
-//     private val rainTestParams by lazy {
-//         listOf(
-//             RainUnitTestParam(0f, MILLIMETER, 0.0f, 0f),
-//             RainUnitTestParam(2f, MILLIMETER, 2f, 0.079f),
-//             RainUnitTestParam(4f, MILLIMETER, 4f, 0.157f),
-//             RainUnitTestParam(8f, MILLIMETER, 8f, 0.315f),
-//             RainUnitTestParam(0.5f, INCH, 12.7f, 0.5f),
-//             RainUnitTestParam(1.5f, INCH, 38.1f, 1.5f),
-//             RainUnitTestParam(3f, INCH, 76.2f, 3.0f),
-//             RainUnitTestParam(6f, INCH, 152.4f, 6.00f)
-//         )
-//     }
-//
-//     @Test
-//     fun toMillimeterTest() {
-//         rainTestParams.testConvert(
-//             expectedFun = { it.expectedMillimeter },
-//             actualFun = { unitTestParam, inputValue -> unitTestParam.inputUnit.toMillimeter(inputValue) }
-//         )
-//     }
-//
-//     @Test
-//     fun toInchTest() {
-//         rainTestParams.testConvert(
-//             expectedFun = { it.expectedInch },
-//             actualFun = { unitTestParam, inputValue -> unitTestParam.inputUnit.toInch(inputValue) }
-//         )
-//     }
-// }
-//
-// class PressureUnitTest {
-//
-//     data class PressureUnitTestParam(
-//         override val inputValue: Float,
-//         val inputUnit: PressureUnit,
-//         val expectedHectoPascal: Float,
-//         val expectedMillibar: Float
-//     ) : TestParam
-//
-//     private val pressureTestParams by lazy {
-//         listOf(
-//             PressureUnitTestParam(1000f, HECTOPASCAL, 1000.0f, 1000f),
-//             PressureUnitTestParam(1002f, HECTOPASCAL, 1002f, 1002.000f),
-//             PressureUnitTestParam(1004f, MILLIBAR, 1004.0f, 1004f),
-//             PressureUnitTestParam(1008f, MILLIBAR, 1008f, 1008f)
-//         )
-//     }
-//
-//     @Test
-//     fun toHectoPascalTest() {
-//         pressureTestParams.testConvert(
-//             expectedFun = { it.expectedHectoPascal },
-//             actualFun = { unitTestParam, inputValue -> unitTestParam.inputUnit.toHectoPascal(inputValue) }
-//         )
-//     }
-//
-//     @Test
-//     fun toMillibarTest() {
-//         pressureTestParams.testConvert(
-//             expectedFun = { it.expectedMillibar },
-//             actualFun = { unitTestParam, inputValue -> unitTestParam.inputUnit.toMillibar(inputValue) }
-//         )
-//     }
+    @Test
+    fun tempFormattingTest() {
+        val temperature = 274.313f.kelvin
+        assertEquals("274.3", temperature.kelvin.formattedValue())
+        assertEquals("1.2", temperature.celsius.formattedValue())
+        assertEquals("34.1", temperature.fahrenheit.formattedValue())
+    }
+
+    @Test
+    fun humidityFormattingTest() {
+        val humidity = 74.5f.percent
+        assertEquals("75", humidity.percent.formattedValue())
+    }
+
+    @Test
+    fun pressureFormattingTest() {
+        val pressure = 1025.313f.hpa
+        assertEquals("1025", pressure.hpa.formattedValue())
+        assertEquals("1025", pressure.mbar.formattedValue())
+    }
+
+    @Test
+    fun rainfallFormattingTest() {
+        val height = 12.313f.mm
+        assertEquals("12.3", height.mm.formattedValue())
+        assertEquals("0.5", height.inch.formattedValue())
+    }
+
+    @Test
+    fun windSpeedFormattingTest() {
+        val velocity = 6.313f.mps
+        assertEquals("6.3", velocity.mps.formattedValue())
+        assertEquals("14.1", velocity.mph.formattedValue())
+    }
+
+    @Test
+    fun windAngleFormattingTest() {
+        val angle = 214.5f.deg
+        assertEquals("215", angle.deg.formattedValue())
+    }
 }
 
-//FIXME
+class TempUnitTest {
+
+    data class TempUnitTestParam(
+        override val inputUnit: Temperature,
+        val expectedKelvin: Temperature,
+        val expectedCelsius: Temperature,
+        val expectedFahrenheit: Temperature
+    ) : TestParam
+
+    private val tempTestParams by lazy {
+        listOf(
+            TempUnitTestParam((-30f).fahrenheit, 238.706f.kelvin, (-34.444f).celsius, (-30f).fahrenheit),
+            TempUnitTestParam((-10f).fahrenheit, 249.817f.kelvin, (-23.333f).celsius, (-10f).fahrenheit),
+            TempUnitTestParam(0f.fahrenheit, 255.372f.kelvin, (-17.778f).celsius, 0f.fahrenheit),
+            TempUnitTestParam(10.0f.fahrenheit, 260.928f.kelvin, (-12.222f).celsius, 10.0f.fahrenheit),
+            TempUnitTestParam(30.5f.fahrenheit, 272.317f.kelvin, (-0.833f).celsius, 30.50f.fahrenheit),
+            TempUnitTestParam(50.6f.fahrenheit, 283.483f.kelvin, 10.333f.celsius, 50.6f.fahrenheit),
+            TempUnitTestParam(70.7f.fahrenheit, 294.65f.kelvin, 21.5f.celsius, 70.7f.fahrenheit),
+            TempUnitTestParam(92.3f.fahrenheit, 306.65f.kelvin, 33.5f.celsius, 92.30f.fahrenheit),
+            TempUnitTestParam(111.6f.fahrenheit, 317.372f.kelvin, 44.222f.celsius, 111.6f.fahrenheit),
+            TempUnitTestParam(0f.kelvin, 0.0f.kelvin, (-273.15f).celsius, (-459.67f).fahrenheit),
+            TempUnitTestParam(263.15f.kelvin, 263.15f.kelvin, (-10.0f).celsius, 14.0f.fahrenheit),
+            TempUnitTestParam(273.15f.kelvin, 273.150f.kelvin, 0f.celsius, 32.0f.fahrenheit),
+            TempUnitTestParam(283.15f.kelvin, 283.15f.kelvin, 10f.celsius, 50.0f.fahrenheit),
+            TempUnitTestParam(293.15f.kelvin, 293.15f.kelvin, 20f.celsius, 68.0f.fahrenheit),
+            TempUnitTestParam(303.15f.kelvin, 303.15f.kelvin, 30.0f.celsius, 86.0f.fahrenheit),
+            TempUnitTestParam(313.15f.kelvin, 313.150f.kelvin, 40f.celsius, 104.0f.fahrenheit),
+            TempUnitTestParam((-20.0f).celsius, 253.150f.kelvin, (-20.0f).celsius, (-4.0f).fahrenheit),
+            TempUnitTestParam((-10.0f).celsius, 263.150f.kelvin, (-10.0f).celsius, 14.0f.fahrenheit),
+            TempUnitTestParam(0f.celsius, 273.150f.kelvin, 0f.celsius, 32.0f.fahrenheit),
+            TempUnitTestParam(20.5f.celsius, 293.650f.kelvin, 20.5f.celsius, 68.9f.fahrenheit),
+            TempUnitTestParam(30.5f.celsius, 303.650f.kelvin, 30.5f.celsius, 86.9f.fahrenheit),
+            TempUnitTestParam(40.0f.celsius, 313.150f.kelvin, 40f.celsius, 104.0f.fahrenheit),
+            TempUnitTestParam(50f.celsius, 323.150f.kelvin, 50f.celsius, 122.0f.fahrenheit),
+        )
+    }
+
+    @Test
+    fun toKelvinTest() {
+        tempTestParams.testConvert(
+            expectedFun = { it.expectedKelvin }
+        ) { unitTestParam -> unitTestParam.inputUnit.kelvin }
+    }
+
+    @Test
+    fun toCelsiusTest() {
+        tempTestParams.testConvert(
+            expectedFun = { it.expectedCelsius }
+        ) { unitTestParam -> unitTestParam.inputUnit.celsius }
+    }
+
+    @Test
+    fun toFahrenheitTest() {
+        tempTestParams.testConvert(
+            expectedFun = { it.expectedFahrenheit }
+        ) { unitTestParam -> unitTestParam.inputUnit.fahrenheit }
+    }
+}
+
+class RainfallUnitTest {
+
+    data class RainUnitTestParam(
+        override val inputUnit: Height,
+        val expectedMillimeter: Height,
+        val expectedInch: Height
+    ) : TestParam
+
+    private val rainTestParams by lazy {
+        listOf(
+            RainUnitTestParam(0f.mm, 0.0f.mm, 0f.inch),
+            RainUnitTestParam(2f.mm, 2f.mm, 0.079f.inch),
+            RainUnitTestParam(4f.mm, 4f.mm, 0.157f.inch),
+            RainUnitTestParam(8f.mm, 8f.mm, 0.315f.inch),
+            RainUnitTestParam(0.5f.inch, 12.7f.mm, 0.5f.inch),
+            RainUnitTestParam(1.5f.inch, 38.1f.mm, 1.5f.inch),
+            RainUnitTestParam(3f.inch, 76.2f.mm, 3.0f.inch),
+            RainUnitTestParam(6f.inch, 152.4f.mm, 6.00f.inch)
+        )
+    }
+
+    @Test
+    fun toMillimeterTest() {
+        rainTestParams.testConvert(
+            expectedFun = { it.expectedMillimeter },
+            actualFun = { unitTestParam -> unitTestParam.inputUnit.mm }
+        )
+    }
+
+    @Test
+    fun toInchTest() {
+        rainTestParams.testConvert(
+            expectedFun = { it.expectedInch },
+            actualFun = { unitTestParam -> unitTestParam.inputUnit.inch }
+        )
+    }
+}
+
+class PressureUnitTest {
+
+    data class PressureUnitTestParam(
+        override val inputUnit: Pressure,
+        val expectedHectoPascal: Pressure,
+        val expectedMillibar: Pressure
+    ) : TestParam
+
+    private val pressureTestParams by lazy {
+        listOf(
+            PressureUnitTestParam(1000f.hpa, 1000.0f.hpa, 1000f.mbar),
+            PressureUnitTestParam(1002f.hpa, 1002f.hpa, 1002.000f.mbar),
+            PressureUnitTestParam(1004f.mbar, 1004.0f.hpa, 1004f.mbar),
+            PressureUnitTestParam(1008f.mbar, 1008f.hpa, 1008f.mbar)
+        )
+    }
+
+    @Test
+    fun toHectoPascalTest() {
+        pressureTestParams.testConvert(
+            expectedFun = { it.expectedHectoPascal },
+            actualFun = { unitTestParam -> unitTestParam.inputUnit.hpa }
+        )
+    }
+
+    @Test
+    fun toMillibarTest() {
+        pressureTestParams.testConvert(
+            expectedFun = { it.expectedMillibar },
+            actualFun = { unitTestParam -> unitTestParam.inputUnit.mbar }
+        )
+    }
+}
+
 class WindSpeedUnitTest {
 
     data class WindSpeedUnitTestParam(
-        override val inputValue: Float,
-        val inputUnit: VelocityUnit,
-        val expectedMilesPerHour: Float,
-        val expectedMetersPerSecond: Float
+        override val inputUnit: Velocity,
+        val expectedMilesPerHour: Velocity,
+        val expectedMetersPerSecond: Velocity
     ) : TestParam
 
     private val windSpeedTestParams by lazy {
         listOf(
-            WindSpeedUnitTestParam(3.5f, METERS_PER_SECOND, 7.830f, 3.5f),
-            WindSpeedUnitTestParam(0f, METERS_PER_SECOND, 0f, 0.0f),
-            WindSpeedUnitTestParam(10f, METERS_PER_SECOND, 22.371f, 10f),
-            WindSpeedUnitTestParam(15f, METERS_PER_SECOND, 33.557f, 15f),
-            WindSpeedUnitTestParam(3f, MILES_PER_HOUR, 3f, 1.341f),
-            WindSpeedUnitTestParam(10f, MILES_PER_HOUR, 10.0f, 4.470f),
-            WindSpeedUnitTestParam(25f, MILES_PER_HOUR, 25f, 11.175f),
-            WindSpeedUnitTestParam(35f, MILES_PER_HOUR, 35f, 15.645f)
+            WindSpeedUnitTestParam(3.5f.mps, 7.830f.mph, 3.5f.mps),
+            WindSpeedUnitTestParam(0f.mps, 0f.mph, 0.0f.mps),
+            WindSpeedUnitTestParam(10f.mps, 22.371f.mph, 10f.mps),
+            WindSpeedUnitTestParam(15f.mps, 33.557f.mph, 15f.mps),
+            WindSpeedUnitTestParam(3f.mph, 3f.mph, 1.341f.mps),
+            WindSpeedUnitTestParam(10f.mph, 10.0f.mph, 4.470f.mps),
+            WindSpeedUnitTestParam(25f.mph, 25f.mph, 11.175f.mps),
+            WindSpeedUnitTestParam(35f.mph, 35f.mph, 15.645f.mps)
         )
     }
 
-    // @Test
-    // fun toMilesPerHourTest() {
-    //     windSpeedTestParams.testConvert(
-    //         expectedFun = { it.expectedMilesPerHour },
-    //         actualFun = { unitTestParam, inputValue -> unitTestParam.inputUnit.toMilesPerHour(inputValue) }
-    //     )
-    // }
-    //
-    // @Test
-    // fun toMetersPerSecondTest() {
-    //     windSpeedTestParams.testConvert(
-    //         expectedFun = { it.expectedMetersPerSecond },
-    //         actualFun = { unitTestParam, inputValue -> unitTestParam.inputUnit.toMetersPerSecond(inputValue) }
-    //     )
-    // }
+    @Test
+    fun toMilesPerHourTest() {
+        windSpeedTestParams.testConvert(
+            expectedFun = { it.expectedMilesPerHour },
+            actualFun = { unitTestParam -> unitTestParam.inputUnit.mph }
+        )
+    }
+
+    @Test
+    fun toMetersPerSecondTest() {
+        windSpeedTestParams.testConvert(
+            expectedFun = { it.expectedMetersPerSecond },
+            actualFun = { unitTestParam -> unitTestParam.inputUnit.mps }
+        )
+    }
 }
 
 interface TestParam {
-    val inputValue: Float
+    val inputUnit: QuantityUnit
 }
 
-private fun <T : TestParam> List<T>.testConvert(expectedFun: (T) -> Float, actualFun: (T, Float) -> Float) {
+private fun <T : TestParam> List<T>.testConvert(expectedFun: (T) -> QuantityUnit, actualFun: (T) -> QuantityUnit) {
     this.forEach {
         val expected = expectedFun(it)
-        val actual = actualFun(it, it.inputValue)
+        val actual = actualFun(it)
         assertEquals(
-            expected,
-            actual,
-            "The unit was not converted as expected. Actual result: >>> $actual <<<; Expected result: >>> $expected <<<."
+            expected.value,
+            actual.value,
+            "The value was not converted as expected. Actual result: >>> ${actual.value} <<<; Expected result: >>> ${expected.value} <<<."
+        )
+        assertEquals(
+            expected.unit,
+            actual.unit,
+            "The unit was not converted as expected. Actual result: >>> ${actual.unit} <<<; Expected result: >>> ${expected.unit} <<<."
         )
     }
 }
