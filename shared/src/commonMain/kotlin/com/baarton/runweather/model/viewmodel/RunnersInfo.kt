@@ -17,10 +17,7 @@ import dev.icerock.moko.resources.StringResource
 import kotlinx.datetime.Clock
 import kotlin.reflect.KClass
 
-/*
- * Velocity ranges are intended to be in meters per second
- * Temperature ranges are intended to be in Kelvin
- */
+
 sealed class RunnersInfo {
 
     object WindWarning : WeatherWarning {
