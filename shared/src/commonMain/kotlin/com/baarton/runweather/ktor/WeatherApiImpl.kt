@@ -21,6 +21,10 @@ import io.ktor.client.plugins.logging.Logger as KtorLogger
 
 class WeatherApiImpl(private val log: KermitLogger, engine: HttpClientEngine) : WeatherApi {
 
+    companion object {
+        //TODO introduce consts for the schema
+    }
+
     private val client = HttpClient(engine) {
         expectSuccess = true
         install(ContentNegotiation) {

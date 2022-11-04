@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -25,13 +26,16 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.flowWithLifecycle
+import coil.compose.AsyncImage
 import com.baarton.runweather.android.ui.AndroidVector.build
 import com.baarton.runweather.db.PersistedWeather
 import com.baarton.runweather.model.Angle
@@ -513,8 +517,7 @@ private fun MainRow(modifier: Modifier, weather: PersistedWeather) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .weight(3f)
-                .align(CenterVertically),
+                .weight(3f),
             verticalArrangement = Arrangement.Center
         ) {
             Text(
@@ -524,19 +527,28 @@ private fun MainRow(modifier: Modifier, weather: PersistedWeather) {
             )
             Row(
                 modifier = Modifier
-                    .padding(2.dp)
+                    .wrapContentSize(),
+                verticalAlignment = CenterVertically
             ) {
-                //TODO img from service
-                Image(
-                    imageVector = Vector.ABOUT.build(),
+                AsyncImage(
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                        .background(color = MaterialTheme.colors.secondary, shape = MaterialTheme.shapes.medium),
+                    model = "https://openweathermap.org/img/wn/${weather.weatherList[0].iconId}@2x.png", //TODO extract to builder in WeatherApi?
+                    placeholder = rememberVectorPainter(image = Vector.LOADING.build()),
+                    onError = { /*TODO make invisible */ },
+                    onSuccess = { /*TODO make visible */ },
+                    alignment = Center,
+                    contentScale = ContentScale.Fit,
                     contentDescription = null
                 )
                 Text(
                     modifier = Modifier
-                        .padding(horizontal = 2.dp),
+                        .padding(horizontal = 6.dp),
                     text = weather.weatherList[0].description,
                     color = MaterialTheme.colors.onBackground,
-                    style = MaterialTheme.typography.body1
+                    style = MaterialTheme.typography.body1,
+                    textAlign = TextAlign.Start
                 )
             }
         }
@@ -548,9 +560,11 @@ private fun MainRow(modifier: Modifier, weather: PersistedWeather) {
             verticalArrangement = Arrangement.Center
         ) {
             Text(
+                modifier = Modifier.fillMaxWidth(),
                 text = dataText(weather.mainData.temperature),
                 color = MaterialTheme.colors.onBackground,
-                style = MaterialTheme.typography.h1
+                style = MaterialTheme.typography.h1,
+                textAlign = TextAlign.End
             )
         }
     }
