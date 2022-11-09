@@ -93,9 +93,9 @@ class WeatherApiTest {
                 )
             )
         }
-        val weatherApi = WeatherApiImpl(emptyLogger, engine)
+        val weatherApi = WeatherDataApiImpl(emptyLogger, engine)
 
-        val result = weatherApi.getJsonFromApi()
+        val result = weatherApi.getWeatherFromApi()
         assertEquals(
             WeatherData(
                 listOf(Weather(WeatherId.OVERCAST_CLOUDS, "Clouds", "zataženo", "04d")),
@@ -117,10 +117,10 @@ class WeatherApiTest {
                 status = HttpStatusCode.NotFound
             )
         }
-        val weatherApi = WeatherApiImpl(emptyLogger, engine)
+        val weatherApi = WeatherDataApiImpl(emptyLogger, engine)
 
         assertFailsWith<ClientRequestException> {
-            weatherApi.getJsonFromApi()
+            weatherApi.getWeatherFromApi()
         }
     }
 

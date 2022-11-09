@@ -37,10 +37,11 @@
     <string name="fragment_permission_denied_rationale">Oprávnění proi přístup k lokaci bylo zamítnuto. Aplikace nemůže být spuštěna.</string>
     <string name="fragment_permission_button">Schválit</string>
 
-    <string name="fragment_weather_results_endpoint_error">Chyba během zpracovávání odpovědi ze serveru. Nejsou k dispozici žádná data. Zkontrolujte své internetové připojení a/nebo nastavení lokace.</string>
+    <string name="fragment_weather_results_init_error">Data nebyla inicializována. Opakujte načtení dat kliknutím na tlačítko.</string>
+    <string name="fragment_weather_results_unknown_error">Neočekávaná chyba. Opakujte načtení dat kliknutím na tlačítko.</string>
+    <string name="fragment_weather_results_endpoint_error">Chyba během zpracovávání odpovědi ze serveru. Nejsou k dispozici žádná data. Zkontrolujte své internetové připojení a/nebo nastavení lokace. Poté zkuste opakovat načtení dat kliknutím na tlačítko.</string>
     <string name="fragment_weather_results_data_error">Obdržená data jsou prázdná, nekompletní, nebo poškozená. Opakujte načtení dat kliknutím na tlačítko.</string>
     <string name="fragment_weather_results_refresh_button">Načíst znovu</string>
-    <string name="fragment_weather_results_nothing">PRÁZDNÉ</string>
 
     <string name="fragment_weather_location_content_description">Nastavení Polohy %1$s</string>
     <string name="fragment_weather_network_content_description">Připojení k internetu %1$s</string>

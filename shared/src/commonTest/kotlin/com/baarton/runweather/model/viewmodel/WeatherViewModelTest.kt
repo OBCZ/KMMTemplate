@@ -11,7 +11,7 @@ import com.baarton.runweather.mock.BRNO1
 import com.baarton.runweather.mock.BRNO2
 import com.baarton.runweather.mock.CORRUPT
 import com.baarton.runweather.mock.ClockMock
-import com.baarton.runweather.mock.WeatherApiMock
+import com.baarton.runweather.mock.WeatherDataApiMock
 import com.baarton.runweather.model.Angle.Companion.deg
 import com.baarton.runweather.model.Humidity.Companion.percent
 import com.baarton.runweather.model.Pressure.Companion.hpa
@@ -47,7 +47,7 @@ class WeatherViewModelTest : StateFlowTest() {
     private var dataTimestamp: Instant? = null
 
     private val settingsMock = MapSettings()
-    private val apiMock = WeatherApiMock()
+    private val apiMock = WeatherDataApiMock()
     private val clockMock = ClockMock()
     private val testConfig: Config = TestConfig
     private val repository: WeatherRepository = WeatherRepository(dbHelper, settingsMock, testConfig, apiMock, logger, clockMock)

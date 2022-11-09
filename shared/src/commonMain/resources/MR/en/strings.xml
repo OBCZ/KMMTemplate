@@ -37,10 +37,11 @@
     <string name="fragment_permission_denied_rationale">Fine location permission was denied, but is needed for core functionality. The application can not be started.</string>
     <string name="fragment_permission_button">Approve</string>
 
-    <string name="fragment_weather_results_endpoint_error">Unable to download weather list. I can\'t display anything, sorry. Check your Connection and/or Location settings.</string>
-    <string name="fragment_weather_results_data_error">Weather data is empty, incomplete or corrupt. Try refresh the data by clicking the button.</string>
+    <string name="fragment_weather_results_init_error">Weather has not been initialized yet. Try refreshing  the data again manually.</string>
+    <string name="fragment_weather_results_unknown_error">Unknown error. Try refreshing the data again manually.</string>
+    <string name="fragment_weather_results_endpoint_error">Unable to download weather list. I can\'t display anything, sorry. Check your Connection and/or Location settings. Then try refreshing the data again manually.</string>
+    <string name="fragment_weather_results_data_error">Weather data is empty, incomplete or corrupt. Try refreshing the data again manually.</string>
     <string name="fragment_weather_results_refresh_button">Refresh</string>
-    <string name="fragment_weather_results_nothing">NO RESULTS</string>
 
     <string name="fragment_weather_location_content_description">Location setting %1$s</string>
     <string name="fragment_weather_network_content_description">Network connection %1$s</string>

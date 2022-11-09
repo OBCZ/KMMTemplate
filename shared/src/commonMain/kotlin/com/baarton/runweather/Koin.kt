@@ -1,7 +1,7 @@
 package com.baarton.runweather
 
-import com.baarton.runweather.ktor.WeatherApi
-import com.baarton.runweather.ktor.WeatherApiImpl
+import com.baarton.runweather.ktor.WeatherDataApi
+import com.baarton.runweather.ktor.WeatherDataApiImpl
 import com.baarton.runweather.repo.WeatherRepository
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.StaticConfig
@@ -72,8 +72,8 @@ private val coreModule = module {
             Dispatchers.Default
         )
     }
-    single<WeatherApi> {
-        WeatherApiImpl(
+    single<WeatherDataApi> {
+        WeatherDataApiImpl(
             getWith("WeatherApiImpl"),
             get()
         )

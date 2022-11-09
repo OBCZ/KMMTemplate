@@ -1,6 +1,7 @@
 package com.baarton.runweather.ui
 
 
+//TODO we need all dimens in dp (Android) and pt (iOS) defined HERE
 object Dimens {
 
     const val SVG_VIEWPORT = 24

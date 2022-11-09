@@ -34,6 +34,14 @@ class WeatherViewModel(
     private val clock: Clock,
     log: Logger
 ) : ViewModel() {
+
+    companion object {
+
+        fun getImageUrl(imageId: String): String {
+            return WeatherRepository.getImageUrl(imageId)
+        }
+    }
+
     private val log = log.withTag("WeatherViewModel")
 
     private var isClosed = false
@@ -215,5 +223,7 @@ data class WeatherViewState(
     enum class ErrorType(val messageRes: StringResource) {
         DATA_PROVIDER(SharedRes.strings.fragment_weather_results_endpoint_error),
         DATA_CONSISTENCY(SharedRes.strings.fragment_weather_results_data_error),
+        INIT_STATE(SharedRes.strings.fragment_weather_results_init_error),
+        UNKNOWN(SharedRes.strings.fragment_weather_results_unknown_error),
     }
 }

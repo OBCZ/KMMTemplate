@@ -5,7 +5,7 @@ import co.touchlab.kermit.StaticConfig
 import com.baarton.runweather.TestConfig
 import com.baarton.runweather.db.PersistedWeather
 import com.baarton.runweather.mock.BRNO1
-import com.baarton.runweather.mock.WeatherApiMock
+import com.baarton.runweather.mock.WeatherDataApiMock
 import com.baarton.runweather.model.Angle.Companion.deg
 import com.baarton.runweather.model.Humidity.Companion.percent
 import com.baarton.runweather.model.Pressure.Companion.hpa
@@ -42,7 +42,7 @@ class WeatherRepositoryTest {
 
     private val settingsMock = MapSettings()
     private val testConfig = TestConfig
-    private val apiMock = WeatherApiMock()
+    private val apiMock = WeatherDataApiMock()
     private val clock = Clock.System
 
     private val repository: WeatherRepository = WeatherRepository(dbHelper, settingsMock, testConfig, apiMock, logger, clock)

@@ -3,7 +3,8 @@ package com.baarton.runweather.repo
 import co.touchlab.kermit.Logger
 import co.touchlab.stately.ensureNeverFrozen
 import com.baarton.runweather.Config
-import com.baarton.runweather.ktor.WeatherApi
+import com.baarton.runweather.ktor.ImageUrlBuilder
+import com.baarton.runweather.ktor.WeatherDataApi
 import com.baarton.runweather.model.viewmodel.SettingsViewModel.Companion.WEATHER_DATA_THRESHOLD_TAG
 import com.baarton.runweather.model.weather.CurrentWeather
 import com.baarton.runweather.sqldelight.DatabaseHelper
@@ -17,7 +18,7 @@ class WeatherRepository(
     private val dbHelper: DatabaseHelper,
     private val settings: ObservableSettings,
     private val config: Config,
-    private val weatherApi: WeatherApi,
+    private val weatherApi: WeatherDataApi,
     log: Logger,
     private val clock: Clock
 ) {
@@ -26,6 +27,10 @@ class WeatherRepository(
 
     companion object {
         internal const val DB_TIMESTAMP_KEY = "DbTimestampKey"
+
+        fun getImageUrl(imageId: String): String {
+            return ImageUrlBuilder.buildUrl(imageId)
+        }
     }
 
     init {
@@ -59,7 +64,7 @@ class WeatherRepository(
 
     private suspend fun doRefreshWeather(): CurrentWeather {
         val weatherResult = try {
-            weatherApi.getJsonFromApi()
+            weatherApi.getWeatherFromApi()
         } catch (e: Exception) {
             throw WeatherAPIException("Weather API has thrown an Exception: ${e.message}", e.cause)
         }

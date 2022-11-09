@@ -1,16 +1,16 @@
 package com.baarton.runweather.mock
 
-import com.baarton.runweather.ktor.WeatherApi
+import com.baarton.runweather.ktor.WeatherDataApi
 import com.baarton.runweather.model.weather.WeatherData
 
 
-class WeatherApiMock : WeatherApi {
+class WeatherDataApiMock : WeatherDataApi {
 
     private var resultQueue: ArrayDeque<() -> WeatherData> = initQueue()
     var calledCount = 0
         private set
 
-    override suspend fun getJsonFromApi(): WeatherData {
+    override suspend fun getWeatherFromApi(): WeatherData {
         val result = resultQueue.removeFirst()()
         calledCount++
         return result

@@ -21,6 +21,8 @@ class MainActivity : FragmentActivity(), /*PermissionFragment.PermissionListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         //TODO resolve installSplashScreen()
+        // https://developersancho.medium.com/jetpack-compose-splash-screen-api-36ca40c6196b
+        // https://proandroiddev.com/animated-splash-screen-in-android-with-compose-4b7dc1baecc5
         super.onCreate(savedInstanceState)
     }
 
