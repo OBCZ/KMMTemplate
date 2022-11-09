@@ -136,8 +136,6 @@ private fun LoadingScreen() {
     )
 }
 
-//TODO review
-// dont forget explicit button refresh
 @Composable
 private fun ErrorScreen(error: WeatherViewState.ErrorType, onRefresh: () -> Unit) {
     Text(

@@ -55,7 +55,7 @@ class WeatherRepositoryTest {
 
     @Test
     fun `Web call with no data`() = runBlocking {
-        apiMock.prepareResults(BRNO1.data)
+        apiMock.prepareResults(BRNO1)
         repository.refreshWeather().let {
             assertEquals(
                 PersistedWeather(
@@ -76,7 +76,7 @@ class WeatherRepositoryTest {
     @Test
     fun `No web call if data is not stale`() = runTest {
         settingsMock.putLong(DB_TIMESTAMP_KEY, clock.now().toEpochMilliseconds())
-        apiMock.prepareResults(BRNO1.data)
+        apiMock.prepareResults(BRNO1)
 
         repository.refreshWeather()
         assertEquals(0, apiMock.calledCount)
@@ -85,7 +85,7 @@ class WeatherRepositoryTest {
     @Test
     fun `No web call if data is not stale and web call after delay`() = runTest {
         settingsMock.putLong(DB_TIMESTAMP_KEY, clock.now().toEpochMilliseconds())
-        apiMock.prepareResults(BRNO1.data)
+        apiMock.prepareResults(BRNO1)
 
         repository.refreshWeather()
         assertEquals(0, apiMock.calledCount)
@@ -105,7 +105,7 @@ class WeatherRepositoryTest {
             SettingsViewModel.WEATHER_DATA_THRESHOLD_TAG,
             5.seconds.toIsoString()
         )
-        apiMock.prepareResults(BRNO1.data)
+        apiMock.prepareResults(BRNO1)
 
         runBlocking {
             delay(2000)
@@ -129,7 +129,7 @@ class WeatherRepositoryTest {
             SettingsViewModel.WEATHER_DATA_THRESHOLD_TAG,
             5.seconds.toIsoString()
         )
-        apiMock.prepareResults(BRNO1.data)
+        apiMock.prepareResults(BRNO1)
 
         runBlocking {
             delay(1000)

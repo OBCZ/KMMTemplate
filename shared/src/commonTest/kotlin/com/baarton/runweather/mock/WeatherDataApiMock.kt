@@ -25,7 +25,7 @@ class WeatherDataApiMock : WeatherDataApi {
         resultQueue.clear()
         results.forEach {
             when (it) {
-                is WeatherData -> resultQueue.add { it }
+                is MockResponse -> resultQueue.add { it.data }
                 is Throwable -> resultQueue.add { throw it }
                 else -> error("Not supported type for API mock result queue.")
             }

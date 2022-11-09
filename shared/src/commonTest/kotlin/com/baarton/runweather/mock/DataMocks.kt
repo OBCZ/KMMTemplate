@@ -11,11 +11,11 @@ import com.baarton.runweather.model.weather.WeatherData
 import com.baarton.runweather.model.weather.WeatherId.*
 import kotlinx.datetime.Instant
 
-sealed class MockResponses {
+sealed class MockResponse {
     abstract val data: WeatherData
 }
 
-object CORRUPT : MockResponses() {
+object CORRUPT : MockResponse() {
     override val data by lazy {
         WeatherData(
             listOf(Weather(UNKNOWN, "Clear", "clear sky", "01d")),
@@ -28,7 +28,7 @@ object CORRUPT : MockResponses() {
     }
 }
 
-object BRNO1 : MockResponses() {
+object BRNO1 : MockResponse() {
     override val data by lazy {
         WeatherData(
             listOf(Weather(CLEAR_SKY, "Clear", "clear sky", "01d")),
@@ -41,7 +41,7 @@ object BRNO1 : MockResponses() {
     }
 }
 
-object BRNO2 : MockResponses() {
+object BRNO2 : MockResponse() {
     override val data by lazy {
         WeatherData(
             listOf(Weather(CLEAR_SKY, "Clear", "clear sky", "01d")),
@@ -54,7 +54,7 @@ object BRNO2 : MockResponses() {
     }
 }
 
-object BRNO3 : MockResponses() {
+object BRNO3 : MockResponse() {
     override val data by lazy {
         WeatherData(
             listOf(Weather(CLEAR_SKY, "Clear", "clear sky", "01d")),
@@ -67,7 +67,7 @@ object BRNO3 : MockResponses() {
     }
 }
 
-object BRNO4 : MockResponses() {
+object BRNO4 : MockResponse() {
     override val data by lazy {
         WeatherData(
             listOf(

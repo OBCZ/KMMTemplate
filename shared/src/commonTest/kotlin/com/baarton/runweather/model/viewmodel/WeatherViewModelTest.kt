@@ -102,7 +102,7 @@ class WeatherViewModelTest : StateFlowTest() {
 
     @Test
     fun `Get weather without cache`() = runBlocking {
-        apiMock.prepareResults(BRNO1.data)
+        apiMock.prepareResults(BRNO1)
 
         viewModel.weatherState.test {
             assertEquals(
@@ -115,7 +115,7 @@ class WeatherViewModelTest : StateFlowTest() {
 
     @Test
     fun `Get weather from DB and update from API`() = runBlocking {
-        apiMock.prepareResults(BRNO2.data)
+        apiMock.prepareResults(BRNO2)
         dbHelper.insert(BRNO1.data)
         setDataAge(Clock.System.now() - 1.seconds)
 
@@ -146,7 +146,7 @@ class WeatherViewModelTest : StateFlowTest() {
 
     @Test
     fun `Get weather from API and refresh from API`() = runBlocking {
-        apiMock.prepareResults(BRNO1.data, BRNO2.data)
+        apiMock.prepareResults(BRNO1, BRNO2)
 
         viewModel.weatherState.test(2000) {
             assertEquals(
@@ -173,7 +173,7 @@ class WeatherViewModelTest : StateFlowTest() {
 
     @Test
     fun `Get weather from API and don't refresh from API`() = runBlocking {
-        apiMock.prepareResults(BRNO1.data, BRNO2.data)
+        apiMock.prepareResults(BRNO1, BRNO2)
 
         viewModel.weatherState.test {
             assertEquals(
@@ -200,6 +200,60 @@ class WeatherViewModelTest : StateFlowTest() {
     }
 
     @Test
+    fun `Show Data Error on initial run with no connection and refresh manually with a success`() = runBlocking {
+        apiMock.prepareResults(RuntimeException("Test error"), BRNO1)
+
+        viewModel.weatherState.test {
+            assertEquals(
+                WeatherViewState(error = WeatherViewState.ErrorType.DATA_PROVIDER),
+                awaitItemAfter(WeatherViewState(isLoading = true))
+            )
+            assertEquals(0, apiMock.calledCount)
+
+            viewModel.refreshWeather().join()
+
+            assertEquals(
+                weatherSuccessStateBrno1.copy(lastUpdated = 0.seconds),
+                awaitItemAfter(
+                    WeatherViewState(
+                        error = WeatherViewState.ErrorType.DATA_PROVIDER,
+                        isLoading = true
+                    )
+                )
+            )
+            assertEquals(1, apiMock.calledCount)
+            cancel()
+        }
+    }
+
+    @Test
+    fun `Show Data Error on initial run with no connection and refresh manually with an error`() = runBlocking {
+        apiMock.prepareResults(RuntimeException("Test error"), RuntimeException("Test error2"))
+
+        viewModel.weatherState.test {
+            assertEquals(
+                WeatherViewState(error = WeatherViewState.ErrorType.DATA_PROVIDER),
+                awaitItemAfter(WeatherViewState(isLoading = true))
+            )
+            assertEquals(0, apiMock.calledCount)
+
+            viewModel.refreshWeather().join()
+
+            assertEquals(
+                WeatherViewState(error = WeatherViewState.ErrorType.DATA_PROVIDER),
+                awaitItemAfter(
+                    WeatherViewState(
+                        error = WeatherViewState.ErrorType.DATA_PROVIDER,
+                        isLoading = true
+                    ),
+                )
+            )
+            assertEquals(0, apiMock.calledCount)
+            cancel()
+        }
+    }
+
+    @Test
     fun `Show API Error with outdated cache`() = runBlocking {
         dbHelper.insert(BRNO1.data)
         apiMock.prepareResults(RuntimeException("Test error"))
@@ -217,7 +271,7 @@ class WeatherViewModelTest : StateFlowTest() {
     @Test
     fun `Show API Error with outdated DB and then refresh from API`() = runBlocking {
         dbHelper.insert(BRNO1.data)
-        apiMock.prepareResults(RuntimeException("Test error"), BRNO2.data)
+        apiMock.prepareResults(RuntimeException("Test error"), BRNO2)
 
         viewModel.weatherState.test(2000) {
             assertEquals(
@@ -243,7 +297,7 @@ class WeatherViewModelTest : StateFlowTest() {
     @Test
     fun `Ignore API Error on refresh with up-to-date cache`() = runBlocking {
         dbHelper.insert(BRNO1.data)
-        apiMock.prepareResults(RuntimeException("Test error"), BRNO2.data)
+        apiMock.prepareResults(RuntimeException("Test error"), BRNO2)
         setDataAge(Clock.System.now() - 1.seconds)
 
         viewModel.weatherState.test {
@@ -273,7 +327,7 @@ class WeatherViewModelTest : StateFlowTest() {
     @Test
     fun `Show Data Error on corrupt data from DB and then refresh API`() = runBlocking {
         dbHelper.insert(CORRUPT.data)
-        apiMock.prepareResults(BRNO2.data)
+        apiMock.prepareResults(BRNO2)
         setDataAge(Clock.System.now() - 1.seconds)
 
         assertEquals(0, apiMock.calledCount)
@@ -304,7 +358,7 @@ class WeatherViewModelTest : StateFlowTest() {
 
     @Test
     fun `Show Data Error on corrupt data from API`() = runBlocking {
-        apiMock.prepareResults(CORRUPT.data)
+        apiMock.prepareResults(CORRUPT)
 
         viewModel.weatherState.test {
             assertEquals(
@@ -317,7 +371,7 @@ class WeatherViewModelTest : StateFlowTest() {
 
     @Test
     fun `Show correct data and refresh from API with corrupt data`() = runBlocking {
-        apiMock.prepareResults(BRNO2.data, CORRUPT.data)
+        apiMock.prepareResults(BRNO2, CORRUPT)
 
         assertEquals(0, apiMock.calledCount)
 
@@ -343,7 +397,7 @@ class WeatherViewModelTest : StateFlowTest() {
 
     @Test
     fun `Show correct data and refresh from API with error`() = runBlocking {
-        apiMock.prepareResults(BRNO2.data, RuntimeException("Test error"))
+        apiMock.prepareResults(BRNO2, RuntimeException("Test error"))
 
         assertEquals(0, apiMock.calledCount)
 
@@ -368,8 +422,8 @@ class WeatherViewModelTest : StateFlowTest() {
     }
 
     @Test
-    fun `Show correct data with desired unit change - default init`() = runBlocking {
-        apiMock.prepareResults(BRNO1.data)
+    fun `Show correct data with desired unit change - default`() = runBlocking {
+        apiMock.prepareResults(BRNO1)
 
         viewModel.weatherState.test(2000) {
             assertEquals(
@@ -395,8 +449,8 @@ class WeatherViewModelTest : StateFlowTest() {
     }
 
     @Test
-    fun `Show correct data with desired unit change - Imperial init`() = runBlocking {
-        apiMock.prepareResults(BRNO1.data, BRNO2.data)
+    fun `Show correct data with desired unit change - Imperial`() = runBlocking {
+        apiMock.prepareResults(BRNO1, BRNO2)
         settingsMock.putString(SettingsViewModel.DATA_UNIT_TAG, UnitSystem.IMPERIAL.name)
 
         viewModel.weatherState.test(2000) {

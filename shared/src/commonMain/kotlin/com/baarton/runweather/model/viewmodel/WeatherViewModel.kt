@@ -104,23 +104,27 @@ class WeatherViewModel(
             log.d { "WeatherData refresh coroutine launch." }
             refreshFlow.collect { pollingResult ->
                 log.d("Weather collected.")
-                mutableWeatherState.update { previousState ->
-                    if (shouldUpdateState(previousState, pollingResult)) {
-                        previousState.copy(
-                            isLoading = false,
-                            lastUpdated = pollingResult.data?.let { timeStampDuration(it.timestamp) },
-                            weather = pollingResult.data?.persistedWeather,
-                            error = pollingResult.error?.let {
-                                classifyError(previousState, pollingResult.error)
-                            }
-                        ).also {
-                            log.d { "Updating weather state with $it." }
-                        }
-                    } else {
-                        previousState.also {
-                            log.d { "Weather state not updated." }
-                        }
+                updateState(pollingResult)
+            }
+        }
+    }
+
+    private fun updateState(result: PollingResult) {
+        mutableWeatherState.update { previousState ->
+            if (shouldUpdateState(previousState, result)) {
+                previousState.copy(
+                    isLoading = false,
+                    lastUpdated = result.data?.let { timeStampDuration(it.timestamp) },
+                    weather = result.data?.persistedWeather,
+                    error = result.error?.let {
+                        classifyError(previousState, result.error)
                     }
+                ).also {
+                    log.d { "Updating weather state with $it." }
+                }
+            } else {
+                previousState.also {
+                    log.d { "Weather state not updated." }
                 }
             }
         }
@@ -144,37 +148,26 @@ class WeatherViewModel(
         }
     }
 
-    //TODO review when implementing the one-time button
     fun refreshWeather(): Job {
+        log.i("Try to refresh WeatherData one-time.")
         mutableWeatherState.update {
             it.copy(isLoading = true).also {
                 log.d { "State updated with $it" }
             }
         }
         return viewModelScope.launch {
-            log.i("Try to refresh WeatherData one-time.")
-            try {
-                weatherRepository.refreshWeather()
+            log.i("Launching refresh WeatherData one-time.")
+            val oneTimeData = try {
+                PollingResult(data = weatherRepository.refreshWeather())
             } catch (exception: Exception) {
-                handleWeatherError(exception)
+                PollingResult(error = exception)
             }
+
+            updateState(oneTimeData)
+            log.d { "One-time state update over." }
         }
     }
 
-    //TODO review when implementing the one-time button
-    private fun handleWeatherError(throwable: Throwable) {
-        log.e(throwable) { "Error downloading weather list" }
-        mutableWeatherState.update {
-            if (it.weather == null) {
-                it.copy(error = WeatherViewState.ErrorType.DATA_CONSISTENCY)
-            } else {
-                // Just let it fail silently if we have a cache
-                it.copy(isLoading = false)
-            }.also {
-                log.d { "State updated with $it" }
-            }
-        }
-    }
 }
 
 fun PersistedWeather.copy(unitSetting: UnitSystem): PersistedWeather {
