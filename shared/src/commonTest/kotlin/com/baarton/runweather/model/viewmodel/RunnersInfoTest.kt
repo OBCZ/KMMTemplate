@@ -2,6 +2,7 @@ package com.baarton.runweather.model.viewmodel
 
 import com.baarton.runweather.model.Temperature.Companion.celsius
 import com.baarton.runweather.model.Temperature.Companion.kelvin
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -164,31 +165,37 @@ class RunnersInfoTest {
         }
     }
 
+    @Ignore
     @Test
     fun sunglassesValidTest() {
         //TEST clock mock?
     }
 
+    @Ignore
     @Test
     fun sunglassesInvalidTest() {
         //TEST clock mock?
     }
 
+    @Ignore
     @Test
     fun temperatureWarningValidTest() {
         //TEST
     }
 
+    @Ignore
     @Test
     fun temperatureWarningInvalidTest() {
         //TEST
     }
 
+    @Ignore
     @Test
     fun windWarningValidTest() {
         //TEST
     }
 
+    @Ignore
     @Test
     fun windWarningInvalidTest() {
         //TEST
