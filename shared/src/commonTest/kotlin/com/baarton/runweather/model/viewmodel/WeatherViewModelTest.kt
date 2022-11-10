@@ -1,8 +1,6 @@
 package com.baarton.runweather.model.viewmodel
 
 import app.cash.turbine.test
-import co.touchlab.kermit.Logger
-import co.touchlab.kermit.StaticConfig
 import com.baarton.runweather.Config
 import com.baarton.runweather.StateFlowTest
 import com.baarton.runweather.TestConfig
@@ -24,6 +22,7 @@ import com.baarton.runweather.model.weather.WeatherId
 import com.baarton.runweather.repo.WeatherRepository
 import com.baarton.runweather.sqldelight.DatabaseHelper
 import com.baarton.runweather.testDbConnection
+import com.baarton.runweather.testLogger
 import com.russhwolf.settings.MapSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -41,7 +40,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class WeatherViewModelTest : StateFlowTest() {
 
-    private var logger = Logger(StaticConfig())
+    private var logger = testLogger()
     private var testDbConnection = testDbConnection()
     private var dbHelper = DatabaseHelper(testDbConnection, Dispatchers.Default, logger)
     private var dataTimestamp: Instant? = null
