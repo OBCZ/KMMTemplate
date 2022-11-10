@@ -1,7 +1,5 @@
 package com.baarton.runweather.repo
 
-import co.touchlab.kermit.Logger
-import co.touchlab.kermit.StaticConfig
 import com.baarton.runweather.TestConfig
 import com.baarton.runweather.db.PersistedWeather
 import com.baarton.runweather.mock.BRNO1
@@ -18,6 +16,7 @@ import com.baarton.runweather.model.weather.WeatherId
 import com.baarton.runweather.repo.WeatherRepository.Companion.DB_TIMESTAMP_KEY
 import com.baarton.runweather.sqldelight.DatabaseHelper
 import com.baarton.runweather.testDbConnection
+import com.baarton.runweather.testLogger
 import com.russhwolf.settings.MapSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -36,16 +35,16 @@ import kotlin.time.Duration.Companion.seconds
 
 class WeatherRepositoryTest {
 
-    private var logger = Logger(StaticConfig())
+    private var logger = testLogger()
     private var testDbConnection = testDbConnection()
-    private var dbHelper = DatabaseHelper(testDbConnection, logger, Dispatchers.Default)
+    private var dbHelper = DatabaseHelper(testDbConnection, Dispatchers.Default, logger)
 
     private val settingsMock = MapSettings()
     private val testConfig = TestConfig
     private val apiMock = WeatherDataApiMock()
     private val clock = Clock.System
 
-    private val repository: WeatherRepository = WeatherRepository(dbHelper, settingsMock, testConfig, apiMock, logger, clock)
+    private val repository: WeatherRepository = WeatherRepository(dbHelper, settingsMock, testConfig, apiMock, clock, logger)
 
     @AfterTest
     fun tearDown() = runTest {

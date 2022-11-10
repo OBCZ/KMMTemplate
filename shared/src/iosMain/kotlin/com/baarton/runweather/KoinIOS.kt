@@ -17,13 +17,11 @@ import platform.Foundation.NSUserDefaults
 //TODO https://insert-koin.io/docs/quickstart/kmm
 fun initKoinIos(
     userDefaults: NSUserDefaults,
-    appInfo: AppInfo,
-    doOnStartup: () -> Unit
+    appInfo: AppInfo
 ): KoinApplication = initKoin(
     module {
         single<Settings> { AppleSettings(userDefaults) }
         single { appInfo }
-        single { doOnStartup }
     }
 )
 

@@ -26,8 +26,8 @@ class MainApp : Application() {
                 // single<PlatformNetworkManager> { AndroidNetworkManager(get()) }
                 // single<PlatformLocationManager> { AndroidLocationManager(get()) }
 
-                viewModel { WeatherViewModel(get(), get(), get(), get(), get { parametersOf("WeatherViewModel") }) }
-                viewModel { SettingsViewModel(get(), get(), get { parametersOf("SettingsViewModel") }) }
+                viewModel { WeatherViewModel(get(), get(), get(), get(), get { parametersOf(WeatherViewModel::class.simpleName) }) }
+                viewModel { SettingsViewModel(get(), get(), get { parametersOf(SettingsViewModel::class.simpleName) }) }
                 single<SharedPreferences> {
                     get<Context>().getSharedPreferences(get<Config>().preferences, Context.MODE_PRIVATE)
                 }

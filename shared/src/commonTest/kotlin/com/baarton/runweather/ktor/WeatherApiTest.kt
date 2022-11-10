@@ -1,9 +1,6 @@
 package com.baarton.runweather.ktor
 
-import co.touchlab.kermit.LogWriter
-import co.touchlab.kermit.Logger
-import co.touchlab.kermit.LoggerConfig
-import co.touchlab.kermit.Severity
+import com.baarton.runweather.emptyLogger
 import com.baarton.runweather.model.Angle.Companion.deg
 import com.baarton.runweather.model.Humidity.Companion.percent
 import com.baarton.runweather.model.Pressure.Companion.hpa
@@ -27,13 +24,8 @@ import kotlin.test.assertFailsWith
 
 
 class WeatherApiTest {
-    private val emptyLogger = Logger(
-        config = object : LoggerConfig {
-            override val logWriterList: List<LogWriter> = emptyList()
-            override val minSeverity: Severity = Severity.Assert
-        },
-        tag = ""
-    )
+
+    private val emptyLogger = emptyLogger()
 
     @Test
     fun success() = runTest {
@@ -93,7 +85,7 @@ class WeatherApiTest {
                 )
             )
         }
-        val weatherApi = WeatherDataApiImpl(emptyLogger, engine)
+        val weatherApi = WeatherDataApiImpl(engine, emptyLogger)
 
         val result = weatherApi.getWeatherFromApi()
         assertEquals(
@@ -117,7 +109,7 @@ class WeatherApiTest {
                 status = HttpStatusCode.NotFound
             )
         }
-        val weatherApi = WeatherDataApiImpl(emptyLogger, engine)
+        val weatherApi = WeatherDataApiImpl(engine, emptyLogger)
 
         assertFailsWith<ClientRequestException> {
             weatherApi.getWeatherFromApi()

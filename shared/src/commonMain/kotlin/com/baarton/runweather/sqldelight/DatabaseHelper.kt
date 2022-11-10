@@ -20,8 +20,8 @@ import kotlinx.datetime.Instant
 
 class DatabaseHelper(
     sqlDriver: SqlDriver,
-    private val log: Logger,
-    private val backgroundDispatcher: CoroutineDispatcher
+    private val backgroundDispatcher: CoroutineDispatcher,
+    private val log: Logger
 ) {
 
     companion object {
@@ -147,7 +147,7 @@ class DatabaseHelper(
             .executeAsList()
 
     suspend fun insert(weatherData: WeatherData) {
-        log.d { "Inserting weather for ${weatherData.locationName} into database" }
+        log.d { "Inserting weather for ${weatherData.locationName} into database." }
         dbRef.transactionWithContext(backgroundDispatcher) {
             dbRef.tableQueries.nuke()
             with(weatherData) {
@@ -157,7 +157,7 @@ class DatabaseHelper(
     }
 
     suspend fun nuke() {
-        log.i { "Database Cleared" }
+        log.i { "Database cleared." }
         dbRef.transactionWithContext(backgroundDispatcher) {
             dbRef.tableQueries.nuke()
         }

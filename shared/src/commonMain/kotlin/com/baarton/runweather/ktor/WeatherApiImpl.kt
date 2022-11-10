@@ -36,7 +36,8 @@ private const val LANGUAGE_KEY = "lang"
 private const val OPENWEATHER_API_KEY_APP_ID_VALUE = "b0719071a899e4b1c350725d752ec252" //FIXME hide
 private const val UNITS_VALUE = "standard" //Intended units request value constant.
 
-class WeatherDataApiImpl(private val log: KermitLogger, engine: HttpClientEngine) : WeatherDataApi {
+
+class WeatherDataApiImpl(engine: HttpClientEngine, private val log: KermitLogger) : WeatherDataApi {
 
     private val client = HttpClient(engine) {
         expectSuccess = true

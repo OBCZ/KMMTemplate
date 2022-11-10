@@ -10,12 +10,10 @@ func startKoin() {
 
     let userDefaults = UserDefaults(suiteName: "RUNWEATHER_SETTINGS")!
     let iosAppInfo = IosAppInfo()
-    let doOnStartup = { NSLog("Hello from iOS/Swift!") }
 
     let koinApplication = KoinIOSKt.doInitKoinIos(
         userDefaults: userDefaults,
-        appInfo: iosAppInfo,
-        doOnStartup: doOnStartup
+        appInfo: iosAppInfo
     )
     _koin = koinApplication.koin
 }

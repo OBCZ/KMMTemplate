@@ -19,11 +19,9 @@ class WeatherRepository(
     private val settings: ObservableSettings,
     private val config: Config,
     private val weatherApi: WeatherDataApi,
-    log: Logger,
-    private val clock: Clock
+    private val clock: Clock,
+    private val log: Logger
 ) {
-
-    private val log = log.withTag("WeatherModel")
 
     companion object {
         internal const val DB_TIMESTAMP_KEY = "DbTimestampKey"
@@ -68,7 +66,7 @@ class WeatherRepository(
         } catch (e: Exception) {
             throw WeatherAPIException("Weather API has thrown an Exception: ${e.message}", e.cause)
         }
-        log.d { "Weather network result: $weatherResult" }
+        log.d { "Weather network result: $weatherResult." }
 
         if (!weatherResult.isInvalid()) {
             dbHelper.insert(weatherResult)
@@ -95,7 +93,7 @@ class WeatherRepository(
         }
         return (lastDownload + threshold < now).also {
             if (!it) {
-                log.i { "Weather not fetched from network. Recently updated" }
+                log.i { "Weather not fetched from network. Recently updated." }
             } else {
                 log.i { "Weather data is stale. Will fetch from network." }
             }

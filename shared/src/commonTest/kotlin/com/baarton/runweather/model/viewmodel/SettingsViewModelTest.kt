@@ -7,6 +7,7 @@ import com.baarton.runweather.Config
 import com.baarton.runweather.StateFlowTest
 import com.baarton.runweather.TestConfig
 import com.baarton.runweather.model.UnitSystem
+import com.baarton.runweather.testLogger
 import com.russhwolf.settings.MapSettings
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
@@ -16,7 +17,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class SettingsViewModelTest : StateFlowTest() {
 
-    private var logger = Logger(StaticConfig())
+    private var logger = testLogger()
     private val settingsMock = MapSettings()
     private val testConfig: Config = TestConfig
 

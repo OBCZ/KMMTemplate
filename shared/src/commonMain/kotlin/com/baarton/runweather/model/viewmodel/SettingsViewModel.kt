@@ -13,15 +13,13 @@ import kotlin.time.Duration
 class SettingsViewModel(
     private val settings: ObservableSettings,
     private val config: Config,
-    log: Logger
+    private val log: Logger
 ) : ViewModel() {
 
     companion object {
         const val DATA_UNIT_TAG = "DataUnit"
         const val WEATHER_DATA_THRESHOLD_TAG = "RefreshDuration"
     }
-
-    private val log = log.withTag("SettingsViewModel")
 
     private val mutableSettingsState: MutableStateFlow<SettingsViewState> =
         MutableStateFlow(
@@ -39,7 +37,7 @@ class SettingsViewModel(
     val settingsState: StateFlow<SettingsViewState> = mutableSettingsState
 
     override fun onCleared() {
-        log.v("Clearing SettingsViewModel")
+        log.v("Clearing SettingsViewModel.")
     }
 
     fun setDataUnit() {
@@ -51,14 +49,18 @@ class SettingsViewModel(
                 }
             ).also { newState ->
                 settings.putString(DATA_UNIT_TAG, newState.unitSetting.name)
+                log.d { "Updating setting state with $newState." }
             }
         }
     }
 
     fun setRefreshInterval(newDuration: Duration) {
         mutableSettingsState.update { state ->
-            state.copy(refreshSetting = newDuration).also { newState ->
+            state.copy(
+                refreshSetting = newDuration
+            ).also { newState ->
                 settings.putString(WEATHER_DATA_THRESHOLD_TAG, newState.refreshSetting.toIsoString())
+                log.d { "Updating setting state with $newState." }
             }
         }
     }

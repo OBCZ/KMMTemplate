@@ -32,7 +32,7 @@ class WeatherViewModel(
     private val config: Config,
     private val weatherRepository: WeatherRepository,
     private val clock: Clock,
-    log: Logger
+    private val log: Logger
 ) : ViewModel() {
 
     companion object {
@@ -41,8 +41,6 @@ class WeatherViewModel(
             return WeatherRepository.getImageUrl(imageId)
         }
     }
-
-    private val log = log.withTag("WeatherViewModel")
 
     private var isClosed = false
     private val pollingDispatcher: CoroutineDispatcher = Dispatchers.Default
@@ -75,7 +73,7 @@ class WeatherViewModel(
         isClosed = true
         pollingDispatcher.cancel()
         settingsListener.deactivate()
-        log.v("Clearing WeatherViewModel")
+        log.v("Clearing WeatherViewModel.")
     }
 
     private fun observeWeather() {
@@ -84,7 +82,7 @@ class WeatherViewModel(
                 log.i("Get WeatherData for poll send.")
                 mutableWeatherState.update {
                     it.copy(isLoading = true).also {
-                        log.d { "State updated with $it" }
+                        log.d { "State updated with $it." }
                     }
                 }
                 try {
@@ -152,7 +150,7 @@ class WeatherViewModel(
         log.i("Try to refresh WeatherData one-time.")
         mutableWeatherState.update {
             it.copy(isLoading = true).also {
-                log.d { "State updated with $it" }
+                log.d { "State updated with $it." }
             }
         }
         return viewModelScope.launch {

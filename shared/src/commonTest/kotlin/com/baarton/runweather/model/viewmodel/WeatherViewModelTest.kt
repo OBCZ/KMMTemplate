@@ -43,14 +43,14 @@ class WeatherViewModelTest : StateFlowTest() {
 
     private var logger = Logger(StaticConfig())
     private var testDbConnection = testDbConnection()
-    private var dbHelper = DatabaseHelper(testDbConnection, logger, Dispatchers.Default)
+    private var dbHelper = DatabaseHelper(testDbConnection, Dispatchers.Default, logger)
     private var dataTimestamp: Instant? = null
 
     private val settingsMock = MapSettings()
     private val apiMock = WeatherDataApiMock()
     private val clockMock = ClockMock()
     private val testConfig: Config = TestConfig
-    private val repository: WeatherRepository = WeatherRepository(dbHelper, settingsMock, testConfig, apiMock, logger, clockMock)
+    private val repository: WeatherRepository = WeatherRepository(dbHelper, settingsMock, testConfig, apiMock, clockMock, logger)
 
     private val viewModel by lazy { WeatherViewModel(settingsMock, testConfig, repository, clockMock, logger) }
 

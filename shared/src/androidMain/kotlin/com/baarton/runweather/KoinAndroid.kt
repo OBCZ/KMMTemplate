@@ -14,7 +14,7 @@ actual val platformModule: Module = module {
         AndroidSqliteDriver(
             RunWeatherDb.Schema,
             get(),
-            "RunWeatherDb"
+            APP_DB_NAME
         )
     }
 

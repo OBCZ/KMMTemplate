@@ -1,10 +1,7 @@
 package com.baarton.runweather.sqldelight
 
-import co.touchlab.kermit.LogWriter
-import co.touchlab.kermit.Logger
-import co.touchlab.kermit.LoggerConfig
-import co.touchlab.kermit.Severity
 import com.baarton.runweather.db.PersistedWeather
+import com.baarton.runweather.emptyLogger
 import com.baarton.runweather.mock.BRNO1
 import com.baarton.runweather.mock.BRNO2
 import com.baarton.runweather.mock.BRNO3
@@ -31,20 +28,12 @@ class SqlDelightTest {
 
     private lateinit var dbHelper: DatabaseHelper
 
-    private val emptyLogger = Logger(
-        config = object : LoggerConfig {
-            override val logWriterList: List<LogWriter> = emptyList()
-            override val minSeverity: Severity = Severity.Assert
-        },
-        tag = ""
-    )
-
     @BeforeTest
     fun setup() = runTest {
         dbHelper = DatabaseHelper(
             testDbConnection(),
-            emptyLogger,
-            Dispatchers.Default
+            Dispatchers.Default,
+            emptyLogger()
         )
         dbHelper.nuke()
         dbHelper.insert(BRNO1.data)
@@ -123,5 +112,4 @@ class SqlDelightTest {
             "Delete All did not work"
         )
     }
-
 }
