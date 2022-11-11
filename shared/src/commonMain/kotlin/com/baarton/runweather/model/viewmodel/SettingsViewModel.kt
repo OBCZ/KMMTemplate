@@ -1,6 +1,7 @@
 package com.baarton.runweather.model.viewmodel
 
 import co.touchlab.kermit.Logger
+import com.baarton.runweather.AppInfo
 import com.baarton.runweather.Config
 import com.baarton.runweather.model.UnitSystem
 import com.russhwolf.settings.ObservableSettings
@@ -13,6 +14,7 @@ import kotlin.time.Duration
 class SettingsViewModel(
     private val settings: ObservableSettings,
     private val config: Config,
+    private val appInfo: AppInfo,
     private val log: Logger
 ) : ViewModel() {
 
@@ -71,6 +73,10 @@ class SettingsViewModel(
 
     fun refreshSteps(): Int {
         return (config.weatherDataMaximumThreshold - config.weatherDataMinimumThreshold).inWholeMinutes.toInt()
+    }
+
+    fun appInfo(): AppInfo {
+        return appInfo
     }
 }
 

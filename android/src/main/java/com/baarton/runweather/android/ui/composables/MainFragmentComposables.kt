@@ -54,7 +54,7 @@ fun MainFragmentScreen() {
 
 @ExperimentalPagerApi
 @Composable
-fun IconWithTextTabLayout(
+private fun IconWithTextTabLayout(
     selectedIndex: Int,
     onPageSelected: ((tabItem: TabItem) -> Unit)
 ) {
@@ -77,7 +77,7 @@ fun IconWithTextTabLayout(
 
 @ExperimentalPagerApi
 @Composable
-fun TabPage(pagerState: PagerState) {
+private fun TabPage(pagerState: PagerState) {
     HorizontalPager(
         count = TabItem.values().size,
         state = pagerState

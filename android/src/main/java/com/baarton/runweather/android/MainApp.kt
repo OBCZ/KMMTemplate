@@ -27,7 +27,7 @@ class MainApp : Application() {
                 // single<PlatformLocationManager> { AndroidLocationManager(get()) }
 
                 viewModel { WeatherViewModel(get(), get(), get(), get(), get { parametersOf(WeatherViewModel::class.simpleName) }) }
-                viewModel { SettingsViewModel(get(), get(), get { parametersOf(SettingsViewModel::class.simpleName) }) }
+                viewModel { SettingsViewModel(get(), get(), get(), get { parametersOf(SettingsViewModel::class.simpleName) }) }
                 single<SharedPreferences> {
                     get<Context>().getSharedPreferences(get<Config>().preferences, Context.MODE_PRIVATE)
                 }
@@ -43,5 +43,6 @@ class MainApp : Application() {
 
 object AndroidAppInfo : AppInfo {
     override val appId: String = BuildConfig.APPLICATION_ID
+    override val versionName: String = BuildConfig.VERSION_NAME
     override val debug: Boolean = BuildConfig.DEBUG
 }
