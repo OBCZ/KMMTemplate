@@ -16,15 +16,16 @@ import dev.icerock.moko.resources.StringResource
 import kotlin.math.roundToInt
 
 enum class UnitSystem(
-    val tempSwitch: (Temperature) -> Temperature,
-    val humiditySwitch: (Humidity) -> Humidity,
-    val heightSwitch: (Height) -> Height,
-    val pressureSwitch: (Pressure) -> Pressure,
-    val angleSwitch: (Angle) -> Angle,
-    val velocitySwitch: (Velocity) -> Velocity
+    val tempConversion: (Temperature) -> Temperature,
+    val humidityConversion: (Humidity) -> Humidity,
+    val heightConversion: (Height) -> Height,
+    val pressureConversion: (Pressure) -> Pressure,
+    val angleConversion: (Angle) -> Angle,
+    val velocityConversion: (Velocity) -> Velocity,
+    val textRes: StringResource
 ) {
-    METRIC({ it.celsius }, { it.percent }, { it.mm }, { it.hpa }, { it.deg }, { it.mps }),
-    IMPERIAL({ it.fahrenheit }, { it.percent }, { it.inch }, { it.mbar }, { it.deg }, { it.mph });
+    METRIC({ it.celsius }, { it.percent }, { it.mm }, { it.hpa }, { it.deg }, { it.mps }, SharedRes.strings.setting_units_entry_metric),
+    IMPERIAL({ it.fahrenheit }, { it.percent }, { it.inch }, { it.mbar }, { it.deg }, { it.mph }, SharedRes.strings.setting_units_entry_imperial);
 
     companion object {
 

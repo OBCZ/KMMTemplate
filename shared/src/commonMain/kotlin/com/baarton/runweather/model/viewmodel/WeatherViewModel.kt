@@ -40,6 +40,15 @@ class WeatherViewModel(
         fun getImageUrl(imageId: String): String {
             return WeatherRepository.getImageUrl(imageId)
         }
+
+        fun lastUpdatedResId(timestampAge: Duration?): Pair<StringResource, Long?> {
+            return when (timestampAge?.inWholeSeconds) {
+                null -> SharedRes.strings.app_n_a to null
+                0L -> SharedRes.strings.fragment_weather_last_updated_now to null
+                in 1L..59L -> SharedRes.strings.fragment_weather_last_updated_sec_time to timestampAge.inWholeSeconds
+                else -> SharedRes.strings.fragment_weather_last_updated_min_time to timestampAge.inWholeMinutes
+            }
+        }
     }
 
     private var isClosed = false
@@ -168,35 +177,25 @@ class WeatherViewModel(
 
 }
 
-fun PersistedWeather.copy(unitSetting: UnitSystem): PersistedWeather {
+fun PersistedWeather.convert(unitSetting: UnitSystem): PersistedWeather {
     return this.copy(
         weatherList = weatherList,
         locationName = locationName,
         mainData = mainData.copy(
-            temperature = unitSetting.tempSwitch(mainData.temperature),
-            pressure = unitSetting.pressureSwitch(mainData.pressure),
-            humidity = unitSetting.humiditySwitch(mainData.humidity),
+            temperature = unitSetting.tempConversion(mainData.temperature),
+            pressure = unitSetting.pressureConversion(mainData.pressure),
+            humidity = unitSetting.humidityConversion(mainData.humidity),
         ),
         wind = wind.copy(
-            velocity = unitSetting.velocitySwitch(wind.velocity),
-            angle = unitSetting.angleSwitch(wind.angle),
+            velocity = unitSetting.velocityConversion(wind.velocity),
+            angle = unitSetting.angleConversion(wind.angle),
         ),
         rain = rain.copy(
-            oneHour = unitSetting.heightSwitch(rain.oneHour),
-            threeHour = unitSetting.heightSwitch(rain.threeHour)
+            oneHour = unitSetting.heightConversion(rain.oneHour),
+            threeHour = unitSetting.heightConversion(rain.threeHour)
         ),
         sys = sys
     )
-}
-
-//TODO probably needs to be moved somewhere - UIUtils in common module?
-fun lastUpdatedResId(timestampAge: Duration?): Pair<StringResource, Long?> {
-    return when (timestampAge?.inWholeSeconds) {
-        null -> SharedRes.strings.app_n_a to null
-        0L -> SharedRes.strings.fragment_weather_last_updated_now to null
-        in 1L..59L -> SharedRes.strings.fragment_weather_last_updated_sec_time to timestampAge.inWholeSeconds
-        else -> SharedRes.strings.fragment_weather_last_updated_min_time to timestampAge.inWholeMinutes
-    }
 }
 
 data class PollingResult(val data: CurrentWeather? = null, val error: Throwable? = null)

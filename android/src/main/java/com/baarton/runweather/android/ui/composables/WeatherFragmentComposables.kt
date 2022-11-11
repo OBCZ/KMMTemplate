@@ -56,9 +56,9 @@ import com.baarton.runweather.model.viewmodel.WarningHint
 import com.baarton.runweather.model.viewmodel.WeatherHint
 import com.baarton.runweather.model.viewmodel.WeatherViewModel
 import com.baarton.runweather.model.viewmodel.WeatherViewModel.Companion.getImageUrl
+import com.baarton.runweather.model.viewmodel.WeatherViewModel.Companion.lastUpdatedResId
 import com.baarton.runweather.model.viewmodel.WeatherViewState
-import com.baarton.runweather.model.viewmodel.copy
-import com.baarton.runweather.model.viewmodel.lastUpdatedResId
+import com.baarton.runweather.model.viewmodel.convert
 import com.baarton.runweather.model.weather.Weather
 import com.baarton.runweather.model.weather.WeatherData
 import com.baarton.runweather.model.weather.WeatherId
@@ -159,7 +159,7 @@ private fun ErrorScreen(error: WeatherViewState.ErrorType, onRefresh: () -> Unit
 
 @Composable
 private fun ColumnScope.WeatherScreen(weatherState: WeatherViewState) {
-    val weather = weatherState.weather!!.copy(weatherState.unitSetting) // we should not get NPE here
+    val weather = weatherState.weather!!.convert(weatherState.unitSetting) // we should not get NPE here
     val locationAvailable = weatherState.locationAvailable
     val networkAvailable = weatherState.networkAvailable
     val lastUpdated = weatherState.lastUpdated
