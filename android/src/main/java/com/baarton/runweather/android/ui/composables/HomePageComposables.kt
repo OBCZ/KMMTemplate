@@ -75,7 +75,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 @Composable
-fun WeatherFragmentScreen(
+fun WeatherScreen(
 ) {
     val viewModel = koinViewModel<WeatherViewModel>()
 
@@ -86,14 +86,14 @@ fun WeatherFragmentScreen(
 
     val weatherState by lifecycleAwareWeatherFlow.collectAsState(viewModel.weatherState.value)
 
-    WeatherFragmentScreenContent(
+    WeatherScreenContent(
         weatherState = weatherState,
         onRefresh = { viewModel.refreshWeather() },
     )
 }
 
 @Composable
-private fun WeatherFragmentScreenContent(
+private fun WeatherScreenContent(
     weatherState: WeatherViewState,
     onRefresh: () -> Unit,
 ) {
@@ -150,9 +150,8 @@ private fun ErrorScreen(error: WeatherViewState.ErrorType, onRefresh: () -> Unit
         Text(
             modifier = Modifier
                 .padding(2.dp),
-            text = stringResource(SharedRes.strings.fragment_weather_results_refresh_button.resourceId),
-            style = MaterialTheme.typography.button,
-            color = MaterialTheme.colors.onSurface
+            text = stringResource(SharedRes.strings.weather_results_refresh_button.resourceId),
+            style = MaterialTheme.typography.button
         )
     }
 }
@@ -207,7 +206,7 @@ private fun ColumnScope.StateRow(weight: Float, locationAvailable: Boolean, netw
                 Vector.LOCATION_OFF
             }.build(),
             contentDescription = stringResource(
-                id = SharedRes.strings.fragment_weather_location_content_description.resourceId,
+                id = SharedRes.strings.weather_location_content_description.resourceId,
                 formatArgs = arrayOf(onOffText(locationAvailable))
             )
         )
@@ -222,7 +221,7 @@ private fun ColumnScope.StateRow(weight: Float, locationAvailable: Boolean, netw
                 Vector.NETWORK_OFF
             }.build(),
             contentDescription = stringResource(
-                id = SharedRes.strings.fragment_weather_network_content_description.resourceId,
+                id = SharedRes.strings.weather_network_content_description.resourceId,
                 formatArgs = arrayOf(onOffText(networkAvailable))
             )
         )
@@ -259,7 +258,7 @@ private fun lastUpdatedText(lastUpdated: Duration?): String {
     }
 
     return stringResource(
-        id = SharedRes.strings.fragment_weather_last_updated_text.resourceId,
+        id = SharedRes.strings.weather_last_updated_text.resourceId,
         formatArgs = arrayOf(
             lastUpdatedValue
         )
@@ -577,7 +576,7 @@ private fun ColumnScope.MainRow(weight: Float, weather: PersistedWeather) {
 @Preview
 @Composable
 fun MainScreenContentPreview() {
-    WeatherFragmentScreenContent(
+    WeatherScreenContent(
         weatherState = WeatherViewState(
             weather = PersistedWeather(
                 weatherList = listOf(
@@ -609,7 +608,7 @@ fun MainScreenContentPreview() {
 @Preview
 @Composable
 fun LoadingScreenPreview() {
-    WeatherFragmentScreenContent(
+    WeatherScreenContent(
         weatherState = WeatherViewState(isLoading = true)
     ) { }
 }
@@ -617,7 +616,7 @@ fun LoadingScreenPreview() {
 @Preview
 @Composable
 fun ErrorScreenPreview() {
-    WeatherFragmentScreenContent(
+    WeatherScreenContent(
         weatherState = WeatherViewState(error = WeatherViewState.ErrorType.DATA_CONSISTENCY)
     ) { }
 }

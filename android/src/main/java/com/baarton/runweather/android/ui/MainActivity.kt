@@ -1,17 +1,16 @@
 package com.baarton.runweather.android.ui
 
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.fragment.app.FragmentActivity
 import co.touchlab.kermit.Logger
-import com.baarton.runweather.android.ui.composables.MainFragmentScreen
+import com.baarton.runweather.android.ui.composables.MainScreen
 import com.baarton.runweather.android.ui.theme.RunWeatherTheme
 import com.baarton.runweather.injectLogger
 import org.koin.core.component.KoinComponent
 
 //TEST tests with composables?
-//TODO handle permissions somehow
-class MainActivity : FragmentActivity(), /*PermissionFragment.PermissionListener,*/ KoinComponent {
+class MainActivity : ComponentActivity(), KoinComponent {
 
     //TODO
     // private val locationManager: LocationManager by inject()
@@ -24,17 +23,16 @@ class MainActivity : FragmentActivity(), /*PermissionFragment.PermissionListener
         // https://developersancho.medium.com/jetpack-compose-splash-screen-api-36ca40c6196b
         // https://proandroiddev.com/animated-splash-screen-in-android-with-compose-4b7dc1baecc5
         super.onCreate(savedInstanceState)
+
+        setContent {
+            RunWeatherTheme {
+                MainScreen()
+            }
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        //TODO set permission fragment or Composable? which is better?
-
-        // if (!applicationContext.hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
-        //     requestFineLocationPermission()
-        // } else {
-             locationPermissionGranted()
-        // }
         // networkManager.startNetworkCallback()
     }
 
@@ -43,29 +41,4 @@ class MainActivity : FragmentActivity(), /*PermissionFragment.PermissionListener
         // locationManager.stopLocationUpdates()
         // networkManager.stopNetworkCallback()
     }
-
-    private fun requestFineLocationPermission() {
-        // supportFragmentManager
-        //     .beginTransaction()
-        //     .replace(R.id.main_activity_container_view, PermissionFragment())
-        //     .addToBackStack(PermissionFragment.TAG)
-        //     .commit()
-    }
-
-    // override fun onPermissionGranted() {
-    //     locationPermissionGranted()
-    // }
-
-    private fun locationPermissionGranted() {
-        // locationManager.startLocationUpdates()
-
-        setContent {
-            RunWeatherTheme {
-                MainFragmentScreen()
-            }
-        }
-
-    }
-
-
 }

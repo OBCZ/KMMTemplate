@@ -48,7 +48,7 @@ private const val ATTRIBUTION_MATERIAL_JCOMP_FREEPIK_LINK =
     "https://www.freepik.com/free-photo/beautiful-sky-sunset-sun-clouds-landscape-nature-background_4550584.htm#query=sunset&position=4&from_view=search&track=sph"
 
 @Composable
-fun SettingsFragmentScreen(
+fun SettingsScreen(
 ) {
     val viewModel = koinViewModel<SettingsViewModel>()
 
@@ -59,7 +59,7 @@ fun SettingsFragmentScreen(
 
     val settingsState by lifecycleAwareWeatherFlow.collectAsState(viewModel.settingsState.value)
 
-    SettingsFragmentScreenContent(
+    SettingsScreenContent(
         settingsState = settingsState,
         onUnitSettingChanged = { viewModel.setDataUnit() },
         refreshValueRange = viewModel.refreshValueRange(),
@@ -70,7 +70,7 @@ fun SettingsFragmentScreen(
 }
 
 @Composable
-private fun SettingsFragmentScreenContent(
+private fun SettingsScreenContent(
     settingsState: SettingsViewState,
     onUnitSettingChanged: () -> Unit,
     refreshValueRange: ClosedFloatingPointRange<Float>,
@@ -254,7 +254,7 @@ private fun AttributionSection() {
 @Preview
 @Composable
 fun SettingsScreenContentPreview() {
-    SettingsFragmentScreenContent(
+    SettingsScreenContent(
         settingsState = SettingsViewState(
             UnitSystem.METRIC, 2.minutes
         ),

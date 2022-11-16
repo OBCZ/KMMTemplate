@@ -44,9 +44,9 @@ class WeatherViewModel(
         fun lastUpdatedResId(timestampAge: Duration?): Pair<StringResource, Long?> {
             return when (timestampAge?.inWholeSeconds) {
                 null -> SharedRes.strings.app_n_a to null
-                0L -> SharedRes.strings.fragment_weather_last_updated_now to null
-                in 1L..59L -> SharedRes.strings.fragment_weather_last_updated_sec_time to timestampAge.inWholeSeconds
-                else -> SharedRes.strings.fragment_weather_last_updated_min_time to timestampAge.inWholeMinutes
+                0L -> SharedRes.strings.weather_last_updated_now to null
+                in 1L..59L -> SharedRes.strings.weather_last_updated_sec_time to timestampAge.inWholeSeconds
+                else -> SharedRes.strings.weather_last_updated_min_time to timestampAge.inWholeMinutes
             }
         }
     }
@@ -211,9 +211,9 @@ data class WeatherViewState(
 ) {
 
     enum class ErrorType(val messageRes: StringResource) {
-        DATA_PROVIDER(SharedRes.strings.fragment_weather_results_endpoint_error),
-        DATA_CONSISTENCY(SharedRes.strings.fragment_weather_results_data_error),
-        INIT_STATE(SharedRes.strings.fragment_weather_results_init_error),
-        UNKNOWN(SharedRes.strings.fragment_weather_results_unknown_error),
+        DATA_PROVIDER(SharedRes.strings.weather_results_endpoint_error),
+        DATA_CONSISTENCY(SharedRes.strings.weather_results_data_error),
+        INIT_STATE(SharedRes.strings.weather_results_init_error),
+        UNKNOWN(SharedRes.strings.weather_results_unknown_error),
     }
 }

@@ -22,7 +22,6 @@ sqlDelight = "1.5.4"
 
 android-desugaring = { module = "com.android.tools:desugar_jdk_libs", version = "1.1.5" }
 androidx-core = { module = "androidx.core:core-ktx", version = "1.9.0" }
-androidx-fragment = { module = "androidx.fragment:fragment-ktx", version = "1.5.3" }
 androidx-lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
 androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
 androidx-test-junit = { module = "androidx.test.ext:junit-ktx", version = "1.1.3" }
@@ -40,8 +39,9 @@ coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", ve
 google-accompanist-swipeRefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version = "0.23.1" }
 google-accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version = "0.25.0" }
 google-accompanist-pager-indicators = { module = "com.google.accompanist:accompanist-pager-indicators", version = "0.25.0" }
+google-accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version = "0.27.0" }
 
-gradlePlugin-android = "com.android.tools.build:gradle:7.2.2"
+gradlePlugin-android = { module = "com.android.tools.build:gradle", version = "7.2.2" }
 gradlePlugin-kotlinSerialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 gradlePlugin-ktlint = { module = "org.jlleitschuh.gradle:ktlint-gradle", version = "10.3.0" }
 gradlePlugin-sqlDelight = { module = "com.squareup.sqldelight:gradle-plugin", version.ref = "sqlDelight" }
@@ -86,10 +86,9 @@ kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotl
 gradleDependencyUpdate = "com.github.ben-manes.versions:0.42.0"
 
 [bundles]
-app-ui = [
+android-ui = [
     "compose-compiler",
     "androidx-core",
-    "androidx-fragment",
     "androidx-lifecycle-runtime",
     "androidx-lifecycle-viewmodel",
     "compose-ui",
@@ -99,7 +98,8 @@ app-ui = [
     "compose-activity",
     "google-accompanist-swipeRefresh",
     "google-accompanist-pager",
-    "google-accompanist-pager-indicators"
+    "google-accompanist-pager-indicators",
+    "google-accompanist-permissions"
 ]
 gradlePlugins = [
     "gradlePlugin-android",
@@ -107,7 +107,12 @@ gradlePlugins = [
     "gradlePlugin-ktlint",
     "gradlePlugin-sqlDelight",
 ]
-ktor-common = ["ktor-client-core", "ktor-client-logging", "ktor-client-serialization", "ktor-client-contentNegotiation"]
+ktor-common = [
+    "ktor-client-core",
+    "ktor-client-logging",
+    "ktor-client-serialization",
+    "ktor-client-contentNegotiation"
+]
 shared-commonTest = [
     "kotlin-test",
     "multiplatformSettings-test",
@@ -122,4 +127,3 @@ shared-androidTest = [
     "roboelectric",
     "sqlDelight-jvm"
 ]
-

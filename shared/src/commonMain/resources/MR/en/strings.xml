@@ -32,24 +32,25 @@
     <string name="main_tab_today">WEATHER</string>
     <string name="main_tab_settings">SETTINGS</string>
 
-    <string name="fragment_permission_title">Approve Location Access</string>
-    <string name="fragment_permission_body">The fine location permission is needed for core functionality.\nIn order for this application to work, please approve access to your location via the button below.</string>
-    <string name="fragment_permission_denied_rationale">Fine location permission was denied, but is needed for core functionality. The application can not be started.</string>
-    <string name="fragment_permission_button">Approve</string>
+    <string name="permission_screen_main_text">The Fine location permission is needed for core functionality.\nIn order for this application to work, please approve access to your location via the button below or in the system Settings of the App.</string>
+    <string name="permission_screen_fine_location_text">Thank you for approving accessing to your approximate location, however the Fine location permission is needed. Please approve access to your Fine Location via the button below.</string>
+    <string name="permission_screen_denied_rationale">Fine location permission was denied, but is needed for core functionality. The application can not be started.</string>
+    <string name="permission_button_fine_location">Approve Fine Location Access</string>
+    <string name="permission_button">Approve</string>
 
-    <string name="fragment_weather_results_init_error">Weather has not been initialized yet. Try refreshing  the data again manually.</string>
-    <string name="fragment_weather_results_unknown_error">Unknown error. Try refreshing the data again manually.</string>
-    <string name="fragment_weather_results_endpoint_error">Unable to download weather list. I can\'t display anything, sorry. Check your Connection and/or Location settings. Then try refreshing the data again manually.</string>
-    <string name="fragment_weather_results_data_error">Weather data is empty, incomplete or corrupt. Try refreshing the data again manually.</string>
-    <string name="fragment_weather_results_refresh_button">Refresh</string>
+    <string name="weather_results_init_error">Weather has not been initialized yet. Try refreshing  the data again manually.</string>
+    <string name="weather_results_unknown_error">Unknown error. Try refreshing the data again manually.</string>
+    <string name="weather_results_endpoint_error">Unable to download weather list. I can\'t display anything, sorry. Check your Connection and/or Location settings. Then try refreshing the data again manually.</string>
+    <string name="weather_results_data_error">Weather data is empty, incomplete or corrupt. Try refreshing the data again manually.</string>
+    <string name="weather_results_refresh_button">Refresh</string>
 
-    <string name="fragment_weather_location_content_description">Location setting %1$s</string>
-    <string name="fragment_weather_network_content_description">Network connection %1$s</string>
+    <string name="weather_location_content_description">Location setting %1$s</string>
+    <string name="weather_network_content_description">Network connection %1$s</string>
 
-    <string name="fragment_weather_last_updated_text">Last update: %1$s</string>
-    <string name="fragment_weather_last_updated_now">Just now</string>
-    <string name="fragment_weather_last_updated_min_time">%1$d min ago</string>
-    <string name="fragment_weather_last_updated_sec_time">%1$d sec ago</string>
+    <string name="weather_last_updated_text">Last update: %1$s</string>
+    <string name="weather_last_updated_now">Just now</string>
+    <string name="weather_last_updated_min_time">%1$d min ago</string>
+    <string name="weather_last_updated_sec_time">%1$d sec ago</string>
 
     <string name="weather_runners_info_header">Runners info</string>
     <string name="weather_runners_info_alert_card_wind_moderate">Moderate Wind</string>

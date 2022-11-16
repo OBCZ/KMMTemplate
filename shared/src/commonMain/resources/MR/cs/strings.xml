@@ -32,24 +32,25 @@
     <string name="main_tab_today">POČASÍ</string>
     <string name="main_tab_settings">NASTAVENÍ</string>
 
-    <string name="fragment_permission_title">Schválit oprávnění pro Lokaci</string>
-    <string name="fragment_permission_body">Pro fungování aplikace je nutné schválit oprávnění pro přísstup k lokaci.\nProsím, schvalte toto oprávnění tlačítkem níže.</string>
-    <string name="fragment_permission_denied_rationale">Oprávnění proi přístup k lokaci bylo zamítnuto. Aplikace nemůže být spuštěna.</string>
-    <string name="fragment_permission_button">Schválit</string>
+    <string name="permission_screen_main_text">Pro fungování aplikace je nutné schválit oprávnění pro přístup k lokaci.\nProsím, schvalte toto oprávnění tlačítkem níže anebo v systémovém Nastavení aplikace.</string>
+    <string name="permission_screen_fine_location_text">Děkujeme za oprávnění k přístupu přibližné Lokaci, nicméně je potřeba schválit přístup i k těm přesnějším. Je to nutné pro správné fungování aplikace.\nProsím, schvalte toto oprávnění tlačítkem níže.</string>
+    <string name="permission_screen_denied_rationale">Oprávnění pro přístup k lokaci bylo zamítnuto. Aplikace nemůže být spuštěna.</string>
+    <string name="permission_button_fine_location">Schválit přístup k Lokaci</string>
+    <string name="permission_button">Schválit</string>
 
-    <string name="fragment_weather_results_init_error">Data nebyla inicializována. Opakujte načtení dat kliknutím na tlačítko.</string>
-    <string name="fragment_weather_results_unknown_error">Neočekávaná chyba. Opakujte načtení dat kliknutím na tlačítko.</string>
-    <string name="fragment_weather_results_endpoint_error">Chyba během zpracovávání odpovědi ze serveru. Nejsou k dispozici žádná data. Zkontrolujte své internetové připojení a/nebo nastavení lokace. Poté zkuste opakovat načtení dat kliknutím na tlačítko.</string>
-    <string name="fragment_weather_results_data_error">Obdržená data jsou prázdná, nekompletní, nebo poškozená. Opakujte načtení dat kliknutím na tlačítko.</string>
-    <string name="fragment_weather_results_refresh_button">Načíst znovu</string>
+    <string name="weather_results_init_error">Data nebyla inicializována. Opakujte načtení dat kliknutím na tlačítko.</string>
+    <string name="weather_results_unknown_error">Neočekávaná chyba. Opakujte načtení dat kliknutím na tlačítko.</string>
+    <string name="weather_results_endpoint_error">Chyba během zpracovávání odpovědi ze serveru. Nejsou k dispozici žádná data. Zkontrolujte své internetové připojení a/nebo nastavení lokace. Poté zkuste opakovat načtení dat kliknutím na tlačítko.</string>
+    <string name="weather_results_data_error">Obdržená data jsou prázdná, nekompletní, nebo poškozená. Opakujte načtení dat kliknutím na tlačítko.</string>
+    <string name="weather_results_refresh_button">Načíst znovu</string>
 
-    <string name="fragment_weather_location_content_description">Nastavení Polohy %1$s</string>
-    <string name="fragment_weather_network_content_description">Připojení k internetu %1$s</string>
+    <string name="weather_location_content_description">Nastavení Polohy %1$s</string>
+    <string name="weather_network_content_description">Připojení k internetu %1$s</string>
 
-    <string name="fragment_weather_last_updated_text">Poslední aktualizace: %1$s</string>
-    <string name="fragment_weather_last_updated_now">Právě nyní</string>
-    <string name="fragment_weather_last_updated_min_time">Před %1$d min</string>
-    <string name="fragment_weather_last_updated_sec_time">Před %1$d sek</string>
+    <string name="weather_last_updated_text">Poslední aktualizace: %1$s</string>
+    <string name="weather_last_updated_now">Právě nyní</string>
+    <string name="weather_last_updated_min_time">Před %1$d min</string>
+    <string name="weather_last_updated_sec_time">Před %1$d sek</string>
 
     <string name="weather_runners_info_header">Běžecké info</string>
     <string name="weather_runners_info_alert_card_wind_moderate">Slabší vítr</string>

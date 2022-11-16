@@ -50,7 +50,7 @@ android {
 
 dependencies {
     implementation(project(":shared"))
-    implementation(libs.bundles.app.ui)
+    implementation(libs.bundles.android.ui)
     implementation(libs.multiplatformSettings.common)
     implementation(libs.kotlinx.dateTime)
     coreLibraryDesugaring(libs.android.desugaring)
