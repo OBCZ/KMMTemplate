@@ -18,16 +18,12 @@ import org.koin.core.parameter.parametersOf
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
 
-//TODO then start duplicating/mimicking UI stuff, platform specific stuff
-//TODO then review all files and its origin/contents
-//TODO review dependencies, cleanup gradle files
-
-//TODO after migration:
-// review all files (formatting, comments, naming variables/files, etc)
-// extracting/moving stuff/files further
-// get iOS working
-// fork to RunWeather GH
+//TODO migration plan:
+// review all files (origin/contents, formatting, comments, naming variables/files, etc)
+// fork to RunWeather GH - former repo
 // create simple CI/CD
+// verify Android release signature
+// get iOS working + extracting/moving stuff/files further
 // define simple formatting rules with ktlint?
 // go through Medium bookmark tips and fine-tune the code
 // go through and review TODOs and create Trello tickets from them

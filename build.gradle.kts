@@ -10,7 +10,7 @@ buildscript {
     dependencies {
         classpath(libs.bundles.gradlePlugins)
         classpath(kotlin("gradle-plugin", libs.versions.kotlin.get()))
-        classpath("dev.icerock.moko:resources-generator:0.20.1")
+        classpath("dev.icerock.moko:resources-generator:${libs.versions.mokoResources.get()}")
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build gradle files
     }

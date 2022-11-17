@@ -1,10 +1,9 @@
 package com.baarton.runweather.model.viewmodel
 
 import app.cash.turbine.test
-import co.touchlab.kermit.Logger
-import co.touchlab.kermit.StaticConfig
 import com.baarton.runweather.Config
 import com.baarton.runweather.StateFlowTest
+import com.baarton.runweather.TestAppInfo
 import com.baarton.runweather.TestConfig
 import com.baarton.runweather.model.UnitSystem
 import com.baarton.runweather.testLogger
@@ -21,7 +20,7 @@ class SettingsViewModelTest : StateFlowTest() {
     private val settingsMock = MapSettings()
     private val testConfig: Config = TestConfig
 
-    private val viewModel by lazy { SettingsViewModel(settingsMock, testConfig, logger) }
+    private val viewModel by lazy { SettingsViewModel(settingsMock, testConfig, TestAppInfo, logger) }
 
     companion object {
 

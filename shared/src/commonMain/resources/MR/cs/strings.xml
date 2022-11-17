@@ -101,6 +101,6 @@
     <string name="settings_poll_freq_title">Frekvence obnovení (min)</string>
 
     <string name="setting_about_title">O aplikaci</string>
-    <string name="setting_about_summary">Verze %1$s\n%2$s</string>
+    <string name="setting_about_summary">Verze %1$s (%2$d)\n%3$s</string>
 
 </resources>

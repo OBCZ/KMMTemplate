@@ -2,4 +2,4 @@ root = true
 
 [*]
 
-# TODO
+# TODO this and/or ktlint? If not ktlint, get rid of ktlint dependency in libs.toml

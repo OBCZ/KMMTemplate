@@ -44,5 +44,6 @@ class MainApp : Application() {
 object AndroidAppInfo : AppInfo {
     override val appId: String = BuildConfig.APPLICATION_ID
     override val versionName: String = BuildConfig.VERSION_NAME
+    override val versionCode: Int = BuildConfig.VERSION_CODE
     override val debug: Boolean = BuildConfig.DEBUG
 }

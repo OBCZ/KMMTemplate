@@ -7,12 +7,13 @@ plugins {
     id("dev.icerock.mobile.multiplatform-resources")
 }
 
+version = libs.versions.versionName.get()
+
 android {
     compileSdk = libs.versions.compileSdk.get().toInt()
     defaultConfig {
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     testOptions {
         unitTests {
@@ -27,19 +28,15 @@ android {
     }
 }
 
-version = "1.2"
-
 //TODO verify function on iOS, see also
 // https://proandroiddev.com/exposing-the-separate-resources-module-to-ios-target-using-moko-resources-in-kmm-76b9c3d533
 // https://github.com/icerockdev/moko-resources
 multiplatformResources {
     multiplatformResourcesPackage = "com.baarton.runweather.res" // required
     multiplatformResourcesClassName = "SharedRes" // optional, default MR
-    // multiplatformResourcesVisibility = MRVisibility.Internal // optional, default Public
-    // iosBaseLocalizationRegion = "en" // optional, default "en"
-    // multiplatformResourcesSourceSet = "commonClientMain"  // optional, default "commonMain"
 }
 
+//TODO what is this
 android {
     configurations {
         create("androidTestApi")
@@ -77,13 +74,13 @@ kotlin {
                 implementation(libs.multiplatformSettings.common)
                 implementation(libs.kotlinx.dateTime)
                 api(libs.touchlab.kermit)
-                api("dev.icerock.moko:resources:0.20.1")
+                api(libs.mokoResources.core)
             }
         }
         val commonTest by getting {
             dependencies {
                 implementation(libs.bundles.shared.commonTest)
-                implementation("dev.icerock.moko:resources-test:0.20.1")
+                implementation(libs.mokoResources.test)
             }
         }
         val androidMain by getting {
@@ -91,7 +88,7 @@ kotlin {
                 implementation(libs.androidx.lifecycle.viewmodel)
                 implementation(libs.sqlDelight.android)
                 implementation(libs.ktor.client.okHttp)
-                api("dev.icerock.moko:resources-compose:0.20.1")
+                api(libs.mokoResources.compose)
             }
         }
         val androidTest by getting {

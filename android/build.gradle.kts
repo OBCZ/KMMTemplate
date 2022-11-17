@@ -3,17 +3,14 @@ plugins {
     kotlin("android")
 }
 
-//TODO make the same package id for android as the current Google Play
-
 android {
     compileSdk = libs.versions.compileSdk.get().toInt()
     defaultConfig {
         applicationId = "com.baarton.runweather"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        versionCode = calcCode()
+        versionName = libs.versions.versionName.get()
     }
     packagingOptions {
         resources.excludes.add("META-INF/*.kotlin_module")
@@ -58,4 +55,16 @@ dependencies {
     implementation(libs.koin.compose)
     implementation(libs.coil.compose)
     testImplementation(libs.junit)
+}
+
+fun calcCode(): Int {
+    val versionName: String = libs.versions.versionName.get()
+    val split = versionName.split("-")
+
+    var minor = 0
+    val major = (split[0].replace(".", "")).toInt() * 100
+    if (split.size == 2) {
+        minor = split[1].toInt()
+    }
+    return major + minor
 }

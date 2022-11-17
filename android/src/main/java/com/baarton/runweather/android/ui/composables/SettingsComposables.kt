@@ -208,13 +208,14 @@ private fun AboutSection(appInfo: AppInfo) {
             textAlign = TextAlign.Start
         )
 
-        val version = appInfo.versionName
+        val versionName = appInfo.versionName
+        val versionCode = appInfo.versionCode
         val copyright = stringResource(id = SharedRes.strings.app_copyright.resourceId)
 
         Text(
             text = stringResource(
                 id = SharedRes.strings.setting_about_summary.resourceId,
-                formatArgs = arrayOf(version, copyright)
+                formatArgs = arrayOf(versionName, versionCode, copyright)
             ),
             style = MaterialTheme.typography.body2,
             color = MaterialTheme.colors.onBackground,
