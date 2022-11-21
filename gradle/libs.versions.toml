@@ -1,5 +1,6 @@
 [versions]
 # App related
+appId = "com.baarton.runweather"
 versionName = "2.0"
 
 # SDK Versions

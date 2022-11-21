@@ -32,7 +32,7 @@ android {
 // https://proandroiddev.com/exposing-the-separate-resources-module-to-ios-target-using-moko-resources-in-kmm-76b9c3d533
 // https://github.com/icerockdev/moko-resources
 multiplatformResources {
-    multiplatformResourcesPackage = "com.baarton.runweather.res" // required
+    multiplatformResourcesPackage = "${libs.versions.appId.get()}.res" // required
     multiplatformResourcesClassName = "SharedRes" // optional, default MR
 }
 
@@ -129,6 +129,6 @@ kotlin {
 
 sqldelight {
     database("RunWeatherDb") {
-        packageName = "com.baarton.runweather.db"
+        packageName = "${libs.versions.appId.get()}.db"
     }
 }
