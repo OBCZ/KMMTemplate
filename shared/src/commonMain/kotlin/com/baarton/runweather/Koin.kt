@@ -5,13 +5,12 @@ import co.touchlab.kermit.StaticConfig
 import co.touchlab.kermit.platformLogWriter
 import com.baarton.runweather.ktor.WeatherDataApi
 import com.baarton.runweather.ktor.WeatherDataApiImpl
+import com.baarton.runweather.network.NetworkManager
 import com.baarton.runweather.repo.WeatherRepository
 import com.baarton.runweather.sqldelight.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.datetime.Clock
 import org.koin.core.KoinApplication
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.core.parameter.parametersOf
@@ -51,18 +50,27 @@ fun initKoin(appModule: Module): KoinApplication {
 
 private val coreModule = module {
     single {
+        NetworkManager(
+            get(),
+            getWith(NetworkManager::class.simpleName)
+        )
+    }
+
+    single {
         DatabaseHelper(
             get(),
             Dispatchers.Default,
             getWith(DatabaseHelper::class.simpleName)
         )
     }
+
     single<WeatherDataApi> {
         WeatherDataApiImpl(
             get(),
             getWith(WeatherDataApiImpl::class.simpleName)
         )
     }
+
     single {
         WeatherRepository(
             get(),
@@ -73,9 +81,11 @@ private val coreModule = module {
             getWith(WeatherRepository::class.simpleName)
         )
     }
+
     single<Clock> {
         Clock.System
     }
+
     single<Config> {
         AppConfig(get())
     }
@@ -89,10 +99,8 @@ private val coreModule = module {
     factory { (tag: String?) -> if (tag != null) baseLogger.withTag(tag) else baseLogger }
 }
 
-internal inline fun <reified T> Scope.getWith(vararg params: Any?): T {
+inline fun <reified T> Scope.getWith(vararg params: Any?): T {
     return get(parameters = { parametersOf(*params) })
 }
-
-fun KoinComponent.injectLogger(tag: String): Lazy<Logger> = inject { parametersOf(tag) }
 
 expect val platformModule: Module

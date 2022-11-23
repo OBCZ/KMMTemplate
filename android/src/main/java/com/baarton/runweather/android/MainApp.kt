@@ -6,9 +6,12 @@ import android.content.SharedPreferences
 import android.util.Log
 import com.baarton.runweather.AppInfo
 import com.baarton.runweather.Config
+import com.baarton.runweather.getWith
 import com.baarton.runweather.initKoin
 import com.baarton.runweather.model.viewmodel.SettingsViewModel
 import com.baarton.runweather.model.viewmodel.WeatherViewModel
+import com.baarton.runweather.android.network.AndroidNetwork
+import com.baarton.runweather.network.PlatformNetwork
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
@@ -23,10 +26,11 @@ class MainApp : Application() {
                 single<Context> { this@MainApp }
 
                 //TODO define network nad location platform specific definitions -> move to platformModule?
-                // single<PlatformNetworkManager> { AndroidNetworkManager(get()) }
                 // single<PlatformLocationManager> { AndroidLocationManager(get()) }
 
-                viewModel { WeatherViewModel(get(), get(), get(), get(), get { parametersOf(WeatherViewModel::class.simpleName) }) }
+                single<PlatformNetwork> { AndroidNetwork(get(), getWith(AndroidNetwork::class.simpleName)) }
+
+                viewModel { WeatherViewModel(get(), get(), get(), get(), get(), get { parametersOf(WeatherViewModel::class.simpleName) }) }
                 viewModel { SettingsViewModel(get(), get(), get(), get { parametersOf(SettingsViewModel::class.simpleName) }) }
                 single<SharedPreferences> {
                     get<Context>().getSharedPreferences(get<Config>().preferences, Context.MODE_PRIVATE)

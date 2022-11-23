@@ -6,6 +6,8 @@ import com.baarton.runweather.db.PersistedWeather
 import com.baarton.runweather.model.UnitSystem
 import com.baarton.runweather.model.viewmodel.SettingsViewModel.Companion.DATA_UNIT_TAG
 import com.baarton.runweather.model.weather.CurrentWeather
+import com.baarton.runweather.network.ConnectionState
+import com.baarton.runweather.network.NetworkManager
 import com.baarton.runweather.repo.WeatherRepository
 import com.baarton.runweather.res.SharedRes
 import com.russhwolf.settings.ObservableSettings
@@ -27,10 +29,13 @@ import kotlinx.datetime.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
+
 class WeatherViewModel(
     settings: ObservableSettings,
     private val config: Config,
     private val weatherRepository: WeatherRepository,
+    // TODO private val locationManager: LocationManager,
+    private val networkManager: NetworkManager,
     private val clock: Clock,
     private val log: Logger
 ) : ViewModel() {
@@ -68,12 +73,16 @@ class WeatherViewModel(
     val weatherState: StateFlow<WeatherViewState> = mutableWeatherState
 
     init {
+        createNetworkListeners()
+        networkManager.startNetworkCallback()
         observeWeather()
     }
 
     private fun onUnitSettingChanged(unitKey: String) {
         mutableWeatherState.update {
             it.copy(unitSetting = UnitSystem.safeValueOf(unitKey))
+        }.also {
+            log.d { "Updating weather state with $it." }
         }
     }
 
@@ -82,7 +91,30 @@ class WeatherViewModel(
         isClosed = true
         pollingDispatcher.cancel()
         settingsListener.deactivate()
+        networkManager.clearListeners()
+        networkManager.stopNetworkCallback()
         log.v("Clearing WeatherViewModel.")
+    }
+
+    private fun createNetworkListeners() {
+        networkManager.addConnectionAvailableListener { connectionState ->
+            mutableWeatherState.update {
+                it.copy(
+                    networkState = connectionState,
+                    isLoading = false
+                ).also {
+                    log.d { "Updating weather state with $it." }
+                }
+            }
+        }
+
+        networkManager.addConnectionAvailableListener {
+            if (it == ConnectionState.Available) {
+                isClosed = true
+                refreshWeather()
+                isClosed = false
+            }
+        }
     }
 
     private fun observeWeather() {
@@ -207,7 +239,7 @@ data class WeatherViewState(
     val isLoading: Boolean = false,
     val unitSetting: UnitSystem = UnitSystem.default(),
     val locationAvailable: Boolean = true, //TODO need provider listener logic
-    val networkAvailable: Boolean = true //TODO need provider listener logic
+    val networkState: ConnectionState = ConnectionState.Unavailable
 ) {
 
     enum class ErrorType(val messageRes: StringResource) {

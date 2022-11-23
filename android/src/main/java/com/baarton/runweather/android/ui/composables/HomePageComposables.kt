@@ -62,9 +62,9 @@ import com.baarton.runweather.model.viewmodel.convert
 import com.baarton.runweather.model.weather.Weather
 import com.baarton.runweather.model.weather.WeatherData
 import com.baarton.runweather.model.weather.WeatherId
+import com.baarton.runweather.network.ConnectionState
 import com.baarton.runweather.res.SharedRes
 import com.baarton.runweather.ui.Vector
-import dev.icerock.moko.resources.StringResource
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDateTime
@@ -160,7 +160,7 @@ private fun ErrorScreen(error: WeatherViewState.ErrorType, onRefresh: () -> Unit
 private fun ColumnScope.WeatherScreen(weatherState: WeatherViewState) {
     val weather = weatherState.weather!!.convert(weatherState.unitSetting) // we should not get NPE here
     val locationAvailable = weatherState.locationAvailable
-    val networkAvailable = weatherState.networkAvailable
+    val networkAvailable = weatherState.networkState
     val lastUpdated = weatherState.lastUpdated
 
     StateRow(
@@ -187,7 +187,7 @@ private fun ColumnScope.WeatherScreen(weatherState: WeatherViewState) {
 }
 
 @Composable
-private fun ColumnScope.StateRow(weight: Float, locationAvailable: Boolean, networkAvailable: Boolean, lastUpdated: Duration?) {
+private fun ColumnScope.StateRow(weight: Float, locationAvailable: Boolean, networkAvailable: ConnectionState, lastUpdated: Duration?) {
     Row(
         modifier = Modifier
             .align(CenterHorizontally)
@@ -215,10 +215,9 @@ private fun ColumnScope.StateRow(weight: Float, locationAvailable: Boolean, netw
                 .align(CenterVertically)
                 .padding(8.dp)
                 .weight(1f),
-            imageVector = if (networkAvailable) {
-                Vector.NETWORK_ON
-            } else {
-                Vector.NETWORK_OFF
+            imageVector = when (networkAvailable) {
+                ConnectionState.Available -> Vector.NETWORK_ON
+                ConnectionState.Unavailable -> Vector.NETWORK_OFF
             }.build(),
             contentDescription = stringResource(
                 id = SharedRes.strings.weather_network_content_description.resourceId,
@@ -238,12 +237,22 @@ private fun ColumnScope.StateRow(weight: Float, locationAvailable: Boolean, netw
 }
 
 @Composable
-private fun onOffText(available: Boolean): String {
+private fun onOffText(connectionState: ConnectionState): String {
     return stringResource(
-        if (available) {
-            SharedRes.strings.app_on
-        } else {
-            SharedRes.strings.app_off
+        when (connectionState) {
+            ConnectionState.Available -> SharedRes.strings.app_on
+            ConnectionState.Unavailable -> SharedRes.strings.app_off
+        }.resourceId
+    )
+}
+
+//TODO might be redundant
+@Composable
+private fun onOffText(boolean: Boolean): String {
+    return stringResource(
+        when (boolean) {
+            true -> SharedRes.strings.app_on
+            false -> SharedRes.strings.app_off
         }.resourceId
     )
 }
@@ -300,45 +309,23 @@ private fun ColumnScope.DataRow(weight: Float, weather: PersistedWeather) {
                 .fillMaxSize()
 
         ) {
-
             //TODO header row?
-
-            InfoRow(
-                weather,
-                SharedRes.strings.weather_runners_info_data_head_cover_category,
-                RunnersInfo.HeadCover
-            )
-            InfoRow(
-                weather,
-                SharedRes.strings.weather_runners_info_data_sunglasses_category,
-                RunnersInfo.Sunglasses
-            )
-            InfoRow(
-                weather,
-                SharedRes.strings.weather_runners_info_data_neck_cover_category,
-                RunnersInfo.NeckCover
-            )
-            InfoRow(
-                weather,
-                SharedRes.strings.weather_runners_info_data_top_layers_category,
-                RunnersInfo.LayersTop
-            )
-            InfoRow(
-                weather,
-                SharedRes.strings.weather_runners_info_data_gloves_category,
-                RunnersInfo.Gloves
-            )
-            InfoRow(
-                weather,
-                SharedRes.strings.weather_runners_info_data_bottom_layers_category,
-                RunnersInfo.LayersBottom
-            )
-            InfoRow(
-                weather,
-                SharedRes.strings.weather_runners_info_data_socks_category,
+            val categories = listOf(
+                RunnersInfo.HeadCover,
+                RunnersInfo.Sunglasses,
+                RunnersInfo.NeckCover,
+                RunnersInfo.LayersTop,
+                RunnersInfo.Gloves,
+                RunnersInfo.LayersBottom,
                 RunnersInfo.Socks
             )
 
+            repeat(7) {
+                InfoRow(
+                    weather,
+                    categories[it]
+                )
+            }
         }
 
     }
@@ -398,7 +385,7 @@ private fun timeText(instant: Instant): String {
 }
 
 @Composable
-private fun ColumnScope.InfoRow(weatherData: PersistedWeather, categoryTextRes: StringResource, hint: RunnersHint) {
+private fun ColumnScope.InfoRow(weatherData: PersistedWeather, hint: RunnersHint) {
     val slowColumnHint = when (hint) {
         is TemperatureHint -> hint.slow(weatherData.mainData.temperature)
         is WeatherHint -> hint.hint(weatherData)
@@ -422,7 +409,7 @@ private fun ColumnScope.InfoRow(weatherData: PersistedWeather, categoryTextRes: 
             modifier = Modifier
                 .padding(vertical = 1.dp, horizontal = 2.dp)
                 .weight(0.33f),
-            text = stringResource(id = categoryTextRes.resourceId),
+            text = stringResource(id = hint.titleRes.resourceId),
             color = MaterialTheme.colors.onPrimary,
             style = MaterialTheme.typography.body2
         )

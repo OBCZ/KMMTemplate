@@ -88,6 +88,9 @@ sealed class RunnersInfo {
             }
         }
 
+        override val titleRes: StringResource
+            get() = SharedRes.strings.weather_runners_info_data_top_layers_category
+
         enum class LayersTopHint(override val textRes: StringResource) : TextHint {
             ONE(RES_TOP_LAYER_ONE),
             TWO(RES_TOP_LAYER_TWO),
@@ -119,6 +122,9 @@ sealed class RunnersInfo {
                 else -> throwException(temp, LayersBottom::class)
             }
         }
+
+        override val titleRes: StringResource
+            get() = SharedRes.strings.weather_runners_info_data_bottom_layers_category
 
         enum class LayersBottomHint(override val textRes: StringResource) : TextHint {
             SHORTS(RES_BOTTOM_LAYER_SHORTS),
@@ -154,6 +160,9 @@ sealed class RunnersInfo {
             }
         }
 
+        override val titleRes: StringResource
+            get() = SharedRes.strings.weather_runners_info_data_head_cover_category
+
         enum class HeadCoverHint(override val textRes: StringResource) : TextHint {
             SUN(RES_HEAD_SUN),
             NONE(RES_HEAD_NONE),
@@ -182,6 +191,9 @@ sealed class RunnersInfo {
                 else -> SunglassesHint.UNKNOWN
             }
         }
+
+        override val titleRes: StringResource
+            get() = SharedRes.strings.weather_runners_info_data_sunglasses_category
 
         enum class SunglassesHint(override val textRes: StringResource) : TextHint {
             NO(RES_SUNGLASSES_NO),
@@ -214,6 +226,9 @@ sealed class RunnersInfo {
             }
         }
 
+        override val titleRes: StringResource
+            get() = SharedRes.strings.weather_runners_info_data_neck_cover_category
+
         enum class NeckCoverHint(override val textRes: StringResource) : TextHint {
             NONE(RES_NECK_NONE),
             WEAK(RES_NECK_WEAK),
@@ -242,6 +257,9 @@ sealed class RunnersInfo {
             }
         }
 
+        override val titleRes: StringResource
+            get() = SharedRes.strings.weather_runners_info_data_gloves_category
+
         enum class GlovesHint(override val textRes: StringResource) : TextHint {
             NO(RES_GLOVES_NO),
             YES(RES_GLOVES_YES);
@@ -269,6 +287,9 @@ sealed class RunnersInfo {
             }
         }
 
+        override val titleRes: StringResource
+            get() = SharedRes.strings.weather_runners_info_data_socks_category
+
         enum class SocksHint(override val textRes: StringResource) : TextHint {
             NORMAL(RES_SOCKS_NORMAL),
             WARM(RES_SOCKS_WARM);
@@ -291,7 +312,9 @@ interface WeatherHint : RunnersHint {
     fun hint(weatherData: PersistedWeather): TextHint
 }
 
-sealed interface RunnersHint
+sealed interface RunnersHint {
+    val titleRes: StringResource
+}
 
 interface WeatherWarning {
     fun warning(weatherData: PersistedWeather): WarningHint?

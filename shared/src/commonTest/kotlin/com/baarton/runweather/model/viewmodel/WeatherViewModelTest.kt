@@ -1,7 +1,6 @@
 package com.baarton.runweather.model.viewmodel
 
 import app.cash.turbine.test
-import com.baarton.runweather.Config
 import com.baarton.runweather.StateFlowTest
 import com.baarton.runweather.TestConfig
 import com.baarton.runweather.db.PersistedWeather
@@ -9,6 +8,7 @@ import com.baarton.runweather.mock.BRNO1
 import com.baarton.runweather.mock.BRNO2
 import com.baarton.runweather.mock.CORRUPT
 import com.baarton.runweather.mock.ClockMock
+import com.baarton.runweather.mock.MockNetwork
 import com.baarton.runweather.mock.WeatherDataApiMock
 import com.baarton.runweather.model.Angle.Companion.deg
 import com.baarton.runweather.model.Humidity.Companion.percent
@@ -19,6 +19,8 @@ import com.baarton.runweather.model.Velocity.Companion.mps
 import com.baarton.runweather.model.weather.Weather
 import com.baarton.runweather.model.weather.WeatherData
 import com.baarton.runweather.model.weather.WeatherId
+import com.baarton.runweather.network.ConnectionState
+import com.baarton.runweather.network.NetworkManager
 import com.baarton.runweather.repo.WeatherRepository
 import com.baarton.runweather.sqldelight.DatabaseHelper
 import com.baarton.runweather.testDbConnection
@@ -40,18 +42,20 @@ import kotlin.time.Duration.Companion.seconds
 
 class WeatherViewModelTest : StateFlowTest() {
 
-    private var logger = testLogger()
-    private var testDbConnection = testDbConnection()
-    private var dbHelper = DatabaseHelper(testDbConnection, Dispatchers.Default, logger)
-    private var dataTimestamp: Instant? = null
-
+    private val logger = testLogger()
+    private val testDbConnection = testDbConnection()
+    private val dbHelper = DatabaseHelper(testDbConnection, Dispatchers.Default, logger)
     private val settingsMock = MapSettings()
     private val apiMock = WeatherDataApiMock()
     private val clockMock = ClockMock()
-    private val testConfig: Config = TestConfig
-    private val repository: WeatherRepository = WeatherRepository(dbHelper, settingsMock, testConfig, apiMock, clockMock, logger)
+    private val testConfig = TestConfig
+    private val repository = WeatherRepository(dbHelper, settingsMock, testConfig, apiMock, clockMock, logger)
+    private val mockNetwork = MockNetwork()
+    private val networkManager = NetworkManager(mockNetwork, logger)
 
-    private val viewModel by lazy { WeatherViewModel(settingsMock, testConfig, repository, clockMock, logger) }
+    private val viewModel by lazy { WeatherViewModel(settingsMock, testConfig, repository, networkManager, clockMock, logger) }
+
+    private var dataTimestamp: Instant? = null
 
     companion object {
 
@@ -97,6 +101,38 @@ class WeatherViewModelTest : StateFlowTest() {
             testDbConnection.close()
         }
         super.tearDown()
+    }
+
+    @Test
+    fun `Network connected`() = runBlocking {
+        apiMock.prepareResults(BRNO1)
+
+        viewModel.weatherState.test {
+            mockNetwork.mockConnected(true)
+
+            assertEquals(
+                WeatherViewState(isLoading = false, networkState = ConnectionState.Available),
+                awaitItemAfter(WeatherViewState(isLoading = true))
+            )
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `Network disconnected`() = runBlocking {
+        apiMock.prepareResults(BRNO1)
+
+        viewModel.weatherState.test {
+            mockNetwork.mockConnected(false)
+
+            assertEquals(
+                weatherSuccessStateBrno1.copy(lastUpdated = 0.seconds, isLoading = false, networkState = ConnectionState.Unavailable),
+                awaitItemAfter(WeatherViewState(isLoading = true))
+            )
+
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
