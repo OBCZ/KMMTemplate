@@ -3,6 +3,8 @@ package com.baarton.runweather.model.viewmodel
 import co.touchlab.kermit.Logger
 import com.baarton.runweather.Config
 import com.baarton.runweather.db.PersistedWeather
+import com.baarton.runweather.location.LocationManager
+import com.baarton.runweather.location.LocationState
 import com.baarton.runweather.model.UnitSystem
 import com.baarton.runweather.model.viewmodel.SettingsViewModel.Companion.DATA_UNIT_TAG
 import com.baarton.runweather.model.weather.CurrentWeather
@@ -34,7 +36,7 @@ class WeatherViewModel(
     settings: ObservableSettings,
     private val config: Config,
     private val weatherRepository: WeatherRepository,
-    // TODO private val locationManager: LocationManager,
+    private val locationManager: LocationManager,
     private val networkManager: NetworkManager,
     private val clock: Clock,
     private val log: Logger
@@ -72,9 +74,12 @@ class WeatherViewModel(
 
     val weatherState: StateFlow<WeatherViewState> = mutableWeatherState
 
+    //FIXME merge these sensor methods somehow?
     init {
         createNetworkListeners()
+        createLocationListeners()
         networkManager.startNetworkCallback()
+        locationManager.startLocationCallback()
         observeWeather()
     }
 
@@ -93,7 +98,22 @@ class WeatherViewModel(
         settingsListener.deactivate()
         networkManager.clearListeners()
         networkManager.stopNetworkCallback()
+        locationManager.clearListeners()
+        locationManager.stopLocationCallback()
         log.v("Clearing WeatherViewModel.")
+    }
+
+    private fun createLocationListeners() {
+        locationManager.addLocationAvailableListener { locationState ->
+            mutableWeatherState.update {
+                it.copy(
+                    locationState = locationState,
+                    // isLoading = false //FIXME ???
+                ).also {
+                    log.d { "Updating weather state with $it." }
+                }
+            }
+        }
     }
 
     private fun createNetworkListeners() {
@@ -128,7 +148,7 @@ class WeatherViewModel(
                 }
                 try {
                     log.i("Try to refresh WeatherData from flow.")
-                    val item = weatherRepository.refreshWeather()
+                    val item = weatherRepository.refreshWeather(locationManager.currentLocation())
                     send(PollingResult(data = item))
                 } catch (exception: Exception) {
                     send(PollingResult(error = exception))
@@ -197,7 +217,7 @@ class WeatherViewModel(
         return viewModelScope.launch {
             log.i("Launching refresh WeatherData one-time.")
             val oneTimeData = try {
-                PollingResult(data = weatherRepository.refreshWeather())
+                PollingResult(data = weatherRepository.refreshWeather(locationManager.currentLocation()))
             } catch (exception: Exception) {
                 PollingResult(error = exception)
             }
@@ -238,7 +258,7 @@ data class WeatherViewState(
     val error: ErrorType? = null,
     val isLoading: Boolean = false,
     val unitSetting: UnitSystem = UnitSystem.default(),
-    val locationAvailable: Boolean = true, //TODO need provider listener logic
+    val locationState: LocationState = LocationState.Unavailable,
     val networkState: ConnectionState = ConnectionState.Unavailable
 ) {
 

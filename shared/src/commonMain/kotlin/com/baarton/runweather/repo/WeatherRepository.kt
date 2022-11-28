@@ -5,6 +5,7 @@ import co.touchlab.stately.ensureNeverFrozen
 import com.baarton.runweather.Config
 import com.baarton.runweather.ktor.ImageUrlBuilder
 import com.baarton.runweather.ktor.WeatherDataApi
+import com.baarton.runweather.location.Location
 import com.baarton.runweather.model.viewmodel.SettingsViewModel.Companion.WEATHER_DATA_THRESHOLD_TAG
 import com.baarton.runweather.model.weather.CurrentWeather
 import com.baarton.runweather.sqldelight.DatabaseHelper
@@ -35,9 +36,9 @@ class WeatherRepository(
         ensureNeverFrozen()
     }
 
-    suspend fun refreshWeather(): CurrentWeather? {
+    suspend fun refreshWeather(location: Location): CurrentWeather? {
         return if (isWeatherListStale()) {
-            doRefreshWeather()
+            doRefreshWeather(location)
         } else {
             getWeather()
         }
@@ -60,9 +61,9 @@ class WeatherRepository(
         }
     }
 
-    private suspend fun doRefreshWeather(): CurrentWeather {
+    private suspend fun doRefreshWeather(location: Location): CurrentWeather {
         val weatherResult = try {
-            weatherApi.getWeatherFromApi()
+            weatherApi.getWeatherFromApi(location)
         } catch (e: Exception) {
             throw WeatherAPIException("Weather API has thrown an Exception: ${e.message}", e.cause)
         }

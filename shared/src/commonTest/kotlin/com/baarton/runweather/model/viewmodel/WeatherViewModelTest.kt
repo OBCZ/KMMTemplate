@@ -4,10 +4,12 @@ import app.cash.turbine.test
 import com.baarton.runweather.StateFlowTest
 import com.baarton.runweather.TestConfig
 import com.baarton.runweather.db.PersistedWeather
+import com.baarton.runweather.location.LocationManager
 import com.baarton.runweather.mock.BRNO1
 import com.baarton.runweather.mock.BRNO2
 import com.baarton.runweather.mock.CORRUPT
 import com.baarton.runweather.mock.ClockMock
+import com.baarton.runweather.mock.MockLocation
 import com.baarton.runweather.mock.MockNetwork
 import com.baarton.runweather.mock.WeatherDataApiMock
 import com.baarton.runweather.model.Angle.Companion.deg
@@ -51,9 +53,11 @@ class WeatherViewModelTest : StateFlowTest() {
     private val testConfig = TestConfig
     private val repository = WeatherRepository(dbHelper, settingsMock, testConfig, apiMock, clockMock, logger)
     private val mockNetwork = MockNetwork()
+    private val mockLocation = MockLocation()
+    private val locationManager = LocationManager(mockLocation, logger)
     private val networkManager = NetworkManager(mockNetwork, logger)
 
-    private val viewModel by lazy { WeatherViewModel(settingsMock, testConfig, repository, networkManager, clockMock, logger) }
+    private val viewModel by lazy { WeatherViewModel(settingsMock, testConfig, repository, locationManager, networkManager, clockMock, logger) }
 
     private var dataTimestamp: Instant? = null
 

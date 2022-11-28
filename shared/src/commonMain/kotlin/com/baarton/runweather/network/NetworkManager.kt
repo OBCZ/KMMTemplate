@@ -11,7 +11,7 @@ class NetworkManager(
     private var isRunning = false
     private var isConnectionAvailableListeners: MutableList<(ConnectionState) -> Unit> = mutableListOf()
 
-    private var _isNetworkConnected: Boolean by Delegates.observable(false) { _, _, newValue ->
+    private var isNetworkConnected: Boolean by Delegates.observable(false) { _, _, newValue ->
         log.i("Connected: $newValue")
         isConnectionAvailableListeners.forEach {
             it(getConnectionState(newValue))
@@ -42,8 +42,8 @@ class NetworkManager(
     }
 
     private fun setConnected(connected: Boolean) {
-        if (connected != _isNetworkConnected) {
-            _isNetworkConnected = connected
+        if (connected != isNetworkConnected) {
+            isNetworkConnected = connected
         }
     }
 

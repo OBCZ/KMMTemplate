@@ -6,7 +6,7 @@ open class PlatformNetwork {
 
     protected var onConnectionChange: BooleanListener? = null
 
-    open fun startCallback(onConnectionChange: (Boolean) -> Unit) {
+    open fun startCallback(onConnectionChange: BooleanListener) {
         this.onConnectionChange = onConnectionChange
     }
 

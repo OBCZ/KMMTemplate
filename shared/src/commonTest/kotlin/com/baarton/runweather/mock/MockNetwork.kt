@@ -1,6 +1,7 @@
 package com.baarton.runweather.mock
 
 import com.baarton.runweather.network.PlatformNetwork
+import com.baarton.runweather.util.BooleanListener
 import kotlin.properties.Delegates
 
 class MockNetwork : PlatformNetwork() {
@@ -13,7 +14,7 @@ class MockNetwork : PlatformNetwork() {
         }
     }
 
-    override fun startCallback(onConnectionChange: (Boolean) -> Unit) {
+    override fun startCallback(onConnectionChange: BooleanListener) {
         super.startCallback(onConnectionChange)
         callbackRegistered = true
     }

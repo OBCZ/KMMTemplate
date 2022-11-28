@@ -5,6 +5,7 @@ import co.touchlab.kermit.StaticConfig
 import co.touchlab.kermit.platformLogWriter
 import com.baarton.runweather.ktor.WeatherDataApi
 import com.baarton.runweather.ktor.WeatherDataApiImpl
+import com.baarton.runweather.location.LocationManager
 import com.baarton.runweather.network.NetworkManager
 import com.baarton.runweather.repo.WeatherRepository
 import com.baarton.runweather.sqldelight.DatabaseHelper
@@ -49,6 +50,13 @@ fun initKoin(appModule: Module): KoinApplication {
 }
 
 private val coreModule = module {
+    single {
+        LocationManager(
+            get(),
+            getWith(LocationManager::class.simpleName)
+        )
+    }
+
     single {
         NetworkManager(
             get(),

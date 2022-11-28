@@ -1,8 +1,9 @@
 package com.baarton.runweather.ktor
 
+import com.baarton.runweather.location.Location
 import com.baarton.runweather.model.weather.WeatherData
 
 interface WeatherDataApi {
 
-    suspend fun getWeatherFromApi(): WeatherData
+    suspend fun getWeatherFromApi(location: Location): WeatherData
 }

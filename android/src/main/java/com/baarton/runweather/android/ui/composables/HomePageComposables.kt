@@ -39,6 +39,7 @@ import androidx.lifecycle.flowWithLifecycle
 import coil.compose.AsyncImage
 import com.baarton.runweather.android.ui.AndroidVector.build
 import com.baarton.runweather.db.PersistedWeather
+import com.baarton.runweather.location.LocationState
 import com.baarton.runweather.model.Angle
 import com.baarton.runweather.model.Angle.Companion.deg
 import com.baarton.runweather.model.Height
@@ -159,14 +160,14 @@ private fun ErrorScreen(error: WeatherViewState.ErrorType, onRefresh: () -> Unit
 @Composable
 private fun ColumnScope.WeatherScreen(weatherState: WeatherViewState) {
     val weather = weatherState.weather!!.convert(weatherState.unitSetting) // we should not get NPE here
-    val locationAvailable = weatherState.locationAvailable
-    val networkAvailable = weatherState.networkState
+    val locationState = weatherState.locationState
+    val networkState = weatherState.networkState
     val lastUpdated = weatherState.lastUpdated
 
     StateRow(
         weight = 1f,
-        locationAvailable = locationAvailable,
-        networkAvailable = networkAvailable,
+        locationState = locationState,
+        networkState = networkState,
         lastUpdated = lastUpdated
     )
 
@@ -187,7 +188,7 @@ private fun ColumnScope.WeatherScreen(weatherState: WeatherViewState) {
 }
 
 @Composable
-private fun ColumnScope.StateRow(weight: Float, locationAvailable: Boolean, networkAvailable: ConnectionState, lastUpdated: Duration?) {
+private fun ColumnScope.StateRow(weight: Float, locationState: LocationState, networkState: ConnectionState, lastUpdated: Duration?) {
     Row(
         modifier = Modifier
             .align(CenterHorizontally)
@@ -200,14 +201,13 @@ private fun ColumnScope.StateRow(weight: Float, locationAvailable: Boolean, netw
                 .align(CenterVertically)
                 .padding(8.dp)
                 .weight(1f),
-            imageVector = if (locationAvailable) {
-                Vector.LOCATION_ON
-            } else {
-                Vector.LOCATION_OFF
+            imageVector = when (locationState) {
+                LocationState.Available -> Vector.LOCATION_ON
+                LocationState.Unavailable -> Vector.LOCATION_OFF
             }.build(),
             contentDescription = stringResource(
                 id = SharedRes.strings.weather_location_content_description.resourceId,
-                formatArgs = arrayOf(onOffText(locationAvailable))
+                formatArgs = arrayOf(onOffText(locationState))
             )
         )
         Image(
@@ -215,13 +215,13 @@ private fun ColumnScope.StateRow(weight: Float, locationAvailable: Boolean, netw
                 .align(CenterVertically)
                 .padding(8.dp)
                 .weight(1f),
-            imageVector = when (networkAvailable) {
+            imageVector = when (networkState) {
                 ConnectionState.Available -> Vector.NETWORK_ON
                 ConnectionState.Unavailable -> Vector.NETWORK_OFF
             }.build(),
             contentDescription = stringResource(
                 id = SharedRes.strings.weather_network_content_description.resourceId,
-                formatArgs = arrayOf(onOffText(networkAvailable))
+                formatArgs = arrayOf(onOffText(networkState))
             )
         )
         Text(
@@ -246,13 +246,12 @@ private fun onOffText(connectionState: ConnectionState): String {
     )
 }
 
-//TODO might be redundant
 @Composable
-private fun onOffText(boolean: Boolean): String {
+private fun onOffText(locationState: LocationState): String {
     return stringResource(
-        when (boolean) {
-            true -> SharedRes.strings.app_on
-            false -> SharedRes.strings.app_off
+        when (locationState) {
+            LocationState.Available -> SharedRes.strings.app_on
+            LocationState.Unavailable -> SharedRes.strings.app_off
         }.resourceId
     )
 }

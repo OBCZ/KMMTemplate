@@ -44,6 +44,8 @@ google-accompanist-pager = { module = "com.google.accompanist:accompanist-pager"
 google-accompanist-pager-indicators = { module = "com.google.accompanist:accompanist-pager-indicators", version = "0.27.0" }
 google-accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version = "0.27.0" }
 
+google-android-location = { module = "com.google.android.gms:play-services-location", version = "21.0.1" }
+
 gradlePlugin-android = { module = "com.android.tools.build:gradle", version = "7.2.2" }
 gradlePlugin-kotlinSerialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 gradlePlugin-ktlint = { module = "org.jlleitschuh.gradle:ktlint-gradle", version = "10.3.0" }
@@ -99,7 +101,8 @@ android-ui = [
     "compose-activity",
     "google-accompanist-pager",
     "google-accompanist-pager-indicators",
-    "google-accompanist-permissions"
+    "google-accompanist-permissions",
+    "google-android-location"
 ]
 gradlePlugins = [
     "gradlePlugin-android",

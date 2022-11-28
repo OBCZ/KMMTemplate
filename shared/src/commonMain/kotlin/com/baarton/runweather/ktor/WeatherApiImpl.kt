@@ -1,6 +1,7 @@
 package com.baarton.runweather.ktor
 
 import co.touchlab.stately.ensureNeverFrozen
+import com.baarton.runweather.location.Location
 import com.baarton.runweather.model.weather.WeatherData
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -69,10 +70,10 @@ class WeatherDataApiImpl(engine: HttpClientEngine, private val log: KermitLogger
         ensureNeverFrozen()
     }
 
-    override suspend fun getWeatherFromApi(): WeatherData {
-        log.d { "Get current weather data from OpenWeather API." }
+    override suspend fun getWeatherFromApi(location: Location): WeatherData {
+        log.d { "Get current weather data from OpenWeather API for location: $location." }
         return client.get {
-            weather()
+            weather(location)
         }.body()
     }
 
@@ -82,7 +83,7 @@ class WeatherDataApiImpl(engine: HttpClientEngine, private val log: KermitLogger
      * https://api.openweathermap.org/data/2.5/onecall?appid=b0719071a899e4b1c350725d752ec252&lat=50&lon=15&exclude=minutely,hourly,daily,alerts
      * https://api.openweathermap.org/data/2.5/weather?appid=b0719071a899e4b1c350725d752ec252&lat=50&lon=15
      */
-    private fun HttpRequestBuilder.weather() {
+    private fun HttpRequestBuilder.weather(location: Location) {
         url {
             protocol = URLProtocol.HTTPS
             host = DATA_AUTHORITY
@@ -90,8 +91,8 @@ class WeatherDataApiImpl(engine: HttpClientEngine, private val log: KermitLogger
             parameters.append(APP_ID_KEY, OPENWEATHER_API_KEY_APP_ID_VALUE)
             parameters.append(UNITS_KEY, UNITS_VALUE)
             parameters.append(LANGUAGE_KEY, "cz") //TODO
-            parameters.append(LATITUDE_KEY, "50.0") //TODO location manager
-            parameters.append(LONGITUDE_KEY, "15.0") //TODO location manager
+            parameters.append(LATITUDE_KEY, location.latitude.toString())
+            parameters.append(LONGITUDE_KEY, location.longitude.toString())
         }
     }
 }

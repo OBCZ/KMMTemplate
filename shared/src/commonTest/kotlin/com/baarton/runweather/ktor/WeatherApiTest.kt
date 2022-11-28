@@ -1,6 +1,7 @@
 package com.baarton.runweather.ktor
 
 import com.baarton.runweather.emptyLogger
+import com.baarton.runweather.location.Location
 import com.baarton.runweather.model.Angle.Companion.deg
 import com.baarton.runweather.model.Humidity.Companion.percent
 import com.baarton.runweather.model.Pressure.Companion.hpa
@@ -87,7 +88,7 @@ class WeatherApiTest {
         }
         val weatherApi = WeatherDataApiImpl(engine, emptyLogger)
 
-        val result = weatherApi.getWeatherFromApi()
+        val result = weatherApi.getWeatherFromApi(Location(50.0, 15.0))
         assertEquals(
             WeatherData(
                 listOf(Weather(WeatherId.OVERCAST_CLOUDS, "Clouds", "zataženo", "04d")),
@@ -112,7 +113,7 @@ class WeatherApiTest {
         val weatherApi = WeatherDataApiImpl(engine, emptyLogger)
 
         assertFailsWith<ClientRequestException> {
-            weatherApi.getWeatherFromApi()
+            weatherApi.getWeatherFromApi(Location())
         }
     }
 
