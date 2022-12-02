@@ -2,7 +2,7 @@ package com.baarton.runweather.repo
 
 import com.baarton.runweather.TestConfig
 import com.baarton.runweather.db.PersistedWeather
-import com.baarton.runweather.location.Location
+import com.baarton.runweather.sensor.location.Location
 import com.baarton.runweather.mock.BRNO1
 import com.baarton.runweather.mock.WeatherDataApiMock
 import com.baarton.runweather.model.Angle.Companion.deg

@@ -1,7 +1,7 @@
 package com.baarton.runweather.ktor
 
 import com.baarton.runweather.emptyLogger
-import com.baarton.runweather.location.Location
+import com.baarton.runweather.sensor.location.Location
 import com.baarton.runweather.model.Angle.Companion.deg
 import com.baarton.runweather.model.Humidity.Companion.percent
 import com.baarton.runweather.model.Pressure.Companion.hpa

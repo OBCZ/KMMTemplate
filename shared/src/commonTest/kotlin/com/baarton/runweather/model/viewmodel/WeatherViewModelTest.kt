@@ -4,7 +4,7 @@ import app.cash.turbine.test
 import com.baarton.runweather.StateFlowTest
 import com.baarton.runweather.TestConfig
 import com.baarton.runweather.db.PersistedWeather
-import com.baarton.runweather.location.LocationManager
+import com.baarton.runweather.sensor.location.LocationManager
 import com.baarton.runweather.mock.BRNO1
 import com.baarton.runweather.mock.BRNO2
 import com.baarton.runweather.mock.CORRUPT
@@ -21,8 +21,8 @@ import com.baarton.runweather.model.Velocity.Companion.mps
 import com.baarton.runweather.model.weather.Weather
 import com.baarton.runweather.model.weather.WeatherData
 import com.baarton.runweather.model.weather.WeatherId
-import com.baarton.runweather.network.ConnectionState
-import com.baarton.runweather.network.NetworkManager
+import com.baarton.runweather.sensor.network.NetworkManager
+import com.baarton.runweather.sensor.SensorState.*
 import com.baarton.runweather.repo.WeatherRepository
 import com.baarton.runweather.sqldelight.DatabaseHelper
 import com.baarton.runweather.testDbConnection
@@ -108,15 +108,29 @@ class WeatherViewModelTest : StateFlowTest() {
     }
 
     @Test
-    fun `Network connected`() = runBlocking {
-        apiMock.prepareResults(BRNO1)
+    fun `Network sensor test`() = runBlocking {
+        apiMock.prepareResults(BRNO2)
+        dbHelper.insert(BRNO1.data)
+        setDataAge(Clock.System.now() - 1.seconds)
 
         viewModel.weatherState.test {
+
+            assertEquals(
+                ConnectionState.Unavailable,
+                awaitItemAfter(WeatherViewState(isLoading = true)).networkState
+            )
+
+            setDataAge(Clock.System.now() - 2.hours)
             mockNetwork.mockConnected(true)
 
             assertEquals(
-                WeatherViewState(isLoading = false, networkState = ConnectionState.Available),
-                awaitItemAfter(WeatherViewState(isLoading = true))
+                ConnectionState.Available,
+                awaitItemAfter(weatherSuccessStateBrno1.copy(isLoading = true)).networkState
+            )
+
+            assertEquals(
+                weatherSuccessStateBrno2.copy(lastUpdated = 0.seconds, isLoading = false, networkState = ConnectionState.Available),
+                awaitItemAfterLast(weatherSuccessStateBrno1.copy(lastUpdated = calculateMockedTimestamp(), isLoading = true, networkState = ConnectionState.Available))
             )
 
             cancelAndIgnoreRemainingEvents()
@@ -124,15 +138,22 @@ class WeatherViewModelTest : StateFlowTest() {
     }
 
     @Test
-    fun `Network disconnected`() = runBlocking {
-        apiMock.prepareResults(BRNO1)
+    fun `Location sensor test`() = runBlocking {
+        dbHelper.insert(BRNO1.data)
+        setDataAge(Clock.System.now() - 1.seconds)
 
         viewModel.weatherState.test {
-            mockNetwork.mockConnected(false)
 
             assertEquals(
-                weatherSuccessStateBrno1.copy(lastUpdated = 0.seconds, isLoading = false, networkState = ConnectionState.Unavailable),
-                awaitItemAfter(WeatherViewState(isLoading = true))
+                LocationState.Unavailable,
+                awaitItemAfter(WeatherViewState(isLoading = true)).locationState
+            )
+
+            mockLocation.mockAvailable(true)
+
+            assertEquals(
+                LocationState.Available,
+                awaitItemAfter(weatherSuccessStateBrno1.copy(isLoading = true)).locationState
             )
 
             cancelAndIgnoreRemainingEvents()

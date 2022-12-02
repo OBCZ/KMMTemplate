@@ -5,7 +5,7 @@ import co.touchlab.stately.ensureNeverFrozen
 import com.baarton.runweather.Config
 import com.baarton.runweather.ktor.ImageUrlBuilder
 import com.baarton.runweather.ktor.WeatherDataApi
-import com.baarton.runweather.location.Location
+import com.baarton.runweather.sensor.location.Location
 import com.baarton.runweather.model.viewmodel.SettingsViewModel.Companion.WEATHER_DATA_THRESHOLD_TAG
 import com.baarton.runweather.model.weather.CurrentWeather
 import com.baarton.runweather.sqldelight.DatabaseHelper

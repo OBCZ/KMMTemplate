@@ -12,8 +12,8 @@ import com.baarton.runweather.initKoin
 import com.baarton.runweather.model.viewmodel.SettingsViewModel
 import com.baarton.runweather.model.viewmodel.WeatherViewModel
 import com.baarton.runweather.android.network.AndroidNetwork
-import com.baarton.runweather.location.PlatformLocation
-import com.baarton.runweather.network.PlatformNetwork
+import com.baarton.runweather.sensor.location.PlatformLocation
+import com.baarton.runweather.sensor.network.PlatformNetwork
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module

@@ -5,7 +5,7 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import co.touchlab.kermit.Logger
-import com.baarton.runweather.network.PlatformNetwork
+import com.baarton.runweather.sensor.network.PlatformNetwork
 import com.baarton.runweather.util.BooleanListener
 
 

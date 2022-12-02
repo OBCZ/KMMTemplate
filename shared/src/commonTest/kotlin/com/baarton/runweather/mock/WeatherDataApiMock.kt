@@ -1,7 +1,7 @@
 package com.baarton.runweather.mock
 
 import com.baarton.runweather.ktor.WeatherDataApi
-import com.baarton.runweather.location.Location
+import com.baarton.runweather.sensor.location.Location
 import com.baarton.runweather.model.weather.WeatherData
 
 

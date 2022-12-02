@@ -1,6 +1,6 @@
 package com.baarton.runweather.mock
 
-import com.baarton.runweather.network.PlatformNetwork
+import com.baarton.runweather.sensor.network.PlatformNetwork
 import com.baarton.runweather.util.BooleanListener
 import kotlin.properties.Delegates
 

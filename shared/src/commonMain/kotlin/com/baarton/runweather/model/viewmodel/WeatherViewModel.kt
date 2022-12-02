@@ -3,15 +3,14 @@ package com.baarton.runweather.model.viewmodel
 import co.touchlab.kermit.Logger
 import com.baarton.runweather.Config
 import com.baarton.runweather.db.PersistedWeather
-import com.baarton.runweather.location.LocationManager
-import com.baarton.runweather.location.LocationState
 import com.baarton.runweather.model.UnitSystem
 import com.baarton.runweather.model.viewmodel.SettingsViewModel.Companion.DATA_UNIT_TAG
 import com.baarton.runweather.model.weather.CurrentWeather
-import com.baarton.runweather.network.ConnectionState
-import com.baarton.runweather.network.NetworkManager
 import com.baarton.runweather.repo.WeatherRepository
 import com.baarton.runweather.res.SharedRes
+import com.baarton.runweather.sensor.SensorState.*
+import com.baarton.runweather.sensor.location.LocationManager
+import com.baarton.runweather.sensor.network.NetworkManager
 import com.russhwolf.settings.ObservableSettings
 import com.russhwolf.settings.SettingsListener
 import dev.icerock.moko.resources.StringResource
@@ -30,7 +29,6 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-
 
 class WeatherViewModel(
     settings: ObservableSettings,
@@ -74,12 +72,9 @@ class WeatherViewModel(
 
     val weatherState: StateFlow<WeatherViewState> = mutableWeatherState
 
-    //FIXME merge these sensor methods somehow?
     init {
-        createNetworkListeners()
-        createLocationListeners()
-        networkManager.startNetworkCallback()
-        locationManager.startLocationCallback()
+        networkManager.start(createNetworkListeners())
+        locationManager.start(createLocationListeners())
         observeWeather()
     }
 
@@ -96,45 +91,44 @@ class WeatherViewModel(
         isClosed = true
         pollingDispatcher.cancel()
         settingsListener.deactivate()
-        networkManager.clearListeners()
-        networkManager.stopNetworkCallback()
-        locationManager.clearListeners()
-        locationManager.stopLocationCallback()
+        networkManager.stop()
+        locationManager.stop()
         log.v("Clearing WeatherViewModel.")
     }
 
-    private fun createLocationListeners() {
-        locationManager.addLocationAvailableListener { locationState ->
-            mutableWeatherState.update {
-                it.copy(
-                    locationState = locationState,
-                    // isLoading = false //FIXME ???
-                ).also {
-                    log.d { "Updating weather state with $it." }
+    private fun createLocationListeners(): List<(LocationState) -> Unit> {
+        return listOf(
+            { locationState ->
+                mutableWeatherState.update {
+                    it.copy(
+                        locationState = locationState
+                    ).also {
+                        log.d { "Updating weather state with $it." }
+                    }
                 }
             }
-        }
+        )
     }
 
-    private fun createNetworkListeners() {
-        networkManager.addConnectionAvailableListener { connectionState ->
-            mutableWeatherState.update {
-                it.copy(
-                    networkState = connectionState,
-                    isLoading = false
-                ).also {
-                    log.d { "Updating weather state with $it." }
+    private fun createNetworkListeners(): List<(ConnectionState) -> Unit> {
+        return listOf(
+            { connectionState ->
+                mutableWeatherState.update {
+                    it.copy(
+                        networkState = connectionState
+                    ).also {
+                        log.d { "Updating weather state with $it." }
+                    }
+                }
+            },
+            {
+                if (it == ConnectionState.Available) {
+                    isClosed = true
+                    refreshWeather()
+                    isClosed = false
                 }
             }
-        }
-
-        networkManager.addConnectionAvailableListener {
-            if (it == ConnectionState.Available) {
-                isClosed = true
-                refreshWeather()
-                isClosed = false
-            }
-        }
+        )
     }
 
     private fun observeWeather() {

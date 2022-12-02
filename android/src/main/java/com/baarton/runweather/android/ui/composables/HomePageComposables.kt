@@ -39,7 +39,6 @@ import androidx.lifecycle.flowWithLifecycle
 import coil.compose.AsyncImage
 import com.baarton.runweather.android.ui.AndroidVector.build
 import com.baarton.runweather.db.PersistedWeather
-import com.baarton.runweather.location.LocationState
 import com.baarton.runweather.model.Angle
 import com.baarton.runweather.model.Angle.Companion.deg
 import com.baarton.runweather.model.Height
@@ -63,8 +62,10 @@ import com.baarton.runweather.model.viewmodel.convert
 import com.baarton.runweather.model.weather.Weather
 import com.baarton.runweather.model.weather.WeatherData
 import com.baarton.runweather.model.weather.WeatherId
-import com.baarton.runweather.network.ConnectionState
 import com.baarton.runweather.res.SharedRes
+import com.baarton.runweather.sensor.SensorState
+import com.baarton.runweather.sensor.SensorState.ConnectionState
+import com.baarton.runweather.sensor.SensorState.LocationState
 import com.baarton.runweather.ui.Vector
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -237,21 +238,11 @@ private fun ColumnScope.StateRow(weight: Float, locationState: LocationState, ne
 }
 
 @Composable
-private fun onOffText(connectionState: ConnectionState): String {
+private fun onOffText(connectionState: SensorState): String {
     return stringResource(
         when (connectionState) {
-            ConnectionState.Available -> SharedRes.strings.app_on
-            ConnectionState.Unavailable -> SharedRes.strings.app_off
-        }.resourceId
-    )
-}
-
-@Composable
-private fun onOffText(locationState: LocationState): String {
-    return stringResource(
-        when (locationState) {
-            LocationState.Available -> SharedRes.strings.app_on
-            LocationState.Unavailable -> SharedRes.strings.app_off
+            ConnectionState.Available, LocationState.Available -> SharedRes.strings.app_on
+            ConnectionState.Unavailable, LocationState.Unavailable -> SharedRes.strings.app_off
         }.resourceId
     )
 }

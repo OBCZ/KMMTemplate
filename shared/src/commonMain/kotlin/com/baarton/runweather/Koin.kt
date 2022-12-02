@@ -5,8 +5,8 @@ import co.touchlab.kermit.StaticConfig
 import co.touchlab.kermit.platformLogWriter
 import com.baarton.runweather.ktor.WeatherDataApi
 import com.baarton.runweather.ktor.WeatherDataApiImpl
-import com.baarton.runweather.location.LocationManager
-import com.baarton.runweather.network.NetworkManager
+import com.baarton.runweather.sensor.location.LocationManager
+import com.baarton.runweather.sensor.network.NetworkManager
 import com.baarton.runweather.repo.WeatherRepository
 import com.baarton.runweather.sqldelight.DatabaseHelper
 import kotlinx.coroutines.Dispatchers

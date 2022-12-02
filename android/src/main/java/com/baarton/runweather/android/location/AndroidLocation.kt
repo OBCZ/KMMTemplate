@@ -8,8 +8,8 @@ import androidx.annotation.MainThread
 import androidx.core.app.ActivityCompat
 import co.touchlab.kermit.Logger
 import com.baarton.runweather.Config
-import com.baarton.runweather.location.Location
-import com.baarton.runweather.location.PlatformLocation
+import com.baarton.runweather.sensor.location.Location
+import com.baarton.runweather.sensor.location.PlatformLocation
 import com.baarton.runweather.util.BooleanListener
 import com.google.android.gms.location.*
 import com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY
@@ -37,8 +37,6 @@ class AndroidLocation(
         // Sets the fastest rate for active location updates. This interval is exact, and your
         // application will never receive updates faster than this value.
         setMinUpdateIntervalMillis(config.locationDataFastestRequestInterval.inWholeMilliseconds)
-
-        setMinUpdateDistanceMeters(config.weatherDataRefreshDistance)
 
         setPriority(PRIORITY_HIGH_ACCURACY)
     }.build()

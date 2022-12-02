@@ -1,4 +1,4 @@
-package com.baarton.runweather.network
+package com.baarton.runweather.sensor.network
 
 import com.baarton.runweather.util.BooleanListener
 
