@@ -36,11 +36,13 @@ class WeatherRepository(
         ensureNeverFrozen()
     }
 
-    suspend fun refreshWeather(location: Location): CurrentWeather? {
-        return if (isWeatherListStale()) {
-            doRefreshWeather(location)
-        } else {
-            getWeather()
+    suspend fun refreshWeather(location: Location?): CurrentWeather? {
+        return when {
+            location == null -> {
+                throw LocationConsistencyException("Location is null and wasn't probably initialized yet.")
+            }
+            isWeatherListStale() -> { doRefreshWeather(location) }
+            else -> { getWeather() }
         }
     }
 
@@ -107,5 +109,6 @@ class WeatherRepository(
 
     class WeatherAPIException(message: String, cause: Throwable?) : Exception(message, cause)
     class WeatherDataConsistencyException(message: String) : Exception(message)
+    class LocationConsistencyException(message: String) : Exception(message)
 
 }

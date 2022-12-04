@@ -4,7 +4,11 @@ import com.baarton.runweather.util.BooleanListener
 
 open class PlatformNetwork {
 
-    protected var onConnectionChange: BooleanListener? = null
+    private var onConnectionChange: BooleanListener? = null
+
+    protected fun processNetworkAvailability(available: Boolean) {
+        onConnectionChange?.invoke(available)
+    }
 
     open fun startCallback(onConnectionChange: BooleanListener) {
         this.onConnectionChange = onConnectionChange

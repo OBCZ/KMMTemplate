@@ -1,33 +1,50 @@
 package com.baarton.runweather.sensor.location
 
 import com.baarton.runweather.util.BooleanListener
+import com.baarton.runweather.util.MovementListener
 
-
+//FIXME tests
 open class PlatformLocation {
 
-    protected var onLocationAvailabilityChange: BooleanListener? = null
+    private var onLocationAvailabilityChange: BooleanListener? = null
+    private var movementListener: MovementListener? = null
 
-    var currentLocation: Location = Location()
-        protected set
+    var currentLocation: Location? = null
+        private set
 
-    open fun startLocationUpdates(onLocationAvailabilityChange: BooleanListener) {
+    protected fun processLocationAvailability(available: Boolean) {
+        if (!available) { currentLocation = null }
+        onLocationAvailabilityChange?.invoke(available)
+    }
+
+    open fun startLocationUpdates(movementListener: MovementListener, onLocationAvailabilityChange: BooleanListener) {
+        this.movementListener = movementListener
         this.onLocationAvailabilityChange = onLocationAvailabilityChange
     }
 
     open fun stopLocationUpdates() {
+        movementListener = null
         onLocationAvailabilityChange = null
     }
 
-    //FIXME I need this (on Repo level or here?) + tests (only cache timestamp reset is needed - settings.putLong(DB_TIMESTAMP_KEY, timeStamp))
-    // private fun clearCacheIfUserMoved(last: Location, current: Location) {
-    //     with(last.distanceTo(current)) {
-    //         logger.info("Location distance between last two: $this meters.")
-    //         if (this >= weatherDataRefreshDistance) {
-    //             CoroutineScope(EmptyCoroutineContext).launch {
-    //                 WeatherRepository.clear()
-    //             }
-    //         }
-    //     }
-    // }
+    protected fun processLocationInternal(location: Location?) {
+        if (location != null) {
+            val new = Location(
+                location.latitude,
+                location.longitude
+            )
+            val current = Location(
+                currentLocation?.latitude ?: 0.0,
+                currentLocation?.longitude ?: 0.0
+            )
+            movementListener?.invoke(Pair(new, current))
+
+            currentLocation = new
+            onLocationAvailabilityChange?.invoke(true)
+        } else {
+            currentLocation = null
+            onLocationAvailabilityChange?.invoke(false)
+        }
+    }
 
 }

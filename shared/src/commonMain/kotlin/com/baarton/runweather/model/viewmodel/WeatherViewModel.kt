@@ -10,7 +10,9 @@ import com.baarton.runweather.repo.WeatherRepository
 import com.baarton.runweather.res.SharedRes
 import com.baarton.runweather.sensor.SensorState.*
 import com.baarton.runweather.sensor.location.LocationManager
+import com.baarton.runweather.sensor.location.distanceTo
 import com.baarton.runweather.sensor.network.NetworkManager
+import com.baarton.runweather.util.MovementListener
 import com.russhwolf.settings.ObservableSettings
 import com.russhwolf.settings.SettingsListener
 import dev.icerock.moko.resources.StringResource
@@ -62,6 +64,15 @@ class WeatherViewModel(
         onUnitSettingChanged(it)
     }
 
+    private val movementListener: MovementListener = {
+        with(it.first.distanceTo(it.second)) {
+            log.i("Location distance between last two: $this meters.")
+            if (this >= config.weatherDataRefreshDistance) {
+                settings.putLong(WeatherRepository.DB_TIMESTAMP_KEY, 0)
+            }
+        }
+    }
+
     private val mutableWeatherState: MutableStateFlow<WeatherViewState> =
         MutableStateFlow(
             WeatherViewState(
@@ -73,8 +84,8 @@ class WeatherViewModel(
     val weatherState: StateFlow<WeatherViewState> = mutableWeatherState
 
     init {
-        networkManager.start(createNetworkListeners())
-        locationManager.start(createLocationListeners())
+        networkManager.start(networkListeners())
+        locationManager.start(locationListeners(), movementListener)
         observeWeather()
     }
 
@@ -96,7 +107,7 @@ class WeatherViewModel(
         log.v("Clearing WeatherViewModel.")
     }
 
-    private fun createLocationListeners(): List<(LocationState) -> Unit> {
+    private fun locationListeners(): List<(LocationState) -> Unit> {
         return listOf(
             { locationState ->
                 mutableWeatherState.update {
@@ -106,11 +117,16 @@ class WeatherViewModel(
                         log.d { "Updating weather state with $it." }
                     }
                 }
+            },
+            {
+                if (it == LocationState.Available) {
+                    refreshWeather()
+                }
             }
         )
     }
 
-    private fun createNetworkListeners(): List<(ConnectionState) -> Unit> {
+    private fun networkListeners(): List<(ConnectionState) -> Unit> {
         return listOf(
             { connectionState ->
                 mutableWeatherState.update {
@@ -123,9 +139,7 @@ class WeatherViewModel(
             },
             {
                 if (it == ConnectionState.Available) {
-                    isClosed = true
                     refreshWeather()
-                    isClosed = false
                 }
             }
         )
@@ -196,12 +210,14 @@ class WeatherViewModel(
     private fun classifyError(previousState: WeatherViewState, error: Throwable): WeatherViewState.ErrorType? {
         return when (error) {
             is WeatherRepository.WeatherDataConsistencyException -> WeatherViewState.ErrorType.DATA_CONSISTENCY
+            is WeatherRepository.LocationConsistencyException -> WeatherViewState.ErrorType.LOCATION_CONSISTENCY
             is WeatherRepository.WeatherAPIException -> WeatherViewState.ErrorType.DATA_PROVIDER
             else -> previousState.error
         }
     }
 
     fun refreshWeather(): Job {
+        isClosed = true
         log.i("Try to refresh WeatherData one-time.")
         mutableWeatherState.update {
             it.copy(isLoading = true).also {
@@ -218,6 +234,8 @@ class WeatherViewModel(
 
             updateState(oneTimeData)
             log.d { "One-time state update over." }
+        }.also {
+            isClosed = false
         }
     }
 
@@ -259,6 +277,7 @@ data class WeatherViewState(
     enum class ErrorType(val messageRes: StringResource) {
         DATA_PROVIDER(SharedRes.strings.weather_results_endpoint_error),
         DATA_CONSISTENCY(SharedRes.strings.weather_results_data_error),
+        LOCATION_CONSISTENCY(SharedRes.strings.weather_results_location_error),
         INIT_STATE(SharedRes.strings.weather_results_init_error),
         UNKNOWN(SharedRes.strings.weather_results_unknown_error),
     }

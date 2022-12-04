@@ -42,6 +42,7 @@
     <string name="weather_results_unknown_error">Neočekávaná chyba. Opakujte načtení dat kliknutím na tlačítko.</string>
     <string name="weather_results_endpoint_error">Chyba během zpracovávání odpovědi ze serveru. Nejsou k dispozici žádná data. Zkontrolujte své internetové připojení a/nebo nastavení lokace. Poté zkuste opakovat načtení dat kliknutím na tlačítko.</string>
     <string name="weather_results_data_error">Obdržená data jsou prázdná, nekompletní, nebo poškozená. Opakujte načtení dat kliknutím na tlačítko.</string>
+    <string name="weather_results_location_error">Lokační data jsou prázdná, nekompletní, nebo poškozená. Zapněte sledování polohy a/nebo opakujte načtení dat kliknutím na tlačítko.</string>
     <string name="weather_results_refresh_button">Načíst znovu</string>
 
     <string name="weather_location_content_description">Nastavení Polohy %1$s</string>

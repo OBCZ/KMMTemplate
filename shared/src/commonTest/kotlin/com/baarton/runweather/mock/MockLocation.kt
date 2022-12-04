@@ -2,6 +2,7 @@ package com.baarton.runweather.mock
 
 import com.baarton.runweather.sensor.location.PlatformLocation
 import com.baarton.runweather.util.BooleanListener
+import com.baarton.runweather.util.MovementListener
 import kotlin.properties.Delegates
 
 class MockLocation : PlatformLocation() {
@@ -10,12 +11,12 @@ class MockLocation : PlatformLocation() {
 
     private var isAvailable: Boolean by Delegates.observable(false) { _, _, newValue ->
         if (callbackRegistered) {
-            onLocationAvailabilityChange?.invoke(newValue)
+            processLocationAvailability(newValue)
         }
     }
 
-    override fun startLocationUpdates(onLocationAvailabilityChange: BooleanListener) {
-        super.startLocationUpdates(onLocationAvailabilityChange)
+    override fun startLocationUpdates(movementListener: MovementListener, onLocationAvailabilityChange: BooleanListener) {
+        super.startLocationUpdates(movementListener, onLocationAvailabilityChange)
         callbackRegistered = true
     }
 

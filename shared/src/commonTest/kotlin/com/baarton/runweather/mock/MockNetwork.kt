@@ -10,7 +10,7 @@ class MockNetwork : PlatformNetwork() {
 
     private var isConnected: Boolean by Delegates.observable(false) { _, _, newValue ->
         if (callbackRegistered) {
-            onConnectionChange?.invoke(newValue)
+            processNetworkAvailability(newValue)
         }
     }
 

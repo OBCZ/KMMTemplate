@@ -6,19 +6,19 @@ import android.content.SharedPreferences
 import android.util.Log
 import com.baarton.runweather.AppInfo
 import com.baarton.runweather.Config
-import com.baarton.runweather.android.location.AndroidLocation
+import com.baarton.runweather.android.sensor.location.AndroidLocation
+import com.baarton.runweather.android.sensor.network.AndroidNetwork
 import com.baarton.runweather.getWith
 import com.baarton.runweather.initKoin
 import com.baarton.runweather.model.viewmodel.SettingsViewModel
 import com.baarton.runweather.model.viewmodel.WeatherViewModel
-import com.baarton.runweather.android.network.AndroidNetwork
 import com.baarton.runweather.sensor.location.PlatformLocation
 import com.baarton.runweather.sensor.network.PlatformNetwork
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
 
-
+//FIXME does this module need to be in com.baarton.runweather.ANDROID.* ???
 class MainApp : Application() {
 
     override fun onCreate() {

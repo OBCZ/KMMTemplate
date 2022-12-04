@@ -1,4 +1,4 @@
-package com.baarton.runweather.android.location
+package com.baarton.runweather.android.sensor.location
 
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.Context
@@ -11,6 +11,7 @@ import com.baarton.runweather.Config
 import com.baarton.runweather.sensor.location.Location
 import com.baarton.runweather.sensor.location.PlatformLocation
 import com.baarton.runweather.util.BooleanListener
+import com.baarton.runweather.util.MovementListener
 import com.google.android.gms.location.*
 import com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY
 
@@ -55,7 +56,7 @@ class AndroidLocation(
 
         override fun onLocationAvailability(availability: LocationAvailability) {
             log.i("Location available: ${availability.isLocationAvailable} ")
-            onLocationAvailabilityChange?.invoke(availability.isLocationAvailable)
+            processLocationAvailability(availability.isLocationAvailable)
         }
     }
 
@@ -68,8 +69,8 @@ class AndroidLocation(
      */
     @Throws(SecurityException::class)
     @MainThread
-    override fun startLocationUpdates(onLocationAvailabilityChange: BooleanListener) {
-        super.startLocationUpdates(onLocationAvailabilityChange)
+    override fun startLocationUpdates(movementListener: MovementListener, onLocationAvailabilityChange: BooleanListener) {
+        super.startLocationUpdates(movementListener, onLocationAvailabilityChange)
         log.i("Start location updates method.")
 
         val granted = ActivityCompat.checkSelfPermission(context, ACCESS_FINE_LOCATION)
@@ -101,10 +102,9 @@ class AndroidLocation(
         val lon = location?.longitude
 
         if (lat != null && lon != null) {
-            currentLocation = Location(lat, lon)
-            onLocationAvailabilityChange?.invoke(true)
+            processLocationInternal(Location(lat, lon))
         } else {
-            onLocationAvailabilityChange?.invoke(false)
+            processLocationInternal(null)
         }
     }
 
@@ -114,4 +114,5 @@ class AndroidLocation(
         log.i("Location updates stopping.")
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
+
 }

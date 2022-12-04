@@ -1,4 +1,4 @@
-package com.baarton.runweather.android.network
+package com.baarton.runweather.android.sensor.network
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -17,17 +17,17 @@ class AndroidNetwork(context: Context, private val log: Logger) : PlatformNetwor
 
         override fun onAvailable(network: Network) {
             log.i("Network $network available.")
-            onConnectionChange?.invoke(true)
+            processNetworkAvailability(true)
         }
 
         override fun onLost(network: Network) {
             log.i("Network $network lost.")
-            onConnectionChange?.invoke(false)
+            processNetworkAvailability(false)
         }
 
         override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
             log.i("Network $network capabilities changed.")
-            onConnectionChange?.invoke(networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET))
+            processNetworkAvailability(networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET))
         }
     }
 
