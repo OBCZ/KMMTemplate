@@ -1,5 +1,5 @@
 package com.baarton.runweather.sensor.location
 
 actual fun Location.distanceTo(other: Location): Float {
-    return 0f //TODO
+    return 0f //IOS
 }

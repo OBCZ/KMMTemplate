@@ -299,7 +299,7 @@ private fun ColumnScope.DataRow(weight: Float, weather: PersistedWeather) {
                 .fillMaxSize()
 
         ) {
-            //TODO header row?
+            //ANDROID header row?
             val categories = listOf(
                 RunnersInfo.HeadCover,
                 RunnersInfo.Sunglasses,

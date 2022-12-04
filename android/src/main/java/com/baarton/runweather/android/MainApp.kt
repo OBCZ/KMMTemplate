@@ -18,7 +18,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
 
-//FIXME does this module need to be in com.baarton.runweather.ANDROID.* ???
+//ANDROID does this module need to be in com.baarton.runweather.android.* ???
 class MainApp : Application() {
 
     override fun onCreate() {

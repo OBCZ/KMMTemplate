@@ -11,7 +11,7 @@ import org.koin.core.component.KoinComponent
 class MainActivity : ComponentActivity(), KoinComponent {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        //TODO resolve installSplashScreen()
+        //ANDROID resolve installSplashScreen()
         // https://developersancho.medium.com/jetpack-compose-splash-screen-api-36ca40c6196b
         // https://proandroiddev.com/animated-splash-screen-in-android-with-compose-4b7dc1baecc5
         super.onCreate(savedInstanceState)

@@ -15,4 +15,4 @@ Internal expect-actual logic
 - TODO App icon is not decided on yet
 
 
-TODO dont forget to export moko resources for iOS, whatever that is, but SharedRes wont probably work without that (https://proandroiddev.com/exposing-the-separate-resources-module-to-ios-target-using-moko-resources-in-kmm-76b9c3d533)
+IOS dont forget to export moko resources for iOS, whatever that is, but SharedRes wont probably work without that (https://proandroiddev.com/exposing-the-separate-resources-module-to-ios-target-using-moko-resources-in-kmm-76b9c3d533)

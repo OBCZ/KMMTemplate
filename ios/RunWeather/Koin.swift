@@ -25,5 +25,5 @@ var koin: Koin_coreKoin {
 
 class IosAppInfo: AppInfo {
     let appId: String = Bundle.main.bundleIdentifier!
-    let debug: Bool = false //FIXME
+    let debug: Bool = false //IOS
 }

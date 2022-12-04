@@ -161,6 +161,16 @@ class WeatherViewModelTest : StateFlowTest() {
     }
 
     @Test
+    fun `Show Location inconsistent error`() = runBlocking {
+        // TEST
+    }
+
+    @Test
+    fun `Refresh data when user moved`() = runBlocking {
+        // TEST
+    }
+
+    @Test
     fun `Get weather without cache`() = runBlocking {
         apiMock.prepareResults(BRNO1)
 

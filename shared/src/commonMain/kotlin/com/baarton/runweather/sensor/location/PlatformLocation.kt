@@ -3,7 +3,7 @@ package com.baarton.runweather.sensor.location
 import com.baarton.runweather.util.BooleanListener
 import com.baarton.runweather.util.MovementListener
 
-//FIXME tests
+
 open class PlatformLocation {
 
     private var onLocationAvailabilityChange: BooleanListener? = null
