@@ -10,7 +10,6 @@ import com.baarton.runweather.repo.WeatherRepository
 import com.baarton.runweather.res.SharedRes
 import com.baarton.runweather.sensor.SensorState.*
 import com.baarton.runweather.sensor.location.LocationManager
-import com.baarton.runweather.sensor.location.distanceTo
 import com.baarton.runweather.sensor.network.NetworkManager
 import com.baarton.runweather.util.MovementListener
 import com.russhwolf.settings.ObservableSettings
@@ -65,7 +64,7 @@ class WeatherViewModel(
     }
 
     private val movementListener: MovementListener = {
-        with(it.first.distanceTo(it.second)) {
+        with(locationManager.calculateDistance(it)) {
             log.i("Location distance between last two: $this meters.")
             if (this >= config.weatherDataRefreshDistance) {
                 settings.putLong(WeatherRepository.DB_TIMESTAMP_KEY, 0)

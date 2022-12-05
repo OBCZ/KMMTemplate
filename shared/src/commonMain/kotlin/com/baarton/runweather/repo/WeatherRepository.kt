@@ -38,9 +38,6 @@ class WeatherRepository(
 
     suspend fun refreshWeather(location: Location?): CurrentWeather? {
         return when {
-            location == null -> {
-                throw LocationConsistencyException("Location is null and wasn't probably initialized yet.")
-            }
             isWeatherListStale() -> { doRefreshWeather(location) }
             else -> { getWeather() }
         }
@@ -63,7 +60,10 @@ class WeatherRepository(
         }
     }
 
-    private suspend fun doRefreshWeather(location: Location): CurrentWeather {
+    private suspend fun doRefreshWeather(location: Location?): CurrentWeather {
+        if (location == null) {
+            throw LocationConsistencyException("Location is null and wasn't probably initialized yet.")
+        }
         val weatherResult = try {
             weatherApi.getWeatherFromApi(location)
         } catch (e: Exception) {

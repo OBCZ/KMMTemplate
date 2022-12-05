@@ -4,7 +4,7 @@ import com.baarton.runweather.util.BooleanListener
 import com.baarton.runweather.util.MovementListener
 
 
-open class PlatformLocation {
+abstract class PlatformLocation {
 
     private var onLocationAvailabilityChange: BooleanListener? = null
     private var movementListener: MovementListener? = null
@@ -46,5 +46,7 @@ open class PlatformLocation {
             onLocationAvailabilityChange?.invoke(false)
         }
     }
+
+    abstract fun calculateDistance(locationPair: Pair<Location, Location>): Float
 
 }

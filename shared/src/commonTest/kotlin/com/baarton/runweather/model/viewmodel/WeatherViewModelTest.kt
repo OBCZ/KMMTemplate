@@ -24,6 +24,7 @@ import com.baarton.runweather.model.weather.WeatherId
 import com.baarton.runweather.sensor.network.NetworkManager
 import com.baarton.runweather.sensor.SensorState.*
 import com.baarton.runweather.repo.WeatherRepository
+import com.baarton.runweather.sensor.location.Location
 import com.baarton.runweather.sqldelight.DatabaseHelper
 import com.baarton.runweather.testDbConnection
 import com.baarton.runweather.testLogger
@@ -164,12 +165,55 @@ class WeatherViewModelTest : StateFlowTest() {
 
     @Test
     fun `Show Location inconsistent error`() = runBlocking {
-        // TEST
+        mockLocation.mockLocation(null)
+        apiMock.prepareResults(BRNO1)
+
+        viewModel.weatherState.test {
+            assertEquals(
+                WeatherViewState(isLoading = false, error = WeatherViewState.ErrorType.LOCATION_CONSISTENCY),
+                awaitItemAfter(WeatherViewState(isLoading = true))
+            )
+            cancel()
+        }
+    }
+
+    @Test
+    fun `Ignore Location error on refresh with up-to-date cache`() = runBlocking {
+        mockLocation.mockLocation(null)
+        dbHelper.insert(BRNO1.data)
+        apiMock.prepareResults(BRNO2)
+        setDataAge(Clock.System.now() - 1.seconds)
+
+        viewModel.weatherState.test {
+            assertEquals(
+                weatherSuccessStateBrno1.copy(lastUpdated = calculateMockedTimestamp()),
+                awaitItemAfter(WeatherViewState(isLoading = true))
+            )
+            assertEquals(0, apiMock.calledCount)
+            cancel()
+        }
     }
 
     @Test
     fun `Refresh data when user moved`() = runBlocking {
-        // TEST
+        mockLocation.mockLocation(Location(49.1908994, 16.6126578))
+        apiMock.prepareResults(BRNO1, BRNO2)
+
+        viewModel.weatherState.test {
+            assertEquals(
+                weatherSuccessStateBrno1.copy(lastUpdated = 0.seconds),
+                awaitItemAfter(WeatherViewState(isLoading = true))
+            )
+
+            mockLocation.mockLocation(Location(49.2419456, 16.5935764))
+            assertEquals(
+                weatherSuccessStateBrno2.copy(lastUpdated = 0.seconds, locationState = LocationState.Available),
+                awaitItemAfter(
+                    weatherSuccessStateBrno1.copy(lastUpdated = 0.seconds, isLoading = false, locationState = LocationState.Available),
+                    weatherSuccessStateBrno1.copy(lastUpdated = 0.seconds, isLoading = true, locationState = LocationState.Available))
+            )
+            cancel()
+        }
     }
 
     @Test

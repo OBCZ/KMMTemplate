@@ -115,4 +115,16 @@ class AndroidLocation(
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
+    override fun calculateDistance(locationPair: Pair<Location, Location>): Float {
+        val thisLocation = android.location.Location("")
+        thisLocation.latitude = locationPair.first.latitude
+        thisLocation.longitude = locationPair.first.longitude
+
+        val otherLocation = android.location.Location("")
+        otherLocation.latitude = locationPair.second.latitude
+        otherLocation.longitude = locationPair.second.longitude
+
+        return thisLocation.distanceTo(otherLocation)
+    }
+
 }

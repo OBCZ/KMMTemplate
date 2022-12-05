@@ -48,4 +48,8 @@ class LocationManager(
         return platformLocation.currentLocation
     }
 
+    fun calculateDistance(locationPair: Pair<Location, Location>): Float {
+        return platformLocation.calculateDistance(locationPair)
+    }
+
 }
