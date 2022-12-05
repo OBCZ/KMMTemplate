@@ -2,7 +2,6 @@ package com.baarton.runweather.repo
 
 import com.baarton.runweather.TestConfig
 import com.baarton.runweather.db.PersistedWeather
-import com.baarton.runweather.sensor.location.Location
 import com.baarton.runweather.mock.BRNO1
 import com.baarton.runweather.mock.WeatherDataApiMock
 import com.baarton.runweather.model.Angle.Companion.deg
@@ -14,6 +13,7 @@ import com.baarton.runweather.model.viewmodel.SettingsViewModel
 import com.baarton.runweather.model.weather.Weather
 import com.baarton.runweather.model.weather.WeatherData
 import com.baarton.runweather.model.weather.WeatherId
+import com.baarton.runweather.randomLocation
 import com.baarton.runweather.repo.WeatherRepository.Companion.DB_TIMESTAMP_KEY
 import com.baarton.runweather.sqldelight.DatabaseHelper
 import com.baarton.runweather.testDbConnection
@@ -56,7 +56,7 @@ class WeatherRepositoryTest {
     @Test
     fun `Web call with no data`() = runBlocking {
         apiMock.prepareResults(BRNO1)
-        repository.refreshWeather(Location()).let {
+        repository.refreshWeather(randomLocation()).let {
             assertEquals(
                 PersistedWeather(
                     listOf(Weather(WeatherId.CLEAR_SKY, "Clear", "clear sky", "01d")),
@@ -78,7 +78,7 @@ class WeatherRepositoryTest {
         settingsMock.putLong(DB_TIMESTAMP_KEY, clock.now().toEpochMilliseconds())
         apiMock.prepareResults(BRNO1)
 
-        repository.refreshWeather(Location())
+        repository.refreshWeather(randomLocation())
         assertEquals(0, apiMock.calledCount)
     }
 
@@ -87,14 +87,14 @@ class WeatherRepositoryTest {
         settingsMock.putLong(DB_TIMESTAMP_KEY, clock.now().toEpochMilliseconds())
         apiMock.prepareResults(BRNO1)
 
-        repository.refreshWeather(Location())
+        repository.refreshWeather(randomLocation())
         assertEquals(0, apiMock.calledCount)
 
         runBlocking {
             delay(2000)
         }
 
-        repository.refreshWeather(Location())
+        repository.refreshWeather(randomLocation())
         assertEquals(1, apiMock.calledCount)
     }
 
@@ -111,14 +111,14 @@ class WeatherRepositoryTest {
             delay(2000)
         }
 
-        repository.refreshWeather(Location())
+        repository.refreshWeather(randomLocation())
         assertEquals(0, apiMock.calledCount)
 
         runBlocking {
             delay(3000)
         }
 
-        repository.refreshWeather(Location())
+        repository.refreshWeather(randomLocation())
         assertEquals(1, apiMock.calledCount)
     }
 
@@ -135,21 +135,21 @@ class WeatherRepositoryTest {
             delay(1000)
         }
 
-        repository.refreshWeather(Location())
+        repository.refreshWeather(randomLocation())
         assertEquals(0, apiMock.calledCount)
 
         runBlocking {
             delay(1000)
         }
 
-        repository.refreshWeather(Location())
+        repository.refreshWeather(randomLocation())
         assertEquals(0, apiMock.calledCount)
 
         runBlocking {
             delay(3000)
         }
 
-        repository.refreshWeather(Location())
+        repository.refreshWeather(randomLocation())
         assertEquals(1, apiMock.calledCount)
     }
 
@@ -158,7 +158,7 @@ class WeatherRepositoryTest {
         apiMock.prepareResults(RuntimeException("Test error"))
 
         val throwable = assertFails {
-            repository.refreshWeather(Location())
+            repository.refreshWeather(randomLocation())
         }
         assertEquals("Weather API has thrown an Exception: Test error", throwable.message)
     }
@@ -169,7 +169,7 @@ class WeatherRepositoryTest {
         apiMock.prepareResults(RuntimeException("Test error"))
 
         val throwable = assertFails {
-            repository.refreshWeather(Location())
+            repository.refreshWeather(randomLocation())
         }
         assertEquals("Weather API has thrown an Exception: Test error", throwable.message)
     }

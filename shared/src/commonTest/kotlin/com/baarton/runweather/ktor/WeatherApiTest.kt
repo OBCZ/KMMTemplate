@@ -10,6 +10,7 @@ import com.baarton.runweather.model.Velocity.Companion.mps
 import com.baarton.runweather.model.weather.Weather
 import com.baarton.runweather.model.weather.WeatherData
 import com.baarton.runweather.model.weather.WeatherId
+import com.baarton.runweather.randomLocation
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.plugins.ClientRequestException
@@ -113,7 +114,7 @@ class WeatherApiTest {
         val weatherApi = WeatherDataApiImpl(engine, emptyLogger)
 
         assertFailsWith<ClientRequestException> {
-            weatherApi.getWeatherFromApi(Location())
+            weatherApi.getWeatherFromApi(randomLocation())
         }
     }
 

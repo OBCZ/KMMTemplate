@@ -91,12 +91,14 @@ class WeatherViewModelTest : StateFlowTest() {
     override fun setup() {
         super.setup()
         setDataAge(Clock.System.now() - 2.hours)
+        mockLocation.mockLocation()
         clockMock.mockClock(Clock.System.now())
     }
 
     @AfterTest
     override fun tearDown() {
         dataTimestamp = null
+        mockLocation.mockLocation(null)
         clockMock.mockClock(null)
         apiMock.reset()
 

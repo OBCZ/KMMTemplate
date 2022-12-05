@@ -1,5 +1,7 @@
 package com.baarton.runweather.mock
 
+import com.baarton.runweather.randomLocation
+import com.baarton.runweather.sensor.location.Location
 import com.baarton.runweather.sensor.location.PlatformLocation
 import com.baarton.runweather.util.BooleanListener
 import com.baarton.runweather.util.MovementListener
@@ -27,6 +29,10 @@ class MockLocation : PlatformLocation() {
 
     fun mockAvailable(available: Boolean) {
         isAvailable = available
+    }
+
+    fun mockLocation(location: Location? = randomLocation()) {
+        processLocationInternal(location)
     }
 
 }
