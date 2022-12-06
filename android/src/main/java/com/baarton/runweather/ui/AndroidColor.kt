@@ -1,8 +1,6 @@
-package com.baarton.runweather.android.ui
+package com.baarton.runweather.ui
 
 import androidx.compose.ui.graphics.Color
-import com.baarton.runweather.ui.PlatformColor
-import com.baarton.runweather.ui.ThemedColor
 
 
 object AndroidColor : PlatformColor<Color> {

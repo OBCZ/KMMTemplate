@@ -1,4 +1,4 @@
-package com.baarton.runweather.android.ui.composables
+package com.baarton.runweather.ui.composables
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -29,8 +29,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.flowWithLifecycle
 import com.baarton.runweather.AppInfo
-import com.baarton.runweather.android.AndroidAppInfo
-import com.baarton.runweather.android.ui.AndroidVector.build
+import com.baarton.runweather.AndroidAppInfo
+import com.baarton.runweather.ui.AndroidVector.build
 import com.baarton.runweather.model.UnitSystem
 import com.baarton.runweather.model.viewmodel.SettingsViewModel
 import com.baarton.runweather.model.viewmodel.SettingsViewState

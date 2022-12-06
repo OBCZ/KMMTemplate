@@ -1,12 +1,10 @@
-package com.baarton.runweather.android.ui
+package com.baarton.runweather.ui
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.addPathNodes
 import androidx.compose.ui.unit.dp
-import com.baarton.runweather.ui.PlatformVector
-import com.baarton.runweather.ui.Vector
 
 
 object AndroidVector : PlatformVector<ImageVector> {

@@ -1,4 +1,4 @@
-package com.baarton.runweather.android.sensor.location
+package com.baarton.runweather.sensor.location
 
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.Context
@@ -8,8 +8,6 @@ import androidx.annotation.MainThread
 import androidx.core.app.ActivityCompat
 import co.touchlab.kermit.Logger
 import com.baarton.runweather.Config
-import com.baarton.runweather.sensor.location.Location
-import com.baarton.runweather.sensor.location.PlatformLocation
 import com.baarton.runweather.util.BooleanListener
 import com.baarton.runweather.util.MovementListener
 import com.google.android.gms.location.*

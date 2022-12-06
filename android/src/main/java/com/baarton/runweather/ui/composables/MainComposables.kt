@@ -1,5 +1,6 @@
-package com.baarton.runweather.android.ui.composables
+package com.baarton.runweather.ui.composables
 
+import android.Manifest
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,7 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.baarton.runweather.android.ui.AndroidVector.build
+import com.baarton.runweather.ui.AndroidVector.build
 import com.baarton.runweather.res.SharedRes
 import com.baarton.runweather.ui.Vector
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -181,8 +182,8 @@ fun PermissionPreview() {
     PermissionContent(
         locationPermissionsState = rememberMultiplePermissionsState(
             listOf(
-                android.Manifest.permission.ACCESS_COARSE_LOCATION,
-                android.Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION,
             )
         )
     )

@@ -1,10 +1,10 @@
-package com.baarton.runweather.android.ui
+package com.baarton.runweather.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.baarton.runweather.android.ui.composables.MainScreen
-import com.baarton.runweather.android.ui.theme.RunWeatherTheme
+import com.baarton.runweather.ui.composables.MainScreen
+import com.baarton.runweather.ui.theme.RunWeatherTheme
 import org.koin.core.component.KoinComponent
 
 //TEST tests with composables?

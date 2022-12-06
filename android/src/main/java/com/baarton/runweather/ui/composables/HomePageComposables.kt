@@ -1,4 +1,4 @@
-package com.baarton.runweather.android.ui.composables
+package com.baarton.runweather.ui.composables
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -37,7 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.flowWithLifecycle
 import coil.compose.AsyncImage
-import com.baarton.runweather.android.ui.AndroidVector.build
+import com.baarton.runweather.ui.AndroidVector.build
 import com.baarton.runweather.db.PersistedWeather
 import com.baarton.runweather.model.Angle
 import com.baarton.runweather.model.Angle.Companion.deg

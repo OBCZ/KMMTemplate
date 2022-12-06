@@ -1,4 +1,4 @@
-package com.baarton.runweather.android.ui.theme
+package com.baarton.runweather.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,8 +14,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.baarton.runweather.android.ui.AndroidColor.dark
-import com.baarton.runweather.android.ui.AndroidColor.light
+import com.baarton.runweather.ui.AndroidColor.dark
+import com.baarton.runweather.ui.AndroidColor.light
 import com.baarton.runweather.ui.Dimens
 import com.baarton.runweather.ui.ThemedColor.BACKGROUND
 import com.baarton.runweather.ui.ThemedColor.ERROR

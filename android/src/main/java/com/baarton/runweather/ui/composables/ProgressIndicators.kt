@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.baarton.runweather.android.ui.composables
+package com.baarton.runweather.ui.composables
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat

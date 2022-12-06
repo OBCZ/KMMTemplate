@@ -1,11 +1,10 @@
-package com.baarton.runweather.android.sensor.network
+package com.baarton.runweather.sensor.network
 
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import co.touchlab.kermit.Logger
-import com.baarton.runweather.sensor.network.PlatformNetwork
 import com.baarton.runweather.util.BooleanListener
 
 

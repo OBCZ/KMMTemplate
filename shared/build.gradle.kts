@@ -26,6 +26,7 @@ android {
         isWarningsAsErrors = true
         isAbortOnError = true
     }
+    namespace = "com.baarton.runweather"
 }
 
 //TODO verify function on iOS, see also
@@ -36,23 +37,9 @@ multiplatformResources {
     multiplatformResourcesClassName = "SharedRes" // optional, default MR
 }
 
-//TODO what is this
-android {
-    configurations {
-        create("androidTestApi")
-        create("androidTestDebugApi")
-        create("androidTestReleaseApi")
-        create("testApi")
-        create("testDebugApi")
-        create("testReleaseApi")
-    }
-}
-
 kotlin {
     android()
     ios()
-    // Note: iosSimulatorArm64 target requires that all dependencies have M1 support
-    iosSimulatorArm64()
 
     sourceSets {
         all {
@@ -103,12 +90,6 @@ kotlin {
             }
         }
         val iosTest by getting
-        val iosSimulatorArm64Main by getting {
-            dependsOn(iosMain)
-        }
-        val iosSimulatorArm64Test by getting {
-            dependsOn(iosTest)
-        }
     }
 
     sourceSets.matching { it.name.endsWith("Test") }
