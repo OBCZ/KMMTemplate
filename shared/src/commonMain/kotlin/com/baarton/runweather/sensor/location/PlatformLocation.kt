@@ -17,7 +17,7 @@ abstract class PlatformLocation {
         onLocationAvailabilityChange?.invoke(available)
     }
 
-    open fun startLocationUpdates(movementListener: MovementListener, onLocationAvailabilityChange: BooleanListener) {
+    open fun startLocationUpdates(movementListener: MovementListener?, onLocationAvailabilityChange: BooleanListener) {
         this.movementListener = movementListener
         this.onLocationAvailabilityChange = onLocationAvailabilityChange
     }

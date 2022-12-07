@@ -1,43 +1,20 @@
 package com.baarton.runweather.sensor.network
 
-import co.touchlab.kermit.Logger
-import com.baarton.runweather.sensor.SensorManager
-import com.baarton.runweather.sensor.SensorState.ConnectionState
+import com.baarton.runweather.sensor.SensorState
+import com.baarton.runweather.util.NetworkStateListener
 
-class NetworkManager(
-    private val platformNetwork: PlatformNetwork,
-    private val log: Logger
-) : SensorManager<ConnectionState>() {
+interface NetworkManager {
 
-    override fun logAvailabilityChange(newAvailability: Boolean) {
-        log.i("Connection available: ${newAvailability}.")
-    }
+    /**
+     * Starts platform specific network updates callbacks. Methods provides possibilities for passing listeners for Connection [SensorState] change.
+     *
+     * @param listeners A collection of separate [NetworkStateListener]s that are all triggered on every new [SensorState.ConnectionState] update. Optional.
+     */
+    fun start(listeners: List<NetworkStateListener>? = null)
 
-    override fun getSensorState(sensorAvailable: Boolean): ConnectionState {
-        return when (sensorAvailable) {
-            true -> ConnectionState.Available
-            false -> ConnectionState.Unavailable
-        }
-    }
-
-    fun start(listeners: List<(ConnectionState) -> Unit>) {
-        startSensorCallback(listeners) {
-            platformNetwork.startCallback {
-                setConnected(it)
-            }
-        }
-    }
-
-    fun stop() {
-        stopSensorCallback {
-            platformNetwork.stopCallback()
-        }
-    }
-
-    private fun setConnected(connected: Boolean) {
-        if (connected != isSensorAvailable) {
-            isSensorAvailable = connected
-        }
-    }
+    /**
+     * Stops platform specific network updates' callbacks. Clears all listeners, provided that they were specified.
+     */
+    fun stop()
 
 }

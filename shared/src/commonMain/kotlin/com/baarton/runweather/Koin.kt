@@ -5,10 +5,14 @@ import co.touchlab.kermit.StaticConfig
 import co.touchlab.kermit.platformLogWriter
 import com.baarton.runweather.ktor.WeatherDataApi
 import com.baarton.runweather.ktor.WeatherDataApiImpl
+import com.baarton.runweather.repo.WeatherRepository
+import com.baarton.runweather.sensor.location.LocationManagerImpl
+import com.baarton.runweather.sensor.network.NetworkManagerImpl
+import com.baarton.runweather.repo.WeatherRepositoryImpl
 import com.baarton.runweather.sensor.location.LocationManager
 import com.baarton.runweather.sensor.network.NetworkManager
-import com.baarton.runweather.repo.WeatherRepository
-import com.baarton.runweather.sqldelight.DatabaseHelper
+import com.baarton.runweather.sqldelight.DatabaseManager
+import com.baarton.runweather.sqldelight.DatabaseManagerImpl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.datetime.Clock
 import org.koin.core.KoinApplication
@@ -19,7 +23,6 @@ import org.koin.core.scope.Scope
 import org.koin.dsl.module
 
 //TODO migration plan:
-// review all files (origin/contents, formatting, comments, naming variables/files, etc)
 // fork to RunWeather GH - former repo
 // create simple CI/CD
 // verify Android release signature
@@ -50,25 +53,25 @@ fun initKoin(appModule: Module): KoinApplication {
 }
 
 private val coreModule = module {
-    single {
-        LocationManager(
+    single<LocationManager> {
+        LocationManagerImpl(
             get(),
-            getWith(LocationManager::class.simpleName)
+            getWith(LocationManagerImpl::class.simpleName)
         )
     }
 
-    single {
-        NetworkManager(
+    single<NetworkManager> {
+        NetworkManagerImpl(
             get(),
-            getWith(NetworkManager::class.simpleName)
+            getWith(NetworkManagerImpl::class.simpleName)
         )
     }
 
-    single {
-        DatabaseHelper(
+    single<DatabaseManager> {
+        DatabaseManagerImpl(
             get(),
             Dispatchers.Default,
-            getWith(DatabaseHelper::class.simpleName)
+            getWith(DatabaseManagerImpl::class.simpleName)
         )
     }
 
@@ -79,14 +82,14 @@ private val coreModule = module {
         )
     }
 
-    single {
-        WeatherRepository(
+    single<WeatherRepository> {
+        WeatherRepositoryImpl(
             get(),
             get(),
             get(),
             get(),
             get(),
-            getWith(WeatherRepository::class.simpleName)
+            getWith(WeatherRepositoryImpl::class.simpleName)
         )
     }
 

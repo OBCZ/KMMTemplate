@@ -18,11 +18,11 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 
-class DatabaseHelper(
+class DatabaseManagerImpl(
     sqlDriver: SqlDriver,
     private val backgroundDispatcher: CoroutineDispatcher,
     private val log: Logger
-) {
+) : DatabaseManager {
 
     companion object {
         private const val ITEM_DECODING_DELIMITER = "␝" //Group Separator
@@ -141,12 +141,12 @@ class DatabaseHelper(
             )
         )
 
-    fun getAll(): List<PersistedWeather> =
+    override fun getAll(): List<PersistedWeather> =
         dbRef.tableQueries
             .getAll()
             .executeAsList()
 
-    suspend fun insert(weatherData: WeatherData) {
+    override suspend fun insert(weatherData: WeatherData) {
         log.d { "Inserting weather for ${weatherData.locationName} into database." }
         dbRef.transactionWithContext(backgroundDispatcher) {
             dbRef.tableQueries.nuke()
@@ -156,7 +156,7 @@ class DatabaseHelper(
         }
     }
 
-    suspend fun nuke() {
+    override suspend fun nuke() {
         log.i { "Database cleared." }
         dbRef.transactionWithContext(backgroundDispatcher) {
             dbRef.tableQueries.nuke()

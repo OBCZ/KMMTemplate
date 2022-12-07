@@ -1,55 +1,37 @@
 package com.baarton.runweather.sensor.location
 
-import co.touchlab.kermit.Logger
-import com.baarton.runweather.sensor.SensorManager
-import com.baarton.runweather.sensor.SensorState.LocationState
+import com.baarton.runweather.sensor.SensorState
+import com.baarton.runweather.util.LocationStateListener
 import com.baarton.runweather.util.MovementListener
 
-class LocationManager(
-    private val platformLocation: PlatformLocation,
-    private val log: Logger
-) : SensorManager<LocationState>() {
+interface LocationManager {
 
-    override fun logAvailabilityChange(newAvailability: Boolean) {
-        log.i("Location available: ${newAvailability}.")
-    }
+    /**
+     * Starts platform specific location updates callbacks. Methods provides possibilities for passing listeners for Location [SensorState] change and for new [Location] data updates, that should be coming in regularly.
+     *
+     * @param listeners A collection of separate [LocationStateListener]s that are all triggered on every new [SensorState.LocationState] update. Optional.
+     * @param movementListener A listener that is triggered on every new [Location] data update. Optional.
+     */
+    fun start(listeners: List<LocationStateListener>? = null, movementListener: MovementListener? = null)
 
-    override fun getSensorState(sensorAvailable: Boolean): LocationState {
-        return when (sensorAvailable) {
-            true -> LocationState.Available
-            false -> LocationState.Unavailable
-        }
-    }
+    /**
+     * Stops platform specific location updates' callbacks. Clears all listeners, provided that they were specified.
+     */
+    fun stop()
 
-    fun start(listeners: List<(LocationState) -> Unit>, movementListener: MovementListener) {
-        startSensorCallback(listeners) {
-            platformLocation.startLocationUpdates(movementListener) {
-                if (it != isSensorAvailable) {
-                    setAvailable(it)
-                }
-            }
-        }
-    }
+    /**
+     * Returns current location of the device.
+     *
+     * @return [Location] object. Can be null - in this case, either the sensor returned invalid data, or the data was not initialized yet.
+     */
+    fun currentLocation(): Location?
 
-    private fun setAvailable(available: Boolean) {
-        if (available != isSensorAvailable) {
-            isSensorAvailable = available
-        }
-    }
-
-    fun stop() {
-        stopSensorCallback {
-            platformLocation.stopLocationUpdates()
-
-        }
-    }
-
-    fun currentLocation(): Location? {
-        return platformLocation.currentLocation
-    }
-
-    fun calculateDistance(locationPair: Pair<Location, Location>): Float {
-        return platformLocation.calculateDistance(locationPair)
-    }
+    /**
+     * Calculates platform specific implementation of distance between two points on an Earth globe.
+     *
+     * @param locationPair Input [Pair] of two [Location] points.
+     * @return Number value in meters.
+     */
+    fun calculateDistance(locationPair: Pair<Location, Location>): Float
 
 }

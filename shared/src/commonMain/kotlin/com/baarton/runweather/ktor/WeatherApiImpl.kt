@@ -77,12 +77,6 @@ class WeatherDataApiImpl(engine: HttpClientEngine, private val log: KermitLogger
         }.body()
     }
 
-    /*
-     * Example URLs
-     * https://api.openweathermap.org/data/2.5/weather?appid=b0719071a899e4b1c350725d752ec252&lang=cz&units=standard&lat=50.0&lon=15.0
-     * https://api.openweathermap.org/data/2.5/onecall?appid=b0719071a899e4b1c350725d752ec252&lat=50&lon=15&exclude=minutely,hourly,daily,alerts
-     * https://api.openweathermap.org/data/2.5/weather?appid=b0719071a899e4b1c350725d752ec252&lat=50&lon=15
-     */
     private fun HttpRequestBuilder.weather(location: Location) {
         url {
             protocol = URLProtocol.HTTPS
@@ -99,10 +93,6 @@ class WeatherDataApiImpl(engine: HttpClientEngine, private val log: KermitLogger
 
 object ImageUrlBuilder : ImageDataApi {
 
-    /*
-     * Example URLs
-     * "https://openweathermap.org/img/wn/04d@2x.png",
-     */
     override fun buildUrl(imageId: String): String {
         return URLBuilder().apply {
             protocol = URLProtocol.HTTPS

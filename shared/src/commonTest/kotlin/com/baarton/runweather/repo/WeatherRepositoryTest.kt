@@ -15,7 +15,7 @@ import com.baarton.runweather.model.weather.WeatherData
 import com.baarton.runweather.model.weather.WeatherId
 import com.baarton.runweather.randomLocation
 import com.baarton.runweather.repo.WeatherRepository.Companion.DB_TIMESTAMP_KEY
-import com.baarton.runweather.sqldelight.DatabaseHelper
+import com.baarton.runweather.sqldelight.DatabaseManagerImpl
 import com.baarton.runweather.testDbConnection
 import com.baarton.runweather.testLogger
 import com.russhwolf.settings.MapSettings
@@ -38,14 +38,14 @@ class WeatherRepositoryTest {
 
     private var logger = testLogger()
     private var testDbConnection = testDbConnection()
-    private var dbHelper = DatabaseHelper(testDbConnection, Dispatchers.Default, logger)
+    private var dbHelper = DatabaseManagerImpl(testDbConnection, Dispatchers.Default, logger)
 
     private val settingsMock = MapSettings()
     private val testConfig = TestConfig
     private val apiMock = WeatherDataApiMock()
     private val clock = Clock.System
 
-    private val repository: WeatherRepository = WeatherRepository(dbHelper, settingsMock, testConfig, apiMock, clock, logger)
+    private val repository: WeatherRepositoryImpl = WeatherRepositoryImpl(dbHelper, settingsMock, testConfig, apiMock, clock, logger)
 
     @AfterTest
     fun tearDown() = runTest {

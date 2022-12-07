@@ -8,7 +8,7 @@ abstract class SensorManager<T : SensorState> {
     private var isRunning = false
     private var isSensorAvailableListeners: MutableList<(T) -> Unit> = mutableListOf()
 
-    protected var isSensorAvailable: Boolean by Delegates.observable(false) { _, _, newValue ->
+    private var isSensorAvailable: Boolean by Delegates.observable(false) { _, _, newValue ->
         logAvailabilityChange(newValue)
         isSensorAvailableListeners.forEach { it(getSensorState(newValue)) }
     }
@@ -17,11 +17,17 @@ abstract class SensorManager<T : SensorState> {
 
     abstract fun getSensorState(sensorAvailable: Boolean): T
 
-    protected fun startSensorCallback(listeners: List<(T) -> Unit>, callbackImpl: () -> Unit) {
+    protected fun startSensorCallback(listeners: List<(T) -> Unit>?, callbackImpl: () -> Unit) {
         addSensorAvailabilityListeners(listeners)
         if (!isRunning) {
             callbackImpl()
             isRunning = true
+        }
+    }
+
+    protected fun setAvailable(available: Boolean) {
+        if (available != isSensorAvailable) {
+            isSensorAvailable = available
         }
     }
 
@@ -33,8 +39,8 @@ abstract class SensorManager<T : SensorState> {
         }
     }
 
-    private fun addSensorAvailabilityListeners(listeners: List<(T) -> Unit>) {
-        listeners.forEach {
+    private fun addSensorAvailabilityListeners(listeners: List<(T) -> Unit>?) {
+        listeners?.forEach {
             isSensorAvailableListeners.add(it)
         }
     }

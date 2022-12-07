@@ -24,7 +24,7 @@ class MockLocation : PlatformLocation() {
         }
     }
 
-    override fun startLocationUpdates(movementListener: MovementListener, onLocationAvailabilityChange: BooleanListener) {
+    override fun startLocationUpdates(movementListener: MovementListener?, onLocationAvailabilityChange: BooleanListener) {
         super.startLocationUpdates(movementListener, onLocationAvailabilityChange)
         callbackRegistered = true
     }

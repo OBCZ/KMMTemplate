@@ -11,7 +11,9 @@ import com.baarton.runweather.res.SharedRes
 import com.baarton.runweather.sensor.SensorState.*
 import com.baarton.runweather.sensor.location.LocationManager
 import com.baarton.runweather.sensor.network.NetworkManager
+import com.baarton.runweather.util.LocationStateListener
 import com.baarton.runweather.util.MovementListener
+import com.baarton.runweather.util.NetworkStateListener
 import com.russhwolf.settings.ObservableSettings
 import com.russhwolf.settings.SettingsListener
 import dev.icerock.moko.resources.StringResource
@@ -106,7 +108,7 @@ class WeatherViewModel(
         log.v("Clearing WeatherViewModel.")
     }
 
-    private fun locationListeners(): List<(LocationState) -> Unit> {
+    private fun locationListeners(): List<LocationStateListener> {
         return listOf(
             { locationState ->
                 mutableWeatherState.update {
@@ -125,7 +127,7 @@ class WeatherViewModel(
         )
     }
 
-    private fun networkListeners(): List<(ConnectionState) -> Unit> {
+    private fun networkListeners(): List<NetworkStateListener> {
         return listOf(
             { connectionState ->
                 mutableWeatherState.update {

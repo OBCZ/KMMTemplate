@@ -26,11 +26,11 @@ import kotlin.test.assertTrue
 
 class SqlDelightTest {
 
-    private lateinit var dbHelper: DatabaseHelper
+    private lateinit var dbHelper: DatabaseManagerImpl
 
     @BeforeTest
     fun setup() = runTest {
-        dbHelper = DatabaseHelper(
+        dbHelper = DatabaseManagerImpl(
             testDbConnection(),
             Dispatchers.Default,
             emptyLogger()

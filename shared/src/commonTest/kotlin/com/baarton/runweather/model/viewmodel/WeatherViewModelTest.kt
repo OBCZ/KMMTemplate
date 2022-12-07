@@ -4,7 +4,7 @@ import app.cash.turbine.test
 import com.baarton.runweather.StateFlowTest
 import com.baarton.runweather.TestConfig
 import com.baarton.runweather.db.PersistedWeather
-import com.baarton.runweather.sensor.location.LocationManager
+import com.baarton.runweather.sensor.location.LocationManagerImpl
 import com.baarton.runweather.mock.BRNO1
 import com.baarton.runweather.mock.BRNO2
 import com.baarton.runweather.mock.CORRUPT
@@ -21,11 +21,12 @@ import com.baarton.runweather.model.Velocity.Companion.mps
 import com.baarton.runweather.model.weather.Weather
 import com.baarton.runweather.model.weather.WeatherData
 import com.baarton.runweather.model.weather.WeatherId
-import com.baarton.runweather.sensor.network.NetworkManager
-import com.baarton.runweather.sensor.SensorState.*
 import com.baarton.runweather.repo.WeatherRepository
+import com.baarton.runweather.sensor.network.NetworkManagerImpl
+import com.baarton.runweather.sensor.SensorState.*
+import com.baarton.runweather.repo.WeatherRepositoryImpl
 import com.baarton.runweather.sensor.location.Location
-import com.baarton.runweather.sqldelight.DatabaseHelper
+import com.baarton.runweather.sqldelight.DatabaseManagerImpl
 import com.baarton.runweather.testDbConnection
 import com.baarton.runweather.testLogger
 import com.russhwolf.settings.MapSettings
@@ -47,16 +48,16 @@ class WeatherViewModelTest : StateFlowTest() {
 
     private val logger = testLogger()
     private val testDbConnection = testDbConnection()
-    private val dbHelper = DatabaseHelper(testDbConnection, Dispatchers.Default, logger)
+    private val dbHelper = DatabaseManagerImpl(testDbConnection, Dispatchers.Default, logger)
     private val settingsMock = MapSettings()
     private val apiMock = WeatherDataApiMock()
     private val clockMock = ClockMock()
     private val testConfig = TestConfig
-    private val repository = WeatherRepository(dbHelper, settingsMock, testConfig, apiMock, clockMock, logger)
+    private val repository = WeatherRepositoryImpl(dbHelper, settingsMock, testConfig, apiMock, clockMock, logger)
     private val mockNetwork = MockNetwork()
     private val mockLocation = MockLocation()
-    private val locationManager = LocationManager(mockLocation, logger)
-    private val networkManager = NetworkManager(mockNetwork, logger)
+    private val locationManager = LocationManagerImpl(mockLocation, logger)
+    private val networkManager = NetworkManagerImpl(mockNetwork, logger)
 
     private val viewModel by lazy { WeatherViewModel(settingsMock, testConfig, repository, locationManager, networkManager, clockMock, logger) }
 
