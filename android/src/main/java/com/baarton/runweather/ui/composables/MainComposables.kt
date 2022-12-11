@@ -39,8 +39,8 @@ import kotlinx.coroutines.launch
 fun MainScreen() {
     val locationPermissionsState = rememberMultiplePermissionsState(
         listOf(
-            android.Manifest.permission.ACCESS_COARSE_LOCATION,
-            android.Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
         )
     )
 

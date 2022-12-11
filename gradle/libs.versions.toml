@@ -4,7 +4,7 @@ appId = "com.baarton.runweather"
 versionName = "2.0"
 
 # SDK Versions
-minSdk = "24"
+minSdk = "26"
 targetSdk = "33"
 compileSdk = "33"
 
